@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-//TODO:implement add temporary page links 
+
 (function (window) {
     "use strict";
 
@@ -29,7 +29,7 @@ SOFTWARE.
 
         var a7 = {};
 
-        a7.ver = "v 1.0";
+        a7.ver = "v1.1";
 
         a7.getFile = function (src, format) {
             format = format.toLowerCase();
@@ -46,7 +46,28 @@ SOFTWARE.
                     }
                 });
         };
+        a7._module = {};
 
+        //get and set modules 
+        a7.module = function(module){
+            a7._module.module = module;
+            this.get = a7._module.get;
+            this.set = a7._module.set;
+            return this;
+        };
+        a7._module.get = function (){
+            var module = a7._module.module;
+            var moduleInConf = a7.config.modules[module];
+            if(moduleInConf){
+                return moduleInConf;
+            } else {
+                return a7.debug("The module \""+ module +"\" was not found. Please check for typos!");
+            }
+        };
+        a7._module.set = function (newContent){
+            var moduleName = a7._module.module;
+            a7.config.modules[moduleName] = newContent;
+        };
         a7.page = {
             _functions:{},
         };
@@ -76,7 +97,7 @@ SOFTWARE.
         };
         a7.host = window.location.host;
 
-        if (a7.host.indexOf("localhost") !== -1) {
+        if (a7.host.indexOf("localhost" | "127.0.0.1") !== -1) {
             a7.isDev = true;
         } else {
             a7.isDev = false;
@@ -225,7 +246,7 @@ SOFTWARE.
             }
 
             if (page === a7._routerCache.latestResolvedPage){
-
+                //do nothing because the page is the same as the latest resolved page
             } else if (page) {
                 a7.pageContainer.innerHTML = page;
                 a7._routerCache.latestResolvedPage = page;
@@ -240,6 +261,18 @@ SOFTWARE.
             a7.path(newPath);
 
             scrollTo(0, scrollX);
+            //a7.pageContainer is Like a miniDOM because it displays the current page on the screen
+            var links = a7.pageContainer.getElementsByTagName("a");
+            if(links){
+                links.forEach(function(link){
+                    if(link.dataset.a7link){
+                        link.addEventListener("mouseup", function(ev){
+                            ev.preventDefault();
+                            a7.router(link.href);
+                        });
+                    }
+                });
+            }
 
         };
         window.onload = function () {
