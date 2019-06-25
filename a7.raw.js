@@ -29,7 +29,7 @@ SOFTWARE.
 
         var a7 = {};
 
-        a7.ver = "v1.1";
+        a7.ver = "v1.1.1";
 
         a7.getFile = function (src, format) {
             format = format.toLowerCase();
@@ -65,6 +65,9 @@ SOFTWARE.
             }
         };
         a7._module.set = function (newContent){
+            if(!newContent){
+                return a7.debug(".set() first param was not defined");
+            }
             var moduleName = a7._module.module;
             a7.config.modules[moduleName] = newContent;
         };
