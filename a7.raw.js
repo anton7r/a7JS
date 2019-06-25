@@ -218,11 +218,6 @@ SOFTWARE.
                 page = config.pages[config.routes[route]].trim();
 
 
-            if (func) {
-                func(subPaths);
-            }
-
-
             if (title) {
                 document.title = title;
             } else {
@@ -235,6 +230,11 @@ SOFTWARE.
                 a7.pageContainer.innerHTML = page;
                 a7._routerCache.latestResolvedPage = page;
                 a7._routerCache.resolvedRoutes[newPath] = route;
+            }
+
+
+            if (func) {
+                func(subPaths);
             }
 
             a7.path(newPath);
