@@ -29,7 +29,7 @@ SOFTWARE.
 
         var a7 = {};
 
-        a7.ver = "v1.1.1";
+        a7.ver = "v1.2";
 
         a7.getFile = function (src, format) {
             format = format.toLowerCase();
@@ -117,6 +117,20 @@ SOFTWARE.
 
             }
         }());
+
+        a7.DOM = {};
+
+        a7.DOM.menu = {
+        };
+
+        a7.toggleMenu = function(menuName){
+            var elem = a7.DOM.menu[menuName],
+                classList = elem.classList,
+                open = "a7-menu-"+menuName+"-open",
+                closed = "a7-menu-"+menuName+"-closed";
+            classList.toggle(open);
+            classList.toggle(closed);
+        };
         a7.init = function () {
             if (a7.initDone === true) {
                 return;
@@ -133,6 +147,35 @@ SOFTWARE.
             }
 
             initPage();
+
+            function initMenu(){
+                var elems = document.querySelectorAll("[data-a7-menu]");
+                if(elems){
+                    elems.forEach(function(elem){
+                        var menuname = elem.getAttribute("data-a7-menu"), 
+                            state = elem.getAttribute("data-a7-default-state");
+                        a7.DOM.menu[menuname] = elem;
+                        if (state === "open"){
+                            elem.classList.add("a7-menu-"+menuname+"-open");
+                        } else if (state === "closed"){
+                            elem.classList.add("a7-menu-"+menuname+"-closed");
+                        } else {
+                            elem.classList.add("a7-menu-"+menuname+"-open");
+                        }
+                    });
+                }
+                var toggles = document.querySelectorAll("[data-a7-menu-toggle]");
+                if(toggles){
+                    toggles.forEach(function(elem){
+                        var togglename = elem.getAttribute("[data-a7-menu-toggle]");
+                        elem.addEventListener("mouseup", function(){
+                            a7.toggleMenu(togglename);
+                        });
+                    });
+                }
+            }
+
+            initMenu();
 
             function initLinks() {
                 var coll = [];
