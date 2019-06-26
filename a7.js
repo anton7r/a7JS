@@ -167,7 +167,7 @@ SOFTWARE.
                 var toggles = document.querySelectorAll("[data-a7-menu-toggle]");
                 if(toggles){
                     toggles.forEach(function(elem){
-                        var togglename = elem.getAttribute("[data-a7-menu-toggle]");
+                        var togglename = elem.getAttribute("data-a7-menu-toggle");
                         elem.addEventListener("mouseup", function(){
                             a7.toggleMenu(togglename);
                         });
