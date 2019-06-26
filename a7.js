@@ -113,6 +113,8 @@ SOFTWARE.
             if (window.HTMLCollection && !HTMLCollection.prototype.forEach) {
                 HTMLCollection.prototype.forEach = Array.prototype.forEach;
             }
+            //very useful 
+            if (!"".trim) String.prototype.trim = function(){ return this.replace(/^[\s﻿]+|[\s﻿]+$/g, ''); };
             if (!document.querySelector){
 
             }
