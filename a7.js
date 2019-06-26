@@ -160,7 +160,7 @@ SOFTWARE.
                         } else if (state === "closed"){
                             elem.classList.add("a7-menu-"+menuname+"-closed");
                         } else {
-                            elem.classList.add("a7-menu-"+menuname+"-open");
+                            elem.classList.add("a7-menu-"+menuname+"-closed");
                         }
                     });
                 }
@@ -181,9 +181,8 @@ SOFTWARE.
                 var coll = [];
                 coll = document.getElementsByTagName("a");
                 coll.forEach(function (link) {
-
-                    if (link.dataset.a7link) {
-                        link.addEventListener("mouseup", function (ev) {
+                    if (link.dataset.a7link !== undefined) {
+                        link.addEventListener("click", function (ev) {
                             ev.preventDefault();
                             var l = link.getAttribute("href");
                             a7.router(l);
