@@ -2,11 +2,22 @@
 a7 is a Javascript Framework which makes SPA's really easy to make
 
 ## Setup
-Download the latest release or the version which you like the most and include it inside your web project.
+Download the latest release and include it inside your web project.
 
-Then insert a <script> at the end of the body to link to a7.js for development stage because bugs are then much easier to track
-when going to production replace the link to a7.js to a7.min.js for maximum performance for your websites users.
+Then add this following code to the end of your html files body:
+```javascript
+<script src="__/a7.js"></script>
+<script src="__/config.js"></script>
+```
 
-also add a new .js file you can name it whatever you want but you should maybe name it like app.js or a7app.js....
+And when you make it into the production remember to change
+```javascript
+<script src="__/a7.js"></script>
+```
+to
+```javascript
+<script src="__/a7.min.js"></script>
+```
 
-In the new script...
+Next were going to show you how to set up the config.js file
+[continue to wiki]()
