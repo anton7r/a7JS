@@ -32,9 +32,12 @@ a7.config ={
     How to access them?
     If you want to get the content of a module then use a7.module(modulename).get()
     If you want to set a modules content you can do by a7.module(modulename).set(new content goes here)
+
+    You can now add modules to DOM by adding data-a7-render-module="modulename" and then calling the function a7.renderModules();
+    It will also change the attribute from data-a7-render-module="modulename" to data-a7-module="modulename" because the module is then rendered
     */
     modules:{
-
+        defaultmodule:"Hello i am a a7.js module",
     },
     /** Triggers are essentially functions that execute
      *  when the router routs to a new path/new stage on your applications flow.
