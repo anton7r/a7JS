@@ -30,26 +30,6 @@ SOFTWARE.
         var a7 = {};
 
         a7.ver = "v1.2";
-
-        a7.getFile = function (src, format) {
-            format = format.toLowerCase();
-            if(!fetch){
-                a7.debug("as of right now a7JS does not have a fallback for fetch. Were are working on it its right now our #1 priority!");
-            } else {
-                fetch(src)
-                    .then(function (response) {
-                        if (response.status === 404) {
-                            a7.debug("404 Error we could not find: " + src);
-                        } else {
-                            if (format === "json") {
-                                return response.json();
-                            } else if (format === "text") {
-                                return response.text();
-                            }
-                        }
-                    });
-            }
-        };
         a7._module = {};
 
         //get and set modules 
