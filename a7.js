@@ -1,4 +1,4 @@
-/*
+/** 
 MIT License
 
 Copyright (c) 2019 anton7r
@@ -54,6 +54,15 @@ SOFTWARE.
             }
             var moduleName = a7._module.module;
             a7.config.modules[moduleName] = newContent;
+        };
+        a7.renderModules = function(){
+            var unRenderedModules = document.querySelectorAll("[data-a7-render-module]");
+            unRenderedModules.forEach(function(module){
+                var moduleName = module.getAttribute("data-a7-render-module");
+                module.innerHTML = a7.module(moduleName).get();
+                module.removeAttribute("data-a7-render-module");
+                module.setAttribute("data-a7-module", moduleName);
+            });
         };
         a7.page = {
             _functions:{},
