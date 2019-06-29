@@ -247,7 +247,7 @@ SOFTWARE.
                 } else if (a7._.devMode === false) {
                     if (!history.pushState) {
                         window.location = newPath;
-                    } else if(a7._.useHash = true){
+                    } else if(a7._.useHash === true){
                         window.location.hash = newPath;
                     } else {
                         history.pushState({}, undefined, ["/", newPath].join(""));
