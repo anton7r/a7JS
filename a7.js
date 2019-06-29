@@ -30,6 +30,7 @@ SOFTWARE.
         var a7 = {};
 
         a7.ver = "v1.2";
+        a7._ = {};
         a7._module = {};
 
         //get and set modules 
@@ -94,7 +95,10 @@ SOFTWARE.
         a7.host = window.location.host;
 
         a7.useProductionMode = function () {
-            a7.isDev = false;
+            a7._.devMode = false;
+        };
+        a7.useHash = function(){
+            a7._.useHash = true;
         };
         a7.fallBacks = (function () {
             if (window.NodeList && !NodeList.prototype.forEach) {
@@ -130,8 +134,8 @@ SOFTWARE.
                 return;
             }
             //use dev or production mode
-            if (a7.isDev === undefined) {
-                a7.isDev = true;
+            if (a7._.devMode === undefined) {
+                a7._.devMode = true;
                 console.log("Youre running in development mode which uses # instead of history.pushState because it is easier to make changes to your app this way. when you want to go to production mode use a7.useProductionMode() once.");
                 
             }
@@ -229,9 +233,10 @@ SOFTWARE.
             init4();
         };
         //if newPath is not defined then it will return the current path
+        //Its looking too complex of a function right now.
         a7.path = function (newPath) {
             if (newPath === undefined) {
-                if (a7.isDev === false) {
+                if (a7._.devMode === false) {
                     return window.location.pathname.replace("/", "");
                 } else {
                     return window.location.hash.replace("#", "");
@@ -239,9 +244,11 @@ SOFTWARE.
             } else {
                 if (newPath.indexOf("/") === 0) {
                     newPath = newPath.replace("/", "");
-                } else if (a7.isDev === false) {
+                } else if (a7._.devMode === false) {
                     if (!history.pushState) {
                         window.location = newPath;
+                    } else if(a7._.useHash = true){
+                        window.location.hash = newPath;
                     } else {
                         history.pushState({}, undefined, ["/", newPath].join(""));
                     }
