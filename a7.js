@@ -31,6 +31,7 @@ SOFTWARE.
 
         a7.ver = "v1.2";
         a7._ = {};
+        a7._.closableMenus = [];
         a7._module = {};
 
         //get and set modules 
@@ -100,6 +101,10 @@ SOFTWARE.
         a7.useHash = function(){
             a7._.useHash = true;
         };
+        a7.closeMenuOnRout = function(menu){
+            a7._.closeMenuOnRout = true;
+            a7._.closableMenus.push(menu);
+        };
         a7.fallBacks = (function () {
             if (window.NodeList && !NodeList.prototype.forEach) {
                 NodeList.prototype.forEach = Array.prototype.forEach;
@@ -128,6 +133,16 @@ SOFTWARE.
                 closed = "a7-menu-" + menuName + "-closed";
             classList.toggle(open);
             classList.toggle(closed);
+        };
+        a7.closeMenu = function(menuName){
+            var elem = a7.DOM.menu[menuName],
+                classList = elem.classList,
+                open = "a7-menu-" + menuName + "-open",
+                closed = "a7-menu-" + menuName + "-closed";
+            if(classList.contains(open)){
+                classList.remove(open);
+                classList.add(closed);
+            }
         };
         a7.init = function () {
             if (a7.initDone === true) {
@@ -261,6 +276,12 @@ SOFTWARE.
         a7._routerCache.resolvedRoutes = {};
         //Resolves any path you give
         a7.router = function (newPath) {
+
+            if(a7._.closeMenuOnRout === true){
+                a7._.closableMenus.forEach(function(menu){
+                    a7.closeMenu(menu);
+                });
+            }
 
             if (newPath.indexOf("/") === 0) {
                 newPath = newPath.replace("/", "");
