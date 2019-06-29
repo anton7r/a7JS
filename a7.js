@@ -33,31 +33,31 @@ SOFTWARE.
         a7._module = {};
 
         //get and set modules 
-        a7.module = function(module){
+        a7.module = function (module) {
             a7._module.module = module;
             this.get = a7._module.get;
             this.set = a7._module.set;
             return this;
         };
-        a7._module.get = function (){
+        a7._module.get = function () {
             var module = a7._module.module;
             var moduleInConf = a7.config.modules[module];
-            if(moduleInConf){
+            if (moduleInConf) {
                 return moduleInConf;
             } else {
-                return a7.debug("The module \""+ module +"\" was not found. Please check for typos!");
+                return a7.debug("The module \"" + module + "\" was not found. Please check for typos!");
             }
         };
-        a7._module.set = function (newContent){
-            if(!newContent){
+        a7._module.set = function (newContent) {
+            if (!newContent) {
                 return a7.debug(".set() first param was not defined");
             }
             var moduleName = a7._module.module;
             a7.config.modules[moduleName] = newContent;
         };
-        a7.renderModules = function(){
+        a7.renderModules = function () {
             var unRenderedModules = document.querySelectorAll("[data-a7-render-module]");
-            unRenderedModules.forEach(function(module){
+            unRenderedModules.forEach(function (module) {
                 var moduleName = module.getAttribute("data-a7-render-module");
                 module.innerHTML = a7.module(moduleName).get();
                 module.removeAttribute("data-a7-render-module");
@@ -65,23 +65,23 @@ SOFTWARE.
             });
         };
         a7.page = {
-            _functions:{},
+            _functions: {},
         };
-        a7.page._functions.html = function(newHTML){
-            if (newHTML === undefined){
+        a7.page._functions.html = function (newHTML) {
+            if (newHTML === undefined) {
                 return a7.page.elem.innerHTML;
             } else {
                 a7.page.elem.innerHTML = newHTML;
             }
         };
-        a7.page._functions.text = function(newText){
-            if (newText === undefined){
+        a7.page._functions.text = function (newText) {
+            if (newText === undefined) {
                 return a7.page.elem.innerText;
             } else {
                 a7.page.elem.innerText = newText;
             }
         };
-        a7.page._functions.get = function(){
+        a7.page._functions.get = function () {
             return a7.page.elem;
         };
         a7.debug = function (message) {
@@ -93,11 +93,9 @@ SOFTWARE.
         };
         a7.host = window.location.host;
 
-        if (a7.host.indexOf("localhost" | "127.0.0.1") !== -1) {
-            a7.isDev = true;
-        } else {
+        a7.useProductionMode = function () {
             a7.isDev = false;
-        }
+        };
         a7.fallBacks = (function () {
             if (window.NodeList && !NodeList.prototype.forEach) {
                 NodeList.prototype.forEach = Array.prototype.forEach;
@@ -107,28 +105,35 @@ SOFTWARE.
                 HTMLCollection.prototype.forEach = Array.prototype.forEach;
             }
             //very useful 
-            if (!"".trim) String.prototype.trim = function(){ return this.replace(/^[\s﻿]+|[\s﻿]+$/g, ''); };
-            if (!document.querySelector){
+            if (!"".trim) String.prototype.trim = function () {
+                return this.replace(/^[\s﻿]+|[\s﻿]+$/g, '');
+            };
+            if (!document.querySelector) {
 
             }
         }());
 
         a7.DOM = {};
 
-        a7.DOM.menu = {
-        };
+        a7.DOM.menu = {};
 
-        a7.toggleMenu = function(menuName){
+        a7.toggleMenu = function (menuName) {
             var elem = a7.DOM.menu[menuName],
                 classList = elem.classList,
-                open = "a7-menu-"+menuName+"-open",
-                closed = "a7-menu-"+menuName+"-closed";
+                open = "a7-menu-" + menuName + "-open",
+                closed = "a7-menu-" + menuName + "-closed";
             classList.toggle(open);
             classList.toggle(closed);
         };
         a7.init = function () {
             if (a7.initDone === true) {
                 return;
+            }
+            //use dev or production mode
+            if (a7.isDev === undefined) {
+                a7.isDev = true;
+                console.log("Youre running in development mode which uses # instead of history.pushState because it is easier to make changes to your app this way. when you want to go to production mode use a7.useProductionMode() once.");
+                
             }
 
             function initPage() {
@@ -143,27 +148,27 @@ SOFTWARE.
 
             initPage();
 
-            function initMenu(){
+            function initMenu() {
                 var elems = document.querySelectorAll("[data-a7-menu]");
-                if(elems){
-                    elems.forEach(function(elem){
-                        var menuname = elem.getAttribute("data-a7-menu"), 
+                if (elems) {
+                    elems.forEach(function (elem) {
+                        var menuname = elem.getAttribute("data-a7-menu"),
                             state = elem.getAttribute("data-a7-default-state");
                         a7.DOM.menu[menuname] = elem;
-                        if (state === "open"){
-                            elem.classList.add("a7-menu-"+menuname+"-open");
-                        } else if (state === "closed"){
-                            elem.classList.add("a7-menu-"+menuname+"-closed");
+                        if (state === "open") {
+                            elem.classList.add("a7-menu-" + menuname + "-open");
+                        } else if (state === "closed") {
+                            elem.classList.add("a7-menu-" + menuname + "-closed");
                         } else {
-                            elem.classList.add("a7-menu-"+menuname+"-closed");
+                            elem.classList.add("a7-menu-" + menuname + "-closed");
                         }
                     });
                 }
                 var toggles = document.querySelectorAll("[data-a7-menu-toggle]");
-                if(toggles){
-                    toggles.forEach(function(elem){
+                if (toggles) {
+                    toggles.forEach(function (elem) {
                         var togglename = elem.getAttribute("data-a7-menu-toggle");
-                        elem.addEventListener("mouseup", function(){
+                        elem.addEventListener("mouseup", function () {
                             a7.toggleMenu(togglename);
                         });
                     });
@@ -203,7 +208,7 @@ SOFTWARE.
 
             init3();
 
-            function intiConfig(){
+            function intiConfig() {
                 if (a7.config.default_title === undefined) {
                     a7.config.default_title = document.title;
                 }
@@ -262,7 +267,7 @@ SOFTWARE.
                 subPaths = newPath.split("/");
 
             //tries to match equal
-            if (cacheMatch){
+            if (cacheMatch) {
                 route = cacheMatch;
             } else if (config.routes[newPath]) {
                 route = newPath;
@@ -285,7 +290,7 @@ SOFTWARE.
                 document.title = config.default_title;
             }
 
-            if (page === a7._routerCache.latestResolvedPage){
+            if (page === a7._routerCache.latestResolvedPage) {
                 //do nothing because the page is the same as the latest resolved page
             } else if (page) {
                 a7.pageContainer.innerHTML = page;
@@ -303,10 +308,10 @@ SOFTWARE.
             scrollTo(0, scrollX);
             //a7.pageContainer is Like a miniDOM because it displays the current page on the screen
             var links = a7.pageContainer.getElementsByTagName("a");
-            if(links){
-                links.forEach(function(link){
-                    if(link.dataset.a7link){
-                        link.addEventListener("mouseup", function(ev){
+            if (links) {
+                links.forEach(function (link) {
+                    if (link.dataset.a7link) {
+                        link.addEventListener("mouseup", function (ev) {
                             ev.preventDefault();
                             a7.router(link.href);
                         });
