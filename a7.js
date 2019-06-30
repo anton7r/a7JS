@@ -24,37 +24,51 @@ SOFTWARE.
 
 (function (window) {
     "use strict";
+    // internal variables used in a7
+    var _module = {},
+        useHash,
+        closeMenuOnRout,
+        routerCache = {},
+        closableMenus = [],
+        devMode,
+        pageMethods = {},
+        pageContainer;
+
+        //debugging function which should not be public facing
+        function a7debug(message) {
+            message = "%c" + "a7.js" + " " + a7.ver + ": " + message;
+            return console.warn(
+                message,
+                "color: white; font-weight:bold;font-size:20px;"
+            );
+        }
 
     function $() {
-
         var a7 = {};
 
         a7.ver = "v1.3";
-        a7._ = {};
-        a7._.closableMenus = [];
-        a7._module = {};
 
         //get and set modules 
         a7.module = function (module) {
-            a7._module.module = module;
-            this.get = a7._module.get;
-            this.set = a7._module.set;
+            _module.module = module;
+            this.get = _module.get;
+            this.set = _module.set;
             return this;
         };
-        a7._module.get = function () {
-            var module = a7._module.module;
+        _module.get = function () {
+            var module = _module.module;
             var moduleInConf = a7.config.modules[module];
             if (moduleInConf) {
                 return moduleInConf;
             } else {
-                return a7.debug("The module \"" + module + "\" was not found. Please check for typos!");
+                return a7debug("The module \"" + module + "\" was not found. Please check for typos!");
             }
         };
-        a7._module.set = function (newContent) {
+        _module.set = function (newContent) {
             if (!newContent) {
-                return a7.debug(".set() first param was not defined");
+                return a7debug(".set() first param was not defined");
             }
-            var moduleName = a7._module.module;
+            var moduleName = _module.module;
             a7.config.modules[moduleName] = newContent;
         };
         a7.renderModules = function () {
@@ -66,44 +80,35 @@ SOFTWARE.
                 module.setAttribute("data-a7-module", moduleName);
             });
         };
-        a7.page = {
-            _functions: {},
-        };
-        a7.page._functions.html = function (newHTML) {
+        a7.page = {};
+
+        pageMethods.html = function (newHTML) {
             if (newHTML === undefined) {
                 return a7.page.elem.innerHTML;
             } else {
                 a7.page.elem.innerHTML = newHTML;
             }
         };
-        a7.page._functions.text = function (newText) {
+        pageMethods.text = function (newText) {
             if (newText === undefined) {
                 return a7.page.elem.innerText;
             } else {
                 a7.page.elem.innerText = newText;
             }
         };
-        a7.page._functions.get = function () {
+        pageMethods.get = function () {
             return a7.page.elem;
         };
-        a7.debug = function (message) {
-            message = "%c" + "a7.js" + " " + a7.ver + ": " + message;
-            return console.warn(
-                message,
-                "color: white; font-weight:bold;font-size:20px;"
-            );
-        };
-        a7.host = window.location.host;
 
         a7.useProductionMode = function () {
-            a7._.devMode = false;
+            devMode = false;
         };
         a7.useHash = function(){
-            a7._.useHash = true;
+            useHash = true;
         };
         a7.closeMenuOnRout = function(menu){
-            a7._.closeMenuOnRout = true;
-            a7._.closableMenus.push(menu);
+            closeMenuOnRout = true;
+            closableMenus.push(menu);
         };
         a7.fallBacks = (function () {
             if (window.NodeList && !NodeList.prototype.forEach) {
@@ -149,8 +154,8 @@ SOFTWARE.
                 return;
             }
             //use dev or production mode
-            if (a7._.devMode === undefined) {
-                a7._.devMode = true;
+            if (devMode === undefined) {
+                devMode = true;
                 console.log("Youre running in development mode which uses # instead of history.pushState because it is easier to make changes to your app this way. when you want to go to production mode use a7.useProductionMode() once.");
                 
             }
@@ -158,9 +163,9 @@ SOFTWARE.
             function initPage() {
                 var Elem = document.querySelector("[data-a7-page-container]");
                 if (Elem === null) {
-                    return a7.debug("Page Container Could not be found, It has to have the data attribute \"data-a7-page-container\". Your website wont function without that.");
+                    return a7debug("Page Container Could not be found, It has to have the data attribute \"data-a7-page-container\". Your website wont function without that.");
                 }
-                a7.pageContainer = Elem;
+                pageContainer = Elem;
                 Elem.setAttribute("a7-page-container", "set");
                 a7.initDone = true;
             }
@@ -217,10 +222,10 @@ SOFTWARE.
             //inits page find feature
             function init3() {
                 a7.page.find = function (elem) {
-                    a7.page.elem = a7.pageContainer.querySelector(elem);
-                    this.get = a7.page._functions.get;
-                    this.html = a7.page._functions.html;
-                    this.text = a7.page._functions.text;
+                    a7.page.elem = pageContainer.querySelector(elem);
+                    this.get = pageMethods.get;
+                    this.html = pageMethods.html;
+                    this.text = pageMethods.text;
                     return this;
                 };
             }
@@ -232,7 +237,7 @@ SOFTWARE.
                     a7.config.default_title = document.title;
                 }
                 if (a7.config === undefined) {
-                    a7.debug("Please configure your app check docs for help");
+                    a7debug("Please configure your app check docs for help");
                 }
             }
 
@@ -251,7 +256,7 @@ SOFTWARE.
         //Its looking too complex of a function right now.
         a7.path = function (newPath) {
             if (newPath === undefined) {
-                if (a7._.devMode === false) {
+                if (devMode === false) {
                     return window.location.pathname.replace("/", "");
                 } else {
                     return window.location.hash.replace("#", "");
@@ -259,10 +264,10 @@ SOFTWARE.
             } else {
                 if (newPath.indexOf("/") === 0) {
                     newPath = newPath.replace("/", "");
-                } else if (a7._.devMode === false) {
+                } else if (devMode === false) {
                     if (!history.pushState) {
                         window.location = newPath;
-                    } else if(a7._.useHash === true){
+                    } else if(useHash === true){
                         window.location.hash = newPath;
                     } else {
                         history.pushState({}, undefined, ["/", newPath].join(""));
@@ -272,13 +277,12 @@ SOFTWARE.
                 }
             }
         };
-        a7._routerCache = {};
-        a7._routerCache.resolvedRoutes = {};
+        routerCache.resolvedRoutes = {};
         //Resolves any path you give
         a7.router = function (newPath) {
 
-            if(a7._.closeMenuOnRout === true){
-                a7._.closableMenus.forEach(function(menu){
+            if(closeMenuOnRout === true){
+                closableMenus.forEach(function(menu){
                     a7.closeMenu(menu);
                 });
             }
@@ -291,7 +295,7 @@ SOFTWARE.
                 index = newPath.indexOf("/"),
                 mainPath = ["/", newPath.slice(0, index + 1), "*"].join(""),
                 route,
-                cacheMatch = a7._routerCache.resolvedRoutes[newPath],
+                cacheMatch = routerCache.resolvedRoutes[newPath],
                 subPaths = newPath.split("/");
 
             //tries to match equal
@@ -304,7 +308,7 @@ SOFTWARE.
             } else if (config.routes["/*"]) {
                 route = "/*";
             } else {
-                return a7.debug("we could not find the page which you were looking for");
+                return a7debug("we could not find the page which you were looking for");
             }
 
             var func = config.triggers[route],
@@ -318,12 +322,12 @@ SOFTWARE.
                 document.title = config.default_title;
             }
 
-            if (page === a7._routerCache.latestResolvedPage) {
+            if (page === routerCache.latestResolvedPage) {
                 //do nothing because the page is the same as the latest resolved page
             } else if (page) {
-                a7.pageContainer.innerHTML = page;
-                a7._routerCache.latestResolvedPage = page;
-                a7._routerCache.resolvedRoutes[newPath] = route;
+                pageContainer.innerHTML = page;
+                routerCache.latestResolvedPage = page;
+                routerCache.resolvedRoutes[newPath] = route;
             }
 
 
@@ -334,8 +338,8 @@ SOFTWARE.
             a7.path(newPath);
 
             scrollTo(0, scrollX);
-            //a7.pageContainer is Like a miniDOM because it displays the current page on the screen
-            var links = a7.pageContainer.getElementsByTagName("a");
+            //pageContainer is Like a miniDOM because it displays the current page on the screen
+            var links = pageContainer.getElementsByTagName("a");
             if (links) {
                 links.forEach(function (link) {
                     if (link.dataset.a7link) {
