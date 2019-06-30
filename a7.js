@@ -29,7 +29,7 @@ SOFTWARE.
 
         var a7 = {};
 
-        a7.ver = "v1.2";
+        a7.ver = "v1.3";
         a7._ = {};
         a7._.closableMenus = [];
         a7._module = {};
