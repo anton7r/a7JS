@@ -19,5 +19,5 @@ to
 <script src="__/a7.min.js"></script>
 ```
 
-Next were going to show you how to set up the config.js file
-[continue to wiki]()
+Next were going to show you how to set up the config.js file and the page container
+[continue to wiki](https://github.com/anton7r/a7JS/wiki/Setup)
