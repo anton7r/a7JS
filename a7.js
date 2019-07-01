@@ -32,7 +32,9 @@ SOFTWARE.
         closableMenus = [],
         devMode,
         pageMethods = {},
-        pageContainer;
+        pageContainer,
+        currentPageName,
+        menus = {};
 
         //debugging function which should not be public facing
         function a7debug(message) {
@@ -46,7 +48,7 @@ SOFTWARE.
     function $() {
         var a7 = {};
 
-        a7.ver = "v1.3";
+        a7.ver = "v1.4-pre";
 
         //get and set modules 
         a7.module = function (module) {
@@ -127,12 +129,8 @@ SOFTWARE.
             }
         }());
 
-        a7.DOM = {};
-
-        a7.DOM.menu = {};
-
         a7.toggleMenu = function (menuName) {
-            var elem = a7.DOM.menu[menuName],
+            var elem = menus[menuName],
                 classList = elem.classList,
                 open = "a7-menu-" + menuName + "-open",
                 closed = "a7-menu-" + menuName + "-closed";
@@ -140,7 +138,7 @@ SOFTWARE.
             classList.toggle(closed);
         };
         a7.closeMenu = function(menuName){
-            var elem = a7.DOM.menu[menuName],
+            var elem = menus[menuName],
                 classList = elem.classList,
                 open = "a7-menu-" + menuName + "-open",
                 closed = "a7-menu-" + menuName + "-closed";
@@ -165,8 +163,10 @@ SOFTWARE.
                 if (Elem === null) {
                     return a7debug("Page Container Could not be found, It has to have the data attribute \"data-a7-page-container\". Your website wont function without that.");
                 }
+                //assignment of pageContainer
                 pageContainer = Elem;
                 Elem.setAttribute("a7-page-container", "set");
+                Elem.removeAttribute("data-a7-page-container");
                 a7.initDone = true;
             }
 
@@ -178,7 +178,7 @@ SOFTWARE.
                     elems.forEach(function (elem) {
                         var menuname = elem.getAttribute("data-a7-menu"),
                             state = elem.getAttribute("data-a7-default-state");
-                        a7.DOM.menu[menuname] = elem;
+                        menus[menuname] = elem;
                         if (state === "open") {
                             elem.classList.add("a7-menu-" + menuname + "-open");
                         } else if (state === "closed") {
@@ -313,8 +313,8 @@ SOFTWARE.
 
             var func = config.triggers[route],
                 title = config.titles[route],
-                page = config.pages[config.routes[route]].trim();
-
+                page = config.pages[config.routes[route]].trim(),
+                pageName = config.routes[route];
 
             if (title) {
                 document.title = title;
@@ -325,7 +325,16 @@ SOFTWARE.
             if (page === routerCache.latestResolvedPage) {
                 //do nothing because the page is the same as the latest resolved page
             } else if (page) {
+
+                //Assign the page stuff to the view
                 pageContainer.innerHTML = page;
+
+                //classList
+                pageContainer.classList.remove(["a7-page-", currentPageName].join(""));
+                pageContainer.classList.add(["a7-page-", pageName].join(""));
+                currentPageName = pageName;
+
+                //store to memory the latest state for later comparison
                 routerCache.latestResolvedPage = page;
                 routerCache.resolvedRoutes[newPath] = route;
             }
