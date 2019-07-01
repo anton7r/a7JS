@@ -48,7 +48,7 @@ SOFTWARE.
     function $() {
         var a7 = {};
 
-        a7.ver = "v1.4-pre";
+        a7.ver = "v1.4";
 
         //html sanitizer
         a7.encoder = function(content){
