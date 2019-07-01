@@ -50,6 +50,18 @@ SOFTWARE.
 
         a7.ver = "v1.4-pre";
 
+        //html sanitizer
+        a7.encoder = function(content){
+            var result = content
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot")
+                .replace(/'/g, "&#x27")
+                //not a good idea TO DO THIS!!!!!!!!!!! because it is escaping and escapes can be escaped
+                .replace(/\//g, "&#x2F");
+            return result;
+        };
         //get and set modules 
         a7.module = function (module) {
             _module.module = module;
@@ -346,7 +358,8 @@ SOFTWARE.
 
             a7.path(newPath);
 
-            scrollTo(0, scrollX);
+            scrollTo(0, pageXOffset);
+
             //pageContainer is Like a miniDOM because it displays the current page on the screen
             var links = pageContainer.getElementsByTagName("a");
             if (links) {
