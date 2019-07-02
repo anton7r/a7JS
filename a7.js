@@ -313,7 +313,7 @@ SOFTWARE.
             //tries to match equal
             if (cacheMatch) {
                 route = cacheMatch;
-            } else if (config.routes[newPath]) {
+            } else if (config.routes["/" + newPath]) {
                 route = newPath;
             } else if (config.routes[mainPath]) {
                 route = mainPath;
