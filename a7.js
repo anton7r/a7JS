@@ -314,7 +314,7 @@ SOFTWARE.
             if (cacheMatch) {
                 route = cacheMatch;
             } else if (config.routes["/" + newPath]) {
-                route = newPath;
+                route = "/" + newPath;
             } else if (config.routes[mainPath]) {
                 route = mainPath;
             } else if (config.routes["/*"]) {
