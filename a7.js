@@ -34,7 +34,8 @@ SOFTWARE.
         pageMethods = {},
         pageContainer,
         currentPageName,
-        menus = {};
+        menus = {},
+        initDone;
 
         //debugging function which should not be public facing
         function a7debug(message) {
@@ -56,10 +57,10 @@ SOFTWARE.
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot")
-                .replace(/'/g, "&#x27")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#x27;")
                 //not a good idea TO DO THIS!!!!!!!!!!! because it is escaping and escapes can be escaped
-                .replace(/\//g, "&#x2F");
+                .replace(/\//g, "&#x2F;");
             return result;
         };
         //get and set modules 
@@ -114,7 +115,7 @@ SOFTWARE.
             return a7.page.elem;
         };
 
-        a7.useProductionMode = function () {
+        a7.useProductionMode = a7.productionMode = function () {
             devMode = false;
         };
         a7.useHash = function(){
@@ -140,7 +141,18 @@ SOFTWARE.
 
             }
         }());
-
+        a7.renderNewLinks = function(trigger){
+            var newLinks = document.querySelectorAll("[data-a7-new-link]");
+            newLinks.forEach(function(link){
+                link.addEventListener("click", function(ev){
+                    ev.preventDefault();
+                    var li = link.getAttribute(href);
+                    a7.router(li);
+                    link.removeAttribute("data-a7-new-link");
+                    link.setAttribute("data-a7-link");
+                });
+            });
+        };
         a7.toggleMenu = function (menuName) {
             var elem = menus[menuName],
                 classList = elem.classList,
@@ -160,13 +172,13 @@ SOFTWARE.
             }
         };
         a7.init = function () {
-            if (a7.initDone === true) {
+            if (initDone === true) {
                 return;
             }
             //use dev or production mode
             if (devMode === undefined) {
                 devMode = true;
-                console.log("Youre running in development mode which uses # instead of history.pushState because it is easier to make changes to your app this way. when you want to go to production mode use a7.useProductionMode() once.");
+                console.log("Youre running in development mode which uses # instead of history.pushState because it is easier to make changes to your app this way. when you want to go to production mode use a7.productionMode() once.");
                 
             }
 
@@ -179,7 +191,7 @@ SOFTWARE.
                 pageContainer = Elem;
                 Elem.setAttribute("a7-page-container", "set");
                 Elem.removeAttribute("data-a7-page-container");
-                a7.initDone = true;
+                initDone = true;
             }
 
             initPage();
@@ -217,7 +229,7 @@ SOFTWARE.
                 var coll = [];
                 coll = document.getElementsByTagName("a");
                 coll.forEach(function (link) {
-                    if (link.dataset.a7link !== undefined) {
+                    if (link.dataset.a7link !== undefined | link.getAttribute("a7-link") !== null) {
                         link.addEventListener("click", function (ev) {
                             ev.preventDefault();
                             var l = link.getAttribute("href");
