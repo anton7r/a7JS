@@ -307,7 +307,7 @@ SOFTWARE.
                 index = newPath.indexOf("/"),
                 mainPath = ["/", newPath.slice(0, index + 1), "*"].join(""),
                 route,
-                cacheMatch = routerCache.resolvedRoutes[newPath],
+                cacheMatch = routerCache.resolvedRoutes["/" + newPath],
                 subPaths = newPath.split("/");
 
             //tries to match equal
