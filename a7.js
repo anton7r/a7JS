@@ -158,21 +158,29 @@ SOFTWARE.
                 open = ["a7-menu-",menuName,"-open"].join(""),
                 closed = ["a7-menu-",menuName,"-closed"].join(""),
                 menuState;
+
             classList.toggle(open);
             classList.toggle(closed);
 
+            var menuToggleFunc = onMenuToggleList[menuName];
+            if (menuToggleFunc === undefined){
+                return;
+            }
 
             if (classList.contains(open) === true){
                 menuState = "open";
             } else {
                 menuState = "closed";
             }
+
+            menuToggleFunc(menuState);
+
             return;
         };
         a7.closeMenu = function(menuName){
             var menuToggleFunc = onMenuToggleList[menuName];
             if(menuToggleFunc !== undefined){
-                menuToggleFunc("menu-closed");
+                menuToggleFunc("closed");
             }
             var elem = menus[menuName],
                 classList = elem.classList,
