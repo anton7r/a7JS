@@ -1,6 +1,8 @@
 # a7JS
 a7 is a Javascript Framework which makes SPA's really easy to make
 
+Works in IE 11
+
 ## Setup
 Download the latest release and include it inside your web project.
 
