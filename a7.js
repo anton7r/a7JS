@@ -35,7 +35,8 @@ SOFTWARE.
         pageContainer,
         currentPageName,
         menus = {},
-        initDone;
+        initDone,
+        onMenuToggleList = {};
 
         //debugging function which should not be public facing
         function a7debug(message) {
@@ -121,10 +122,6 @@ SOFTWARE.
         a7.useHash = function(){
             useHash = true;
         };
-        a7.closeMenuOnRout = function(menu){
-            closeMenuOnRout = true;
-            closableMenus.push(menu);
-        };
         a7.fallBacks = (function () {
             if (window.NodeList && !NodeList.prototype.forEach) {
                 NodeList.prototype.forEach = Array.prototype.forEach;
@@ -153,24 +150,49 @@ SOFTWARE.
                 });
             });
         };
+
+        //Menu stuff
         a7.toggleMenu = function (menuName) {
             var elem = menus[menuName],
                 classList = elem.classList,
-                open = "a7-menu-" + menuName + "-open",
-                closed = "a7-menu-" + menuName + "-closed";
+                open = ["a7-menu-",menuName,"-open"].join(""),
+                closed = ["a7-menu-",menuName,"-closed"].join(""),
+                menuState;
             classList.toggle(open);
             classList.toggle(closed);
+
+
+            if (classList.contains(open) === true){
+                menuState = "open";
+            } else {
+                menuState = "closed";
+            }
+            return;
         };
         a7.closeMenu = function(menuName){
+            var menuToggleFunc = onMenuToggleList[menuName];
+            if(menuToggleFunc !== undefined){
+                menuToggleFunc("menu-closed");
+            }
             var elem = menus[menuName],
                 classList = elem.classList,
-                open = "a7-menu-" + menuName + "-open",
-                closed = "a7-menu-" + menuName + "-closed";
+                open = ["a7-menu-",menuName,"-open"].join(""),
+                closed = ["a7-menu-",menuName,"-closed"].join("");
             if(classList.contains(open)){
                 classList.remove(open);
                 classList.add(closed);
             }
+            return;
         };
+        a7.closeMenuOnRout = function(menu){
+            closeMenuOnRout = true;
+            closableMenus.push(menu);
+        };
+        a7.onMenuToggle = function(menuName, func){
+            onMenuToggleList[menuName] = func;
+        };
+
+        //Init will run once
         a7.init = function () {
             if (initDone === true) {
                 return;
@@ -204,11 +226,11 @@ SOFTWARE.
                             state = elem.getAttribute("data-a7-default-state");
                         menus[menuname] = elem;
                         if (state === "open") {
-                            elem.classList.add("a7-menu-" + menuname + "-open");
+                            elem.classList.add(["a7-menu-",menuname,"-open"].join(""));
                         } else if (state === "closed") {
-                            elem.classList.add("a7-menu-" + menuname + "-closed");
+                            elem.classList.add(["a7-menu-",menuname,"-closed"].join(""));
                         } else {
-                            elem.classList.add("a7-menu-" + menuname + "-closed");
+                            elem.classList.add(["a7-menu-",menuname,"-closed"].join(""));
                         }
                     });
                 }
@@ -325,8 +347,8 @@ SOFTWARE.
             //tries to match equal
             if (cacheMatch) {
                 route = cacheMatch;
-            } else if (config.routes["/" + newPath]) {
-                route = "/" + newPath;
+            } else if (config.routes[["/",newPath].join("")]) {
+                route = ["/",newPath].join();
             } else if (config.routes[mainPath]) {
                 route = mainPath;
             } else if (config.routes["/*"]) {
