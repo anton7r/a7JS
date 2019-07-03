@@ -1,3 +1,5 @@
+//New needed features cache link hrefs!
+
 /** 
 MIT License
 
@@ -138,12 +140,12 @@ SOFTWARE.
 
             }
         }());
-        a7.renderNewLinks = function(trigger){
+        a7.renderNewLinks = function(){
             var newLinks = document.querySelectorAll("[data-a7-new-link]");
             newLinks.forEach(function(link){
                 link.addEventListener("click", function(ev){
                     ev.preventDefault();
-                    var li = link.getAttribute(href);
+                    var li = link.getAttribute("href");
                     a7.router(li);
                     link.removeAttribute("data-a7-new-link");
                     link.setAttribute("data-a7-link");
@@ -409,7 +411,7 @@ SOFTWARE.
                     if (link.dataset.a7link) {
                         link.addEventListener("mouseup", function (ev) {
                             ev.preventDefault();
-                            a7.router(link.href);
+                            a7.router(link.getAttribute("href"));
                         });
                     }
                 });
