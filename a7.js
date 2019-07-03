@@ -28,11 +28,9 @@ SOFTWARE.
     "use strict";
     // internal variables used in a7
     var _module = {},
-        useHash,
         closeMenuOnRout,
         routerCache = {},
         closableMenus = [],
-        devMode,
         pageMethods = {},
         pageContainer,
         currentPageName,
@@ -40,22 +38,22 @@ SOFTWARE.
         initDone,
         onMenuToggleList = {};
 
-        //debugging function which should not be public facing
-        function a7debug(message) {
-            message = "%c" + "a7.js" + " " + a7.ver + ": " + message;
-            return console.warn(
-                message,
-                "color: white; font-weight:bold;font-size:20px;"
-            );
-        }
+    //debugging function which should not be public facing
+    function a7debug(message) {
+        message = "%c" + "a7.js" + " " + a7.ver + ": " + message;
+        return console.warn(
+            message,
+            "color: white; font-weight:bold;font-size:20px;"
+        );
+    }
 
     function $() {
         var a7 = {};
 
-        a7.ver = "v1.4";
+        a7.ver = "v2.0.0";
 
         //html sanitizer
-        a7.encoder = function(content){
+        a7.encoder = function (content) {
             var result = content
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
@@ -118,12 +116,6 @@ SOFTWARE.
             return a7.page.elem;
         };
 
-        a7.useProductionMode = a7.productionMode = function () {
-            devMode = false;
-        };
-        a7.useHash = function(){
-            useHash = true;
-        };
         a7.fallBacks = (function () {
             if (window.NodeList && !NodeList.prototype.forEach) {
                 NodeList.prototype.forEach = Array.prototype.forEach;
@@ -140,15 +132,15 @@ SOFTWARE.
 
             }
         }());
-        a7.renderNewLinks = function(){
+        a7.renderNewLinks = function () {
             var newLinks = document.querySelectorAll("[data-a7-new-link]");
-            newLinks.forEach(function(link){
-                link.addEventListener("click", function(ev){
+            newLinks.forEach(function (link) {
+                link.addEventListener("click", function (ev) {
                     ev.preventDefault();
                     var li = link.getAttribute("href");
                     a7.router(li);
                     link.removeAttribute("data-a7-new-link");
-                    link.setAttribute("data-a7-link");
+                    link.setAttribute("data-a7-link", "");
                 });
             });
         };
@@ -157,19 +149,19 @@ SOFTWARE.
         a7.toggleMenu = function (menuName) {
             var elem = menus[menuName],
                 classList = elem.classList,
-                open = ["a7-menu-",menuName,"-open"].join(""),
-                closed = ["a7-menu-",menuName,"-closed"].join(""),
+                open = ["a7-menu-", menuName, "-open"].join(""),
+                closed = ["a7-menu-", menuName, "-closed"].join(""),
                 menuState;
 
             classList.toggle(open);
             classList.toggle(closed);
 
             var menuToggleFunc = onMenuToggleList[menuName];
-            if (menuToggleFunc === undefined){
+            if (menuToggleFunc === undefined) {
                 return;
             }
 
-            if (classList.contains(open) === true){
+            if (classList.contains(open) === true) {
                 menuState = "open";
             } else {
                 menuState = "closed";
@@ -179,26 +171,26 @@ SOFTWARE.
 
             return;
         };
-        a7.closeMenu = function(menuName){
+        a7.closeMenu = function (menuName) {
             var menuToggleFunc = onMenuToggleList[menuName];
-            if(menuToggleFunc !== undefined){
+            if (menuToggleFunc !== undefined) {
                 menuToggleFunc("closed");
             }
             var elem = menus[menuName],
                 classList = elem.classList,
-                open = ["a7-menu-",menuName,"-open"].join(""),
-                closed = ["a7-menu-",menuName,"-closed"].join("");
-            if(classList.contains(open)){
+                open = ["a7-menu-", menuName, "-open"].join(""),
+                closed = ["a7-menu-", menuName, "-closed"].join("");
+            if (classList.contains(open)) {
                 classList.remove(open);
                 classList.add(closed);
             }
             return;
         };
-        a7.closeMenuOnRout = function(menu){
+        a7.closeMenuOnRout = function (menu) {
             closeMenuOnRout = true;
             closableMenus.push(menu);
         };
-        a7.onMenuToggle = function(menuName, func){
+        a7.onMenuToggle = function (menuName, func) {
             onMenuToggleList[menuName] = func;
         };
 
@@ -206,12 +198,6 @@ SOFTWARE.
         a7.init = function () {
             if (initDone === true) {
                 return;
-            }
-            //use dev or production mode
-            if (devMode === undefined) {
-                devMode = true;
-                console.log("Youre running in development mode which uses # instead of history.pushState because it is easier to make changes to your app this way. when you want to go to production mode use a7.productionMode() once.");
-                
             }
 
             function initPage() {
@@ -236,11 +222,11 @@ SOFTWARE.
                             state = elem.getAttribute("data-a7-default-state");
                         menus[menuname] = elem;
                         if (state === "open") {
-                            elem.classList.add(["a7-menu-",menuname,"-open"].join(""));
+                            elem.classList.add(["a7-menu-", menuname, "-open"].join(""));
                         } else if (state === "closed") {
-                            elem.classList.add(["a7-menu-",menuname,"-closed"].join(""));
+                            elem.classList.add(["a7-menu-", menuname, "-closed"].join(""));
                         } else {
-                            elem.classList.add(["a7-menu-",menuname,"-closed"].join(""));
+                            elem.classList.add(["a7-menu-", menuname, "-closed"].join(""));
                         }
                     });
                 }
@@ -312,33 +298,25 @@ SOFTWARE.
         //Its looking too complex of a function right now.
         a7.path = function (newPath) {
             if (newPath === undefined) {
-                if (devMode === false) {
-                    return window.location.pathname.replace("/", "");
-                } else {
-                    return window.location.hash.replace("#", "");
-                }
+                return window.location.pathname.replace("/", "");
             } else {
                 if (newPath.indexOf("/") === 0) {
                     newPath = newPath.replace("/", "");
-                } else if (devMode === false) {
-                    if (!history.pushState) {
-                        window.location = newPath;
-                    } else if(useHash === true){
-                        window.location.hash = newPath;
-                    } else {
-                        history.pushState({}, undefined, ["/", newPath].join(""));
-                    }
-                } else {
-                    window.location.hash = newPath;
                 }
+                if (!history.pushState) {
+                    window.location = newPath;
+                } else {
+                    history.pushState({}, undefined, ["/", newPath].join(""));
+                }
+
             }
         };
         routerCache.resolvedRoutes = {};
         //Resolves any path you give
         a7.router = function (newPath) {
 
-            if(closeMenuOnRout === true){
-                closableMenus.forEach(function(menu){
+            if (closeMenuOnRout === true) {
+                closableMenus.forEach(function (menu) {
                     a7.closeMenu(menu);
                 });
             }
@@ -357,8 +335,8 @@ SOFTWARE.
             //tries to match equal
             if (cacheMatch) {
                 route = cacheMatch;
-            } else if (config.routes[["/",newPath].join("")]) {
-                route = ["/",newPath].join();
+            } else if (config.routes[["/", newPath].join("")]) {
+                route = ["/", newPath].join("");
             } else if (config.routes[mainPath]) {
                 route = mainPath;
             } else if (config.routes["/*"]) {
@@ -369,7 +347,7 @@ SOFTWARE.
 
             var func = config.triggers[route],
                 title = config.titles[route],
-                page = config.pages[config.routes[route]].trim(),
+                page = config.pages[config.routes[route]],
                 pageName = config.routes[route];
 
             if (title) {
@@ -404,18 +382,6 @@ SOFTWARE.
 
             scrollTo(0, pageXOffset);
 
-            //pageContainer is Like a miniDOM because it displays the current page on the screen
-            var links = pageContainer.getElementsByTagName("a");
-            if (links) {
-                links.forEach(function (link) {
-                    if (link.dataset.a7link) {
-                        link.addEventListener("mouseup", function (ev) {
-                            ev.preventDefault();
-                            a7.router(link.getAttribute("href"));
-                        });
-                    }
-                });
-            }
 
         };
         window.onload = function () {
