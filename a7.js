@@ -276,7 +276,8 @@ SOFTWARE.
                 this.text = pageMethods.text;
                 return this;
                 };
-
+            
+            //conf
             if (a7.config.default_title === undefined) {
                 a7.config.default_title = document.title;
             }
@@ -285,6 +286,7 @@ SOFTWARE.
                 a7debug("Please configure your app check docs for help");
             }
 
+            //first route and enabling back button
             a7.router(a7.path());
             window.addEventListener("popstate", function () {
                 a7.router(a7.path());
