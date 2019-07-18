@@ -51,7 +51,7 @@ SOFTWARE.
     function $() {
         var a7 = {};
 
-        a7.ver = "v2.1.0";
+        a7.ver = "v2.1.1";
 
         //html sanitizer
         a7.encoder = function (content) {
@@ -214,71 +214,61 @@ SOFTWARE.
 
         //Init will run once
         a7.init = function () {
+
             if (initDone === true) {
                 return;
             }
 
-            function initPage() {
-                var Elem = document.querySelector("[data-a7-page-container]");
-                if (Elem === null) {
-                    return a7debug("Page Container Could not be found, It has to have the data attribute \"data-a7-page-container\". Your website wont function without that.");
-                }
-                //assignment of pageContainer
-                pageContainer = Elem;
-                Elem.setAttribute("a7-page-container", "set");
-                Elem.removeAttribute("data-a7-page-container");
-                initDone = true;
+            var pageContainerEL = document.querySelector("[data-a7-page-container]");
+            if (pageContainerEL === null) {
+                return a7debug("Page Container Could not be found, It has to have the data attribute \"data-a7-page-container\". Your website wont function without that.");
             }
+            //assignment of pageContainer
+            pageContainer = pageContainerEL;
+            pageContainerEL.setAttribute("a7-page-container", "set");
+            pageContainerEL.removeAttribute("data-a7-page-container");
+            initDone = true;
 
-            initPage();
-
-            function initMenu() {
-                var elems = document.querySelectorAll("[data-a7-menu]");
-                if (elems) {
-                    elems.forEach(function (elem) {
-                        var menuname = elem.getAttribute("data-a7-menu"),
-                            state = elem.getAttribute("data-a7-default-state");
+            //menu init
+            var menuElements = document.querySelectorAll("[data-a7-menu]");
+            if (menuElements) {
+                menuElements.forEach(function (elem) {
+                    var menuname = elem.getAttribute("data-a7-menu"),
+                        state = elem.getAttribute("data-a7-default-state");
                         menus[menuname] = elem;
-                        if (state === "open") {
-                            elem.classList.add(["a7-menu-", menuname, "-open"].join(""));
-                        } else if (state === "closed") {
-                            elem.classList.add(["a7-menu-", menuname, "-closed"].join(""));
-                        } else {
-                            elem.classList.add(["a7-menu-", menuname, "-closed"].join(""));
-                        }
-                    });
-                }
-                var toggles = document.querySelectorAll("[data-a7-menu-toggle]");
-                if (toggles) {
-                    toggles.forEach(function (elem) {
-                        var togglename = elem.getAttribute("data-a7-menu-toggle");
-                        elem.addEventListener("mouseup", function () {
-                            a7.toggleMenu(togglename);
-                        });
-                    });
-                }
-            }
-
-            initMenu();
-
-            function initLinks() {
-                var coll = [];
-                coll = document.getElementsByTagName("a");
-                coll.forEach(function (link) {
-                    if (link.dataset.a7link !== undefined | link.getAttribute("a7-link") !== null) {
-                        link.addEventListener("click", function (ev) {
-                            ev.preventDefault();
-                            var l = link.getAttribute("href");
-                            a7.router(l);
-                        });
+                    if (state === "open") {
+                        elem.classList.add(["a7-menu-", menuname, "-open"].join(""));
+                    } else if (state === "closed") {
+                        elem.classList.add(["a7-menu-", menuname, "-closed"].join(""));
                     } else {
-                        return;
+                        elem.classList.add(["a7-menu-", menuname, "-closed"].join(""));
                     }
+                });
+                }
+            var menuToggles = document.querySelectorAll("[data-a7-menu-toggle]");
+            if (menuToggles) {
+                menuToggles.forEach(function (elem) {
+                    var togglename = elem.getAttribute("data-a7-menu-toggle");
+                    elem.addEventListener("mouseup", function () {
+                        a7.toggleMenu(togglename);
+                    });
                 });
             }
 
-            initLinks();
+            //links init
+            var linkcollection = document.getElementsByTagName("a");
 
+            linkcollection.forEach(function (link) {
+                if (link.dataset.a7link !== undefined | link.getAttribute("a7-link") !== null) {
+                    link.addEventListener("click", function (ev) {
+                        ev.preventDefault();
+                        var l = link.getAttribute("href");
+                        a7.router(l);
+                    });
+                }
+            });
+
+            //a7 page
             a7.page.find = function (elem) {
                 a7.page.elem = pageContainer.querySelector(elem);
                 this.get = pageMethods.get;
@@ -300,9 +290,12 @@ SOFTWARE.
                 a7.router(a7.path());
             });
         };
+
+
+
         //if newPath is not defined then it will return the current path
         //Its looking too complex of a function right now.
-        a7.path = function (newPath) {
+        a7.path = function ( newPath ) {
             if (newPath === undefined) {
                 return window.location.pathname.replace("/", "");
             } else {
@@ -370,7 +363,7 @@ SOFTWARE.
             }
 
             if (page === routerCache.latestResolvedPage) {
-                //do nothing because the page is the same as the latest resolved page
+            //do nothing because the page is the same as the latest resolved page
             } else if (page) {
 
                 //Assign the page stuff to the view
