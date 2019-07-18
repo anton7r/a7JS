@@ -19,6 +19,10 @@ a7.config ={
     titles: {
         "/*": "a7.js App"
     },
+    /* Snippets Aka site descriptions which is needed for SEO */
+    snippets: {
+        "/*": "This is an Web application which uses a7.js as its core"
+    },
     /** Pages are essentially diffrent views.
      *  
      * 

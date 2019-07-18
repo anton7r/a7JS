@@ -36,7 +36,8 @@ SOFTWARE.
         currentPageName,
         menus = {},
         initDone,
-        onMenuToggleList = {};
+        onMenuToggleList = {},
+        descriptionElements = [];
 
     //debugging function which should not be public facing
     function a7debug(message) {
@@ -50,7 +51,7 @@ SOFTWARE.
     function $() {
         var a7 = {};
 
-        a7.ver = "v2.0.0";
+        a7.ver = "v2.1.0";
 
         //html sanitizer
         a7.encoder = function (content) {
@@ -143,6 +144,23 @@ SOFTWARE.
                     link.setAttribute("data-a7-link", "");
                 });
             });
+        };
+
+
+        a7.getDesc = function () {
+            var el = document.getElementsByName("description")[0];
+            if (el !== "undefined"){
+                return el;
+            } else {
+                a7debug("You do not have the meta description Element in the DOM, because of that we are going to create one for you");
+                document.getElementsByTagName("head")[0].innerHTML += "<meta name=\"description\" content=\"\">";
+                return el;
+            }
+        };
+
+
+        a7.setDesc = function (newContent) {
+
         };
 
         //Menu stuff
@@ -261,38 +279,26 @@ SOFTWARE.
 
             initLinks();
 
-            //inits page find feature
-            function init3() {
-                a7.page.find = function (elem) {
-                    a7.page.elem = pageContainer.querySelector(elem);
-                    this.get = pageMethods.get;
-                    this.html = pageMethods.html;
-                    this.text = pageMethods.text;
-                    return this;
+            a7.page.find = function (elem) {
+                a7.page.elem = pageContainer.querySelector(elem);
+                this.get = pageMethods.get;
+                this.html = pageMethods.html;
+                this.text = pageMethods.text;
+                return this;
                 };
+
+            if (a7.config.default_title === undefined) {
+                a7.config.default_title = document.title;
             }
 
-            init3();
-
-            function intiConfig() {
-                if (a7.config.default_title === undefined) {
-                    a7.config.default_title = document.title;
-                }
-                if (a7.config === undefined) {
-                    a7debug("Please configure your app check docs for help");
-                }
+            if (a7.config === undefined) {
+                a7debug("Please configure your app check docs for help");
             }
 
-            intiConfig();
-
-            function init4() {
+            a7.router(a7.path());
+            window.addEventListener("popstate", function () {
                 a7.router(a7.path());
-                window.addEventListener("popstate", function () {
-                    a7.router(a7.path());
-                });
-            }
-
-            init4();
+            });
         };
         //if newPath is not defined then it will return the current path
         //Its looking too complex of a function right now.
@@ -348,12 +354,19 @@ SOFTWARE.
             var func = config.triggers[route],
                 title = config.titles[route],
                 page = config.pages[config.routes[route]],
-                pageName = config.routes[route];
+                pageName = config.routes[route],
+
+                snippet = config.snippets[route];
 
             if (title) {
                 document.title = title;
             } else {
                 document.title = config.default_title;
+            }
+
+
+            if ( snippet !== undefined){
+                
             }
 
             if (page === routerCache.latestResolvedPage) {
