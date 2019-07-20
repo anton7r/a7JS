@@ -51,7 +51,47 @@ SOFTWARE.
     function $() {
         var a7 = {};
 
-        a7.ver = "v2.1.1";
+        a7.ver = "v2.2.0";
+
+
+        a7.createElement = function (element, attributes, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12){
+            var contentArray = [
+                c1,
+                c2,
+                c3,
+                c4,
+                c5,
+                c6,
+                c7,
+                c8,
+                c9,
+                c10,
+                c11,
+                c12,
+            ].map(function(currentValue){
+                if(currentValue === "undefined"){
+                    currentValue = "";
+                }
+            });
+
+            this.element = element;
+            this.content = contentArray.join("");
+            this.finalAttributes = [];
+
+            function attrHandler(atr){
+                if ( attributes[atr] !== "undefined" ){
+                    return [atr, "=", attributes[atr]].join("");
+                }
+            }
+
+            finalAttributes.push(attrHandler("class"));
+
+            console.log(finalAttributes);
+
+            this.finalElement  = ["<", this.element, this.finalAttributes.join(" "),">", this.content, "</", this.element,">"].join("");
+
+            return this.finalElement;
+        };
 
         //html sanitizer
         a7.encoder = function (content) {
@@ -160,7 +200,7 @@ SOFTWARE.
 
 
         a7.setDesc = function (newContent) {
-
+            var x;
         };
 
         //Menu stuff
