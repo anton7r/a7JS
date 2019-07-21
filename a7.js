@@ -55,6 +55,10 @@ SOFTWARE.
 
 
         a7.createElement = function (element, attributes, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12){
+            if (attributes === undefined | null){
+                attributes = {};
+            }
+            attributes = JSON.stringify(attributes);
             var contentArray = [
                 c1,
                 c2,
@@ -68,27 +72,18 @@ SOFTWARE.
                 c10,
                 c11,
                 c12,
-            ].map(function(currentValue){
-                if(currentValue === "undefined"){
-                    currentValue = "";
-                }
-            });
+            ];
 
             this.element = element;
             this.content = contentArray.join("");
-            this.finalAttributes = [];
+            this.finalAttributes = attributes.replace(/{/g, "").replace(/}/g, "").replace(/:/g, "=");
 
-            function attrHandler(atr){
-                if ( attributes[atr] !== "undefined" ){
-                    return [atr, "=", attributes[atr]].join("");
-                }
-            }
 
-            finalAttributes.push(attrHandler("class"));
+            console.log(contentArray);
+            console.log(this.content);
+            console.log(attributes);
 
-            console.log(finalAttributes);
-
-            this.finalElement  = ["<", this.element, this.finalAttributes.join(" "),">", this.content, "</", this.element,">"].join("");
+            this.finalElement  = ["<", this.element, this.finalAttributes,">", this.content, "</", this.element,">"].join("");
 
             return this.finalElement;
         };
