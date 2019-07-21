@@ -53,9 +53,9 @@ SOFTWARE.
 
         a7.ver = "v2.2.0";
 
-
+        //the letter c represents content as if c was content
         a7.createElement = function (element, attributes, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12){
-            if (attributes === undefined | null){
+            if (attributes === undefined | null | "null"){
                 attributes = {};
             }
             attributes = JSON.stringify(attributes);
@@ -73,17 +73,44 @@ SOFTWARE.
                 c11,
                 c12,
             ];
+            var lenght = attributes.length;
+            var quoteLocations = [];
+            var curVal;
 
+            for(curVal = 0; curVal < lenght; curVal++){
+                var curChar = attributes.charAt(curVal);
+                if(curChar === "\""){
+
+                    quoteLocations.push(curVal);
+
+                }
+            }
+            console.log(curVal);
+            curVal = 0;
+            quoteLocations.forEach(function(val){
+                if(attributes.charAt(val + 1) === ":"){
+                    var start = quoteLocations[curVal - 1] + 1;
+                    var AttrName = attributes.slice(start, val);
+                    console.log("AttrName:",AttrName);
+                    attributes = attributes.replace(["\"", AttrName, "\""].join(""), AttrName);
+                }
+                curVal++;
+            });
             this.element = element;
             this.content = contentArray.join("");
             this.finalAttributes = attributes.replace(/{/g, "").replace(/}/g, "").replace(/:/g, "=");
+            
+            var spacing = "";
+            if (this.finalAttributes.lenght !== 0){
+                spacing = " ";
+            }
 
+            //debugger!! comment it when it is not needed
+            console.log("Content:",this.content);
+            console.log("Attributes:", this.finalAttributes);
+            console.log("Quotes:", quoteLocations);
 
-            console.log(contentArray);
-            console.log(this.content);
-            console.log(attributes);
-
-            this.finalElement  = ["<", this.element, this.finalAttributes,">", this.content, "</", this.element,">"].join("");
+            this.finalElement  = ["<", this.element, spacing , this.finalAttributes,">", this.content, "</", this.element,">"].join("");
 
             return this.finalElement;
         };

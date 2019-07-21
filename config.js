@@ -28,9 +28,8 @@ a7.config ={
      * 
      */
     pages: {
-        default: `
-        <h1>Welcome to my a7.js app</h1>
-        `
+        default: a7.createElement("h1", {xd:"tooMany"}, "Hello World ", 
+            a7.createElement("p", {}, "this is the second content param of Hello World"))
     },
     /**  Modules are smaller components than pages really useful for not repeating code
     How to access them?
