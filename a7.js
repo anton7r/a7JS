@@ -23,7 +23,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
+function timeTest (func){
+    var b = func;
+    var startingTime = new Date().getTime();
+    b();
+    var endingTime = new Date().getTime();
+    var result = endingTime - startingTime;
+    return console.log("Code execution took", result, "ms");
+}
 (function (window) {
     "use strict";
     // internal variables used in a7
@@ -51,7 +58,7 @@ SOFTWARE.
     function $() {
         var a7 = {};
 
-        a7.ver = "v2.2.0";
+        a7.ver = "v2.2.1";
 
         //the letter c represents content as if c was content
         a7.createElement = function (element, attributes, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12){
@@ -85,30 +92,39 @@ SOFTWARE.
 
                 }
             }
-            console.log(curVal);
             curVal = 0;
+            var displacement = 0;
             quoteLocations.forEach(function(val){
-                if(attributes.charAt(val + 1) === ":"){
-                    var start = quoteLocations[curVal - 1] + 1;
-                    var AttrName = attributes.slice(start, val);
+                //console.log(curVal, attributes.charAt(val + 1 - displacement));
+                if(attributes.charAt(val + 1 - displacement) === ":"){
+                    var start = quoteLocations[curVal - 1] + 1 - displacement;
+                    var AttrName = attributes.slice(start, val - displacement);
+                    /*
                     console.log("AttrName:",AttrName);
+                    //*/
                     attributes = attributes.replace(["\"", AttrName, "\""].join(""), AttrName);
+                    displacement += 2;
                 }
                 curVal++;
             });
             this.element = element;
             this.content = contentArray.join("");
-            this.finalAttributes = attributes.replace(/{/g, "").replace(/}/g, "").replace(/:/g, "=");
+            this.finalAttributes = attributes.replace(/{/g, "").replace(/}/g, "").replace(/:/g, "=").replace(/,/g, " ");
             
+
             var spacing = "";
-            if (this.finalAttributes.lenght !== 0){
+            if (this.finalAttributes.length !== 0){
                 spacing = " ";
             }
 
             //debugger!! comment it when it is not needed
+            /*
+
             console.log("Content:",this.content);
             console.log("Attributes:", this.finalAttributes);
             console.log("Quotes:", quoteLocations);
+
+            */
 
             this.finalElement  = ["<", this.element, spacing , this.finalAttributes,">", this.content, "</", this.element,">"].join("");
 
