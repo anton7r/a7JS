@@ -58,31 +58,27 @@ function timeTest (func){
     function $() {
         var a7 = {};
 
-        a7.ver = "v2.2.1";
+        a7.ver = "v2.2.2";
 
         //the letter c represents content as if c was content
-        a7.createElement = function (element, attributes, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12){
+        a7.createElement = function (element, attributes){
             if (attributes === undefined | null | "null"){
                 attributes = {};
             }
             attributes = JSON.stringify(attributes);
-            var contentArray = [
-                c1,
-                c2,
-                c3,
-                c4,
-                c5,
-                c6,
-                c7,
-                c8,
-                c9,
-                c10,
-                c11,
-                c12,
-            ];
+            var contentArray = [];
+            var curVal;
+            var argLen = arguments.length;
+            for(curVal = 0; curVal < argLen; curVal++){
+                var arg = arguments[curVal];
+                console.log(arg);
+                if (2 <= curVal){
+                    contentArray.push(arg);
+                }
+
+            }
             var lenght = attributes.length;
             var quoteLocations = [];
-            var curVal;
 
             for(curVal = 0; curVal < lenght; curVal++){
                 var curChar = attributes.charAt(curVal);
