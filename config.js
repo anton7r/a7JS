@@ -1,3 +1,6 @@
+var appRoutes = a7.config.routes;
+var appPages = a7.config.routes;
+
 a7.config ={
     default_title: "a7.js",
     /** To make the router work you have to setup routes
@@ -12,47 +15,19 @@ a7.config ={
     routes: {
         "/*": "default"
     },
-    /** Will change the html <title></title> of the app
-     *  Titles arent that neccessary if you dont wanna change the title around when You're inside different paths. 
-     *  if a tittle for a path is not defined it will return the default title
-     */
-    titles: {
-        "/*": "a7.js App"
-    },
-    /* Snippets Aka site descriptions which is needed for SEO */
-    snippets: {
-        "/*": "This is an Web application which uses a7.js as its core"
-    },
     /** Pages are essentially diffrent views.
      *  
      * 
      */
     pages: {
-        default: a7.createElement("h1", {xd:"tooMany"}, "Hello World ", 
-            a7.createElement("p", {}, "this is the second content param of Hello World"))
-    },
-    /**  Modules are smaller components than pages really useful for not repeating code
-    How to access them?
-    If you want to get the content of a module then use a7.module(modulename).get()
-    If you want to set a modules content you can do by a7.module(modulename).set(new content goes here)
-
-    You can now add modules to DOM by adding data-a7-render-module="modulename" and then calling the function a7.renderModules();
-    It will also change the attribute from data-a7-render-module="modulename" to data-a7-module="modulename" because the module is then rendered
-    */
-    modules:{
-        defaultmodule:"Hello i am a a7.js module",
-    },
-    /** Triggers are essentially functions that execute
-     *  when the router routs to a new path/new stage on your applications flow.
-     * 
-     *  When the router executes the trigger function it will then feed the path splitten into an array and give it as 
-     *  the first parameter to your trigger function.
-     *  
-     *  As an example you can maybe set a contents of an element to be a module 
-     *  or get documents on the server relative to the path on the client.
-    */
-    triggers: {
-        "/*": function(paths){
+        default: {
+            title: "a7JS app",
+            description: "This is an a7JS app.",
+            toView:function () {
+                return a7.createElement("div", {}, 
+                    a7.createElement("h1", {}, "This is the title"),
+                    a7.createElement("p", {}, "this is the text"));
+            },
         }
-    }
+    },
 };

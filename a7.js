@@ -23,19 +23,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-function timeTest (func){
-    var b = func;
-    var startingTime = new Date().getTime();
-    b();
-    var endingTime = new Date().getTime();
-    var result = endingTime - startingTime;
-    return console.log("Code execution took", result, "ms");
-}
 (function (window) {
     "use strict";
     // internal variables used in a7
-    var _module = {},
-        closeMenuOnRout,
+    var closeMenuOnRout,
         routerCache = {},
         closableMenus = [],
         pageMethods = {},
@@ -58,7 +49,7 @@ function timeTest (func){
     function $() {
         var a7 = {};
 
-        a7.ver = "v2.2.2";
+        a7.ver = "v3.0pre0";
 
         //the letter c represents content as if c was content
         a7.createElement = function (element, attributes){
@@ -69,14 +60,18 @@ function timeTest (func){
             var contentArray = [];
             var curVal;
             var argLen = arguments.length;
+
             for(curVal = 0; curVal < argLen; curVal++){
+                
                 var arg = arguments[curVal];
+
                 console.log(arg);
+                
                 if (2 <= curVal){
                     contentArray.push(arg);
                 }
-
             }
+
             var lenght = attributes.length;
             var quoteLocations = [];
 
@@ -108,11 +103,22 @@ function timeTest (func){
             this.finalAttributes = attributes.replace(/{/g, "").replace(/}/g, "").replace(/:/g, "=").replace(/,/g, " ");
             
 
-            var spacing = "";
+            var spacing;
             if (this.finalAttributes.length !== 0){
                 spacing = " ";
+            } else {
+                spacing = "";
             }
 
+            a7.elementCollection = function(){
+                var length = arguments.length,
+                    i,
+                    res = [];
+                for(i = 0; i < length; i++){
+                    res.push(arg[i]);
+                }
+                return res.join("");
+            };
             //debugger!! comment it when it is not needed
             /*
 
@@ -139,38 +145,7 @@ function timeTest (func){
                 .replace(/\//g, "&#x2F;");
             return result;
         };
-        //get and set modules 
-        a7.module = function (module) {
-            _module.module = module;
-            this.get = _module.get;
-            this.set = _module.set;
-            return this;
-        };
-        _module.get = function () {
-            var module = _module.module;
-            var moduleInConf = a7.config.modules[module];
-            if (moduleInConf) {
-                return moduleInConf;
-            } else {
-                return a7debug("The module \"" + module + "\" was not found. Please check for typos!");
-            }
-        };
-        _module.set = function (newContent) {
-            if (!newContent) {
-                return a7debug(".set() first param was not defined");
-            }
-            var moduleName = _module.module;
-            a7.config.modules[moduleName] = newContent;
-        };
-        a7.renderModules = function () {
-            var unRenderedModules = document.querySelectorAll("[data-a7-render-module]");
-            unRenderedModules.forEach(function (module) {
-                var moduleName = module.getAttribute("data-a7-render-module");
-                module.innerHTML = a7.module(moduleName).get();
-                module.removeAttribute("data-a7-render-module");
-                module.setAttribute("data-a7-module", moduleName);
-            });
-        };
+
         a7.page = {};
 
         pageMethods.html = function (newHTML) {
@@ -425,7 +400,7 @@ function timeTest (func){
                 page = config.pages[config.routes[route]],
                 pageName = config.routes[route],
 
-                snippet = config.snippets[route];
+                snippet = config.descriptions[route];
 
             if (title) {
                 document.title = title;
