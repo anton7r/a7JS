@@ -114,16 +114,6 @@ SOFTWARE.
             } else {
                 spacing = "";
             }
-
-            a7.elementCollection = function(){
-                var length = arguments.length,
-                    i,
-                    res = [];
-                for(i = 0; i < length; i++){
-                    res.push(arg[i]);
-                }
-                return res.join("");
-            };
             //debugger!! comment it when it is not needed
             /*
 
@@ -136,6 +126,16 @@ SOFTWARE.
             this.finalElement  = ["<", this.element, spacing , this.finalAttributes,">", this.content, "</", this.element,">"].join("");
 
             return this.finalElement;
+        };
+
+        a7.elementCollection = function(){
+            var length = arguments.length,
+                i,
+                res = [];
+            for(i = 0; i < length; i++){
+                res.push(arg[i]);
+            }
+            return res.join("");
         };
 
         //html sanitizer
