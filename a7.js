@@ -31,25 +31,32 @@ SOFTWARE.
         closableMenus = [],
         pageMethods = {},
         pageContainer,
-        currentPageName,
         menus = {},
         initDone,
         onMenuToggleList = {},
-        descriptionElements = [];
+        descriptionElements = [],
+        default_title,
+        default_desc,
+        a7app = {
+            routes:{},
+            pages:{}
+        };
 
     //debugging function which should not be public facing
     function a7debug(message) {
         message = "%c" + "a7.js" + " " + a7.ver + ": " + message;
         return console.warn(
             message,
-            "color: white; font-weight:bold;font-size:20px;"
+            ""
         );
     }
 
     function $() {
         var a7 = {};
 
-        a7.ver = "v3.0pre0";
+        a7.ver = "v3.0pre1";
+
+        a7.app = a7app;
 
         //the letter c represents content as if c was content
         a7.createElement = function (element, attributes){
@@ -65,8 +72,6 @@ SOFTWARE.
                 
                 var arg = arguments[curVal];
 
-                console.log(arg);
-                
                 if (2 <= curVal){
                     contentArray.push(arg);
                 }
@@ -195,21 +200,27 @@ SOFTWARE.
             });
         };
 
+        a7.render = function () {
+            var args = [];
+            var curVal;
+            var argLen = arguments.length;
+
+            for(curVal = 0; curVal < argLen; curVal++){
+                args.push(arguments[curVal]);
+            }
+
+            pageContainer.innerHTML = args.join("\n");
+        };
 
         a7.getDesc = function () {
-            var el = document.getElementsByName("description")[0];
-            if (el !== "undefined"){
-                return el;
-            } else {
-                a7debug("You do not have the meta description Element in the DOM, because of that we are going to create one for you");
-                document.getElementsByTagName("head")[0].innerHTML += "<meta name=\"description\" content=\"\">";
-                return el;
-            }
+            return descriptionElements[0];
         };
 
 
         a7.setDesc = function (newContent) {
-            var x;
+            descriptionElements.forEach(function(desc){
+                desc.setAttribute("content", newContent);
+            });
         };
 
         //Menu stuff
@@ -324,19 +335,34 @@ SOFTWARE.
                 this.html = pageMethods.html;
                 this.text = pageMethods.text;
                 return this;
-                };
-            
-            //conf
-            if (a7.config.default_title === undefined) {
-                a7.config.default_title = document.title;
+            };
+
+            //descriptions
+            var descL = document.getElementsByName("description");
+
+            if(descL.length !== 0){
+                descriptionElements.push(descL[0]);
+                var descContent = descL[0].getAttribute("content");
+
+                if (descContent !== undefined){
+                    default_desc = descL[0].getAttribute("content");
+                }
+
+            } else {
+                document.getElementsByTagName("head")[0].innerHTML += "<meta name=\"description\" content=\"\">";
+                descriptionElements.push(descL[0]);
             }
 
-            if (a7.config === undefined) {
-                a7debug("Please configure your app check docs for help");
+            //conf
+            default_title = document.title;
+
+            if (a7.app === undefined) {
+                return a7debug("Please configure your app check docs for help");
             }
 
             //first route and enabling back button
             a7.router(a7.path());
+
             window.addEventListener("popstate", function () {
                 a7.router(a7.path());
             });
@@ -375,7 +401,7 @@ SOFTWARE.
                 newPath = newPath.replace("/", "");
             }
 
-            var config = a7.config,
+            var config = a7.app,
                 index = newPath.indexOf("/"),
                 mainPath = ["/", newPath.slice(0, index + 1), "*"].join(""),
                 route,
@@ -395,52 +421,36 @@ SOFTWARE.
                 return a7debug("we could not find the page which you were looking for");
             }
 
-            var func = config.triggers[route],
-                title = config.titles[route],
+            var title = config.pages[config.routes[route]].title,
                 page = config.pages[config.routes[route]],
-                pageName = config.routes[route],
 
-                snippet = config.descriptions[route];
+                description = config.pages[config.routes[route]].description;
+
 
             if (title) {
                 document.title = title;
             } else {
-                document.title = config.default_title;
+                document.title = default_title;
             }
 
 
-            if ( snippet !== undefined){
-                
+            if ( description !== undefined ){
+
+                a7.setDesc(description);
+
+            } else if ( default_desc !== undefined){
+
+                a7.setDesc(default_desc);
+
             }
 
-            if (page === routerCache.latestResolvedPage) {
-            //do nothing because the page is the same as the latest resolved page
-            } else if (page) {
-
-                //Assign the page stuff to the view
-                pageContainer.innerHTML = page;
-
-                //classList
-                pageContainer.classList.remove(["a7-page-", currentPageName].join(""));
-                pageContainer.classList.add(["a7-page-", pageName].join(""));
-                currentPageName = pageName;
-
-                //store to memory the latest state for later comparison
-                routerCache.latestResolvedPage = page;
-                routerCache.resolvedRoutes[newPath] = route;
-            }
-
-
-            if (func) {
-                func(subPaths);
-            }
+            config.pages[config.routes[route]].script(subPaths);
 
             a7.path(newPath);
 
             scrollTo(0, pageXOffset);
-
-
         };
+
         window.onload = function () {
             a7.init();
         };

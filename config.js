@@ -1,8 +1,8 @@
-var appRoutes = a7.config.routes;
-var appPages = a7.config.routes;
 
-a7.config ={
-    default_title: "a7.js",
+var appRoutes = a7.app.routes;
+var appPages = a7.app.pages;
+
+a7.app = {
     /** To make the router work you have to setup routes
      *  and the route's value should be a desired pages name. 
      * 
@@ -13,20 +13,20 @@ a7.config ={
      * 
      */
     routes: {
-        "/*": "default"
+        "/*": "home"
     },
     /** Pages are essentially diffrent views.
      *  
      * 
      */
     pages: {
-        default: {
+        home: {
             title: "a7JS app",
             description: "This is an a7JS app.",
-            toView:function () {
-                return a7.createElement("div", {}, 
-                    a7.createElement("h1", {}, "This is the title"),
-                    a7.createElement("p", {}, "this is the text"));
+            script:function () {
+                a7.render(
+                    a7.createElement("h1", {}, "This is the homepage of my a7JS app!")
+                );
             },
         }
     },
