@@ -54,7 +54,7 @@ SOFTWARE.
     function $() {
         var a7 = {};
 
-        a7.ver = "v3.0pre1";
+        a7.ver = "v3.0pre2";
 
         a7.app = a7app;
 
@@ -350,7 +350,7 @@ SOFTWARE.
 
             } else {
                 document.getElementsByTagName("head")[0].innerHTML += "<meta name=\"description\" content=\"\">";
-                descriptionElements.push(descL[0]);
+                descriptionElements.push(document.getElementsByName("description")[0]);
             }
 
             //conf
@@ -401,7 +401,7 @@ SOFTWARE.
                 newPath = newPath.replace("/", "");
             }
 
-            var config = a7.app,
+            var app = a7.app,
                 index = newPath.indexOf("/"),
                 mainPath = ["/", newPath.slice(0, index + 1), "*"].join(""),
                 route,
@@ -411,20 +411,20 @@ SOFTWARE.
             //tries to match equal
             if (cacheMatch) {
                 route = cacheMatch;
-            } else if (config.routes[["/", newPath].join("")]) {
+            } else if (app.routes[["/", newPath].join("")]) {
                 route = ["/", newPath].join("");
-            } else if (config.routes[mainPath]) {
+            } else if (app.routes[mainPath]) {
                 route = mainPath;
-            } else if (config.routes["/*"]) {
+            } else if (app.routes["/*"]) {
                 route = "/*";
             } else {
                 return a7debug("we could not find the page which you were looking for");
             }
 
-            var title = config.pages[config.routes[route]].title,
-                page = config.pages[config.routes[route]],
+            var title = app.pages[app.routes[route]].title,
+                page = app.pages[app.routes[route]],
 
-                description = config.pages[config.routes[route]].description;
+                description = app.pages[app.routes[route]].description;
 
 
             if (title) {
@@ -444,7 +444,7 @@ SOFTWARE.
 
             }
 
-            config.pages[config.routes[route]].script(subPaths);
+            app.pages[app.routes[route]].onRoute(subPaths);
 
             a7.path(newPath);
 

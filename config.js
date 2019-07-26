@@ -23,7 +23,7 @@ a7.app = {
         home: {
             title: "a7JS app",
             description: "This is an a7JS app.",
-            script:function () {
+            onRoute:function () {
                 a7.render(
                     a7.createElement("h1", {}, "This is the homepage of my a7JS app!")
                 );
