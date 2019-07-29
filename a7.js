@@ -38,9 +38,10 @@ SOFTWARE.
         default_title,
         default_desc,
         a7app = {
-            routes:{},
-            pages:{}
-        };
+            routes: {},
+            pages: {}
+        },
+        a7components = {};
 
     //debugging function which should not be public facing
     function a7debug(message) {
@@ -54,90 +55,107 @@ SOFTWARE.
     function $() {
         var a7 = {};
 
-        a7.ver = "v3.0pre2";
+        a7.ver = "v3.0";
 
         a7.app = a7app;
 
         //the letter c represents content as if c was content
-        a7.createElement = function (element, attributes){
-            if (attributes === undefined | null | "null"){
+        a7.createElement = function (element, attributes) {
+            if (attributes === undefined | null | "null") {
                 attributes = {};
             }
-            attributes = JSON.stringify(attributes);
-            var contentArray = [];
-            var curVal;
-            var argLen = arguments.length;
 
-            for(curVal = 0; curVal < argLen; curVal++){
-                
-                var arg = arguments[curVal];
-
-                if (2 <= curVal){
-                    contentArray.push(arg);
-                }
-            }
-
-            var lenght = attributes.length;
-            var quoteLocations = [];
-
-            for(curVal = 0; curVal < lenght; curVal++){
-                var curChar = attributes.charAt(curVal);
-                if(curChar === "\""){
-
-                    quoteLocations.push(curVal);
-
-                }
-            }
-            curVal = 0;
-            var displacement = 0;
-            quoteLocations.forEach(function(val){
-                //console.log(curVal, attributes.charAt(val + 1 - displacement));
-                if(attributes.charAt(val + 1 - displacement) === ":"){
-                    var start = quoteLocations[curVal - 1] + 1 - displacement;
-                    var AttrName = attributes.slice(start, val - displacement);
-                    /*
-                    console.log("AttrName:",AttrName);
-                    //*/
-                    attributes = attributes.replace(["\"", AttrName, "\""].join(""), AttrName);
-                    displacement += 2;
-                }
-                curVal++;
-            });
-            this.element = element;
-            this.content = contentArray.join("");
-            this.finalAttributes = attributes.replace(/{/g, "").replace(/}/g, "").replace(/:/g, "=").replace(/,/g, " ");
-            
-
-            var spacing;
-            if (this.finalAttributes.length !== 0){
-                spacing = " ";
+            if (a7components[element] !== undefined) {
+                this.finalElement = ["<div>",a7components[element](attributes), "</div>"].join("");
             } else {
-                spacing = "";
+                attributes = JSON.stringify(attributes);
+                var contentArray = [];
+                var curVal;
+                var argLen = arguments.length;
+
+                for (curVal = 0; curVal < argLen; curVal++) {
+
+                    var arg = arguments[curVal];
+
+                    if (2 <= curVal) {
+                        contentArray.push(arg);
+                    }
+                }
+
+                var lenght = attributes.length;
+                var quoteLocations = [];
+
+                for (curVal = 0; curVal < lenght; curVal++) {
+                    var curChar = attributes.charAt(curVal);
+                    if (curChar === "\"") {
+
+                        quoteLocations.push(curVal);
+
+                    }
+                }
+                curVal = 0;
+                var displacement = 0;
+                quoteLocations.forEach(function (val) {
+                    //console.log(curVal, attributes.charAt(val + 1 - displacement));
+                    if (attributes.charAt(val + 1 - displacement) === ":") {
+                        var start = quoteLocations[curVal - 1] + 1 - displacement;
+                        var AttrName = attributes.slice(start, val - displacement);
+                        /*
+                        console.log("AttrName:",AttrName);
+                        //*/
+                        attributes = attributes.replace(["\"", AttrName, "\""].join(""), AttrName);
+                        displacement += 2;
+                    }
+                    curVal++;
+                });
+                this.element = element;
+                this.content = contentArray.join("");
+                this.finalAttributes = attributes.replace(/{/g, "").replace(/}/g, "").replace(/:/g, "=").replace(/,/g, " ");
+
+
+                var spacing;
+                if (this.finalAttributes.length !== 0) {
+                    spacing = " ";
+                } else {
+                    spacing = "";
+                }
+                //debugger!! comment it when it is not needed
+                /*
+
+                console.log("Content:",this.content);
+                console.log("Attributes:", this.finalAttributes);
+                console.log("Quotes:", quoteLocations);
+
+                */
+
+                this.finalElement = ["<", this.element, spacing, this.finalAttributes, ">", this.content, "</", this.element, ">"].join("");
+
             }
-            //debugger!! comment it when it is not needed
-            /*
-
-            console.log("Content:",this.content);
-            console.log("Attributes:", this.finalAttributes);
-            console.log("Quotes:", quoteLocations);
-
-            */
-
-            this.finalElement  = ["<", this.element, spacing , this.finalAttributes,">", this.content, "</", this.element,">"].join("");
 
             return this.finalElement;
         };
 
-        a7.elementCollection = function(){
+        a7.elementCollection = function () {
             var length = arguments.length,
                 i,
                 res = [];
-            for(i = 0; i < length; i++){
-                res.push(arg[i]);
+            for (i = 0; i < length; i++) {
+                res.push(arguments[i]);
             }
             return res.join("");
         };
 
+        a7.registerComponent = function (compName, compFunc) {
+            if (a7components[compName] === undefined) {
+
+                a7components[compName] = compFunc;
+
+            } else {
+
+                a7debug("That component is already registered!");
+
+            }
+        };
         //html sanitizer
         a7.encoder = function (content) {
             var result = content
@@ -205,7 +223,7 @@ SOFTWARE.
             var curVal;
             var argLen = arguments.length;
 
-            for(curVal = 0; curVal < argLen; curVal++){
+            for (curVal = 0; curVal < argLen; curVal++) {
                 args.push(arguments[curVal]);
             }
 
@@ -218,7 +236,7 @@ SOFTWARE.
 
 
         a7.setDesc = function (newContent) {
-            descriptionElements.forEach(function(desc){
+            descriptionElements.forEach(function (desc) {
                 desc.setAttribute("content", newContent);
             });
         };
@@ -295,7 +313,7 @@ SOFTWARE.
                 menuElements.forEach(function (elem) {
                     var menuname = elem.getAttribute("data-a7-menu"),
                         state = elem.getAttribute("data-a7-default-state");
-                        menus[menuname] = elem;
+                    menus[menuname] = elem;
                     if (state === "open") {
                         elem.classList.add(["a7-menu-", menuname, "-open"].join(""));
                     } else if (state === "closed") {
@@ -304,7 +322,7 @@ SOFTWARE.
                         elem.classList.add(["a7-menu-", menuname, "-closed"].join(""));
                     }
                 });
-                }
+            }
             var menuToggles = document.querySelectorAll("[data-a7-menu-toggle]");
             if (menuToggles) {
                 menuToggles.forEach(function (elem) {
@@ -340,11 +358,11 @@ SOFTWARE.
             //descriptions
             var descL = document.getElementsByName("description");
 
-            if(descL.length !== 0){
+            if (descL.length !== 0) {
                 descriptionElements.push(descL[0]);
                 var descContent = descL[0].getAttribute("content");
 
-                if (descContent !== undefined){
+                if (descContent !== undefined) {
                     default_desc = descL[0].getAttribute("content");
                 }
 
@@ -372,7 +390,7 @@ SOFTWARE.
 
         //if newPath is not defined then it will return the current path
         //Its looking too complex of a function right now.
-        a7.path = function ( newPath ) {
+        a7.path = function (newPath) {
             if (newPath === undefined) {
                 return window.location.pathname.replace("/", "");
             } else {
@@ -434,11 +452,11 @@ SOFTWARE.
             }
 
 
-            if ( description !== undefined ){
+            if (description !== undefined) {
 
                 a7.setDesc(description);
 
-            } else if ( default_desc !== undefined){
+            } else if (default_desc !== undefined) {
 
                 a7.setDesc(default_desc);
 
