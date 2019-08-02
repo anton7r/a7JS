@@ -55,7 +55,7 @@ SOFTWARE.
     function $() {
         var a7 = {};
 
-        a7.ver = "v3.1.0";
+        a7.ver = "v3.1.1";
 
         a7.app = a7app;
 
@@ -94,7 +94,10 @@ SOFTWARE.
                     if (curChar === "\"") {
 
                         quoteLocations.push(curVal);
+                    }
+                    else if (curChar === ":") {
 
+                        equalLocations.push(curVal);
                     }
                 }
                 curVal = 0;
@@ -112,17 +115,6 @@ SOFTWARE.
                     }
                     curVal++;
                 });
-
-
-                curVal = 0;
-                for (curVal = 0; curVal < lenght; curVal++) {
-                    var curChar = attributes.charAt(curVal);
-                    if (curChar === ":") {
-
-                        equalLocations.push(curVal);
-
-                    }
-                }
 
                 curVal = 0;
                 //checks if ":" is inside a string TODO:
