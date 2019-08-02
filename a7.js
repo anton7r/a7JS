@@ -55,7 +55,7 @@ SOFTWARE.
     function $() {
         var a7 = {};
 
-        a7.ver = "v3.0";
+        a7.ver = "v3.1.0";
 
         a7.app = a7app;
 
@@ -66,9 +66,12 @@ SOFTWARE.
             }
 
             if (a7components[element] !== undefined) {
-                this.finalElement = ["<div>",a7components[element](attributes), "</div>"].join("");
+                this.finalElement = ["<div class=\"",element,"\">",a7components[element](attributes), "</div>"].join("");
             } else {
                 attributes = JSON.stringify(attributes);
+
+                //console.log(attributes);
+
                 var contentArray = [];
                 var curVal;
                 var argLen = arguments.length;
@@ -82,8 +85,9 @@ SOFTWARE.
                     }
                 }
 
-                var lenght = attributes.length;
-                var quoteLocations = [];
+                var lenght = attributes.length,
+                    quoteLocations = [],
+                    equalLocations = [];
 
                 for (curVal = 0; curVal < lenght; curVal++) {
                     var curChar = attributes.charAt(curVal);
@@ -108,9 +112,57 @@ SOFTWARE.
                     }
                     curVal++;
                 });
+
+
+                curVal = 0;
+                for (curVal = 0; curVal < lenght; curVal++) {
+                    var curChar = attributes.charAt(curVal);
+                    if (curChar === ":") {
+
+                        equalLocations.push(curVal);
+
+                    }
+                }
+
+                curVal = 0;
+                //checks if ":" is inside a string TODO:
+                equalLocations.forEach(function (val) {
+
+                    //recursive function may cause browsers not wanting to open the site
+                    function checker(charPosition, str){
+                        var checkCharPos = charPosition - 1,
+                            char = str.charAt(checkCharPos),
+                            nextChar = str.charAt(checkCharPos - 1);
+
+                        console.log("checkerCharPos:", checkCharPos);
+
+                        if(char === "\"" & nextChar === ":" | char === "\"" & nextChar === "="){
+                            //No replacing happening here
+                            console.log(":");
+                        }
+                        else if (char === "\"" & nextChar !== ":") {
+                            //Yes please replace the character
+                            console.log("=");
+                            attributes = a7.replaceCharAt(attributes, val, "=");
+                        }
+                        //fail safe for infite loops and check for the first
+                        else if (checkCharPos === 0){
+                            console.log("=");
+                            attributes = a7.replaceCharAt(attributes, val, "=");
+                        }
+                        else {
+                            checker(checkCharPos, str);
+                        }
+                    }
+                    checker(val, attributes);
+
+                    
+                    //.replace(/:/g, "=")
+                });
+
                 this.element = element;
                 this.content = contentArray.join("");
-                this.finalAttributes = attributes.replace(/{/g, "").replace(/}/g, "").replace(/:/g, "=").replace(/,/g, " ");
+                this.finalAttributes = attributes.replace(/{/g, "").replace(/}/g, "").replace(/,/g, " ");
 
 
                 var spacing;
@@ -167,6 +219,11 @@ SOFTWARE.
                 //not a good idea TO DO THIS!!!!!!!!!!! because it is escaping and escapes can be escaped
                 .replace(/\//g, "&#x2F;");
             return result;
+        };
+
+        a7.replaceCharAt = function (str, index, repWith) {
+            var strLen = str.lenght;
+            return [str.substring(0, index), repWith, str.substring(index + 1, strLen)].join("");
         };
 
         a7.page = {};
