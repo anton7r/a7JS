@@ -41,11 +41,12 @@ SOFTWARE.
             routes: {},
             pages: {}
         },
-        a7components = {};
+        a7components = {},
+        a7ver = "v3.1.3";
 
     //debugging function which should not be public facing
     function a7debug(message) {
-        message = "%c" + "a7.js" + " " + a7.ver + ": " + message;
+        message = "%c" + "a7.js" +": " + message;
         return console.warn(
             message,
             ""
@@ -55,18 +56,21 @@ SOFTWARE.
     function $() {
         var a7 = {};
 
-        a7.ver = "v3.1.2";
+        a7.ver = function(){
+            return ["Running",a7ver].join(" ");
+        };
 
         a7.app = a7app;
 
         //the letter c represents content as if c was content
         a7.createElement = function (element, attributes) {
+            var finalElement;
             if (attributes === undefined | null | "null") {
                 attributes = {};
             }
 
             if (a7components[element] !== undefined) {
-                this.finalElement = ["<div class=\"", element, "\">", a7components[element](attributes), "</div>"].join("");
+                finalElement = ["<div class=\"", element, "\">", a7components[element](attributes), "</div>"].join("");
             } else {
                 attributes = JSON.stringify(attributes);
 
@@ -147,13 +151,13 @@ SOFTWARE.
                     curVal++;
                 });
 
-                this.element = element;
-                this.content = contentArray.join("");
-                this.finalAttributes = attributes.replace(/{/g, "").replace(/}/g, "").replace(/,/g, " ");
+                element = element;
+                content = contentArray.join("");
+                var finalAttributes = attributes.replace(/{/g, "").replace(/}/g, "").replace(/,/g, " ");
 
 
                 var spacing;
-                if (this.finalAttributes.length !== 0) {
+                if (finalAttributes.length !== 0) {
                     spacing = " ";
                 } else {
                     spacing = "";
@@ -161,17 +165,17 @@ SOFTWARE.
                 //debugger!! comment it when it is not needed
                 /*
 
-                console.log("Content:",this.content);
-                console.log("Attributes:", this.finalAttributes);
+                console.log("Content:",content);
+                console.log("Attributes:", finalAttributes);
                 console.log("Quotes:", quoteLocations);
 
                 */
 
-                this.finalElement = ["<", this.element, spacing, this.finalAttributes, ">", this.content, "</", this.element, ">"].join("");
+                finalElement = ["<", element, spacing, finalAttributes, ">", content, "</", element, ">"].join("");
 
             }
 
-            return this.finalElement;
+            return finalElement;
         };
 
         a7.elementCollection = function () {
@@ -209,8 +213,7 @@ SOFTWARE.
         };
 
         a7.replaceCharAt = function (str, index, repWith) {
-            var strLen = str.lenght;
-            return [str.substring(0, index), repWith, str.substring(index + 1, strLen)].join("");
+            return [str.substring(0, index), repWith, str.substring(index + 1, str.length)].join("");
         };
 
         a7.page = {};
@@ -263,9 +266,9 @@ SOFTWARE.
         };
 
         a7.render = function () {
-            var args = [];
-            var curVal;
-            var argLen = arguments.length;
+            var args = [],
+                curVal,
+                argLen = arguments.length;
 
             for (curVal = 0; curVal < argLen; curVal++) {
                 args.push(arguments[curVal]);
@@ -484,10 +487,7 @@ SOFTWARE.
             }
 
             var title = app.pages[app.routes[route]].title,
-                page = app.pages[app.routes[route]],
-
                 description = app.pages[app.routes[route]].description;
-
 
             if (title) {
                 document.title = title;
@@ -495,21 +495,15 @@ SOFTWARE.
                 document.title = default_title;
             }
 
-
             if (description !== undefined) {
 
                 a7.setDesc(description);
-
             } else if (default_desc !== undefined) {
 
                 a7.setDesc(default_desc);
-
             }
-
             app.pages[app.routes[route]].onRoute(subPaths);
-
             a7.path(newPath);
-
             scrollTo(0, pageXOffset);
         };
 
