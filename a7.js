@@ -55,7 +55,7 @@ SOFTWARE.
     function $() {
         var a7 = {};
 
-        a7.ver = "v3.1.1";
+        a7.ver = "v3.1.2";
 
         a7.app = a7app;
 
@@ -66,7 +66,7 @@ SOFTWARE.
             }
 
             if (a7components[element] !== undefined) {
-                this.finalElement = ["<div class=\"",element,"\">",a7components[element](attributes), "</div>"].join("");
+                this.finalElement = ["<div class=\"", element, "\">", a7components[element](attributes), "</div>"].join("");
             } else {
                 attributes = JSON.stringify(attributes);
 
@@ -94,17 +94,48 @@ SOFTWARE.
                     if (curChar === "\"") {
 
                         quoteLocations.push(curVal);
-                    }
-                    else if (curChar === ":") {
+                    } else if (curChar === ":") {
 
                         equalLocations.push(curVal);
                     }
                 }
+
+                //checks if ":" is inside a string 
+                equalLocations.forEach(function (val) {
+
+                    //recursive function may cause browsers not wanting to open the site
+                    function checker(charPosition, str) {
+                        var checkCharPos = charPosition - 1,
+                            char = str.charAt(checkCharPos),
+                            nextChar = str.charAt(checkCharPos - 1);
+
+                        //console.log("checkerCharPos:", checkCharPos);
+
+                        if (char === "\"" & nextChar === ":" | char === "\"" & nextChar === "=") {
+                            //We dont want to replace this
+                            //console.log(":");
+                        } else if (char === "\"" & nextChar !== ":") {
+                            //Replace char
+                            //console.log("=");
+                            attributes = a7.replaceCharAt(attributes, val, "=");
+                        }
+                        //fail safe for infite loops and check for the first
+                        else if (checkCharPos === 0) {
+                            //it appears that this is the first ":" so we want to replace it!
+                            //console.log("=");
+                            attributes = a7.replaceCharAt(attributes, val, "=");
+                        } else {
+                            checker(checkCharPos, str);
+                        }
+                    }
+                    checker(val, attributes);
+                });
+
                 curVal = 0;
                 var displacement = 0;
                 quoteLocations.forEach(function (val) {
                     //console.log(curVal, attributes.charAt(val + 1 - displacement));
-                    if (attributes.charAt(val + 1 - displacement) === ":") {
+                    if (attributes.charAt(val + 1 - displacement) === "=") {
                         var start = quoteLocations[curVal - 1] + 1 - displacement;
                         var AttrName = attributes.slice(start, val - displacement);
                         /*
@@ -114,43 +145,6 @@ SOFTWARE.
                         displacement += 2;
                     }
                     curVal++;
-                });
-
-                curVal = 0;
-                //checks if ":" is inside a string TODO:
-                equalLocations.forEach(function (val) {
-
-                    //recursive function may cause browsers not wanting to open the site
-                    function checker(charPosition, str){
-                        var checkCharPos = charPosition - 1,
-                            char = str.charAt(checkCharPos),
-                            nextChar = str.charAt(checkCharPos - 1);
-
-                        //console.log("checkerCharPos:", checkCharPos);
-
-                        if(char === "\"" & nextChar === ":" | char === "\"" & nextChar === "="){
-                            //We dont want to replace this
-                            //console.log(":");
-                        }
-                        else if (char === "\"" & nextChar !== ":") {
-                            //Replace char
-                            //console.log("=");
-                            attributes = a7.replaceCharAt(attributes, val, "=");
-                        }
-                        //fail safe for infite loops and check for the first
-                        else if (checkCharPos === 0){
-                            //it appears that this is the first ":" so we want to replace it!
-                            //console.log("=");
-                            attributes = a7.replaceCharAt(attributes, val, "=");
-                        }
-                        else {
-                            checker(checkCharPos, str);
-                        }
-                    }
-                    checker(val, attributes);
-
-                    
-                    //.replace(/:/g, "=")
                 });
 
                 this.element = element;
