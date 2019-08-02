@@ -134,20 +134,21 @@ SOFTWARE.
                             char = str.charAt(checkCharPos),
                             nextChar = str.charAt(checkCharPos - 1);
 
-                        console.log("checkerCharPos:", checkCharPos);
+                        //console.log("checkerCharPos:", checkCharPos);
 
                         if(char === "\"" & nextChar === ":" | char === "\"" & nextChar === "="){
-                            //No replacing happening here
-                            console.log(":");
+                            //We dont want to replace this
+                            //console.log(":");
                         }
                         else if (char === "\"" & nextChar !== ":") {
-                            //Yes please replace the character
-                            console.log("=");
+                            //Replace char
+                            //console.log("=");
                             attributes = a7.replaceCharAt(attributes, val, "=");
                         }
                         //fail safe for infite loops and check for the first
                         else if (checkCharPos === 0){
-                            console.log("=");
+                            //it appears that this is the first ":" so we want to replace it!
+                            //console.log("=");
                             attributes = a7.replaceCharAt(attributes, val, "=");
                         }
                         else {
