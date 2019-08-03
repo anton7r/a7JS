@@ -20,7 +20,8 @@ goto void
 
 :init
 echo adding a7JS to your current project
-xcopy "%ProgramFiles%\a7js\js\" "%cd%\a7\" /E/C/Y/Q
+xcopy "%ProgramFiles%\a7js\js" %cd%\a7\ /E/C/Y/Q
+echo successfully added a7JS to your project
 goto void
 
 :version
