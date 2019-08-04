@@ -24,5 +24,8 @@
   "bugs": {
     "url": "https://github.com/anton7r/a7JS/issues"
   },
-  "homepage": "https://github.com/anton7r/a7JS#readme"
+  "homepage": "https://github.com/anton7r/a7JS#readme",
+  "dependencies": {
+    "chalk": "^2.4.2"
+  }
 }
