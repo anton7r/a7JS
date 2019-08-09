@@ -510,4 +510,8 @@ if (window !== undefined) {
     //Then use case is on the server
 }
 
-module.exports = exports = a7;
+if(module !== undefined){
+
+    module.exports = exports = a7;
+    
+}
