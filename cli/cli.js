@@ -16,11 +16,11 @@ const createHtmlDoc = function (name) {
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>`, name, `</title>
     <meta name="description" content="`, name, `"></meta>
-    <link href="/css/style.css" rel="stylesheet">
+    <link href="/app/css/style.css" rel="stylesheet">
 </head>
 <body>
     <div data-a7-page-container></div>
-    <script src="/js/app.js"></script>
+    <script src="/app/js/index.js"></script>
 </body>
 </html>`].join("");
 };
@@ -33,12 +33,12 @@ const cssDoc = `:root{
     margin:0px;
     padding:0px;
 }`;
-const jsDoc = `var app = a7.app;
+const jsDoc = `const a7 = require("a7");
 
-app.routes = {
+a7.app.routes = {
     "/*": "home"
 };
-app.pages = {
+a7.app.pages = {
     home:{
         title:"Home",
         description:"Welcome to my site",
@@ -76,7 +76,9 @@ const a7newproject = function (name) {
 
     }
 
-    log(chalk.cyan("creating a new project in /" + name + "/"));
+    log(chalk.cyan("creating a new project in " + name));
+
+    
 
     fs.mkdir(name, {
         recursive: true
@@ -88,38 +90,35 @@ const a7newproject = function (name) {
             log(chalk.green("SUCCESS:"), "project folder was created.");
         }
     });
+
+    fs.writeFile(name + "/package.json", "empty", function (err) {
+        if (err) {
+            log(chalk.red("ERROR:"), "package.json could not be created.");
+        }
+    });
+
+    fs.mkdirSync([name,"/src"].join(""));
     fs.writeFile(name + "/index.html", createHtmlDoc(name), function (err) {
         if (err) {
             log(chalk.red("ERROR:"), "index.html could not be created.");
-        } else {}
+        }
     });
     fs.mkdir(name + "/css", {
         recursive: true
     }, function (err) {
         if (err) {
             log(chalk.red("ERROR:"), "css folder could not be created.");
-        } else {
-
         }
     });
     fs.writeFile(name + "/css/style.css", cssDoc, function (err) {
         if (err) {
             log(chalk.red("ERROR:"), "index.html could not be created.");
-        } else {}
-    });
-    fs.mkdir(name + "/js", {
-        recursive: true
-    }, function (err) {
-        if (err) {
-            log(chalk.red("ERROR:"), "js folder could not be created.");
-        } else {
-
         }
     });
-    fs.writeFile(name + "/js/index.js", jsDoc, function (err) {
+    fs.writeFile(name + "/src/index.js", jsDoc, function (err) {
         if (err) {
             log(chalk.red("ERROR:"), "index.html could not be created.");
-        } else {}
+        }
     });
     log(chalk.green("SUCCESS:"), "The Project was created without any errors!");
 };
@@ -127,6 +126,7 @@ const a7newproject = function (name) {
 const a7unknownArg = function () {
     log(chalk.red("ERROR:"), chalk.cyan(args.join(" ")), "is not a valid argument.");
 };
+
 switch (args[0]) {
     case undefined:
         a7greet();
