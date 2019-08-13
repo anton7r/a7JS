@@ -37,13 +37,13 @@ function a7debug(message) {
 var a7 = {},
 
 a7store = {
-    ver: "v3.1.3",
+    ver: "v3.2",
     componentList: {},
     menus: {},
     closableMenus: [],
     pageMethods: {},
     onMenuToggleList: {},
-    descriptionElements: []
+    descriptionElements: [],
 };
 
 a7.ver = function () {
@@ -147,6 +147,9 @@ a7.createElement = function (element, attributes) {
         content = contentArray.join("");
         var finalAttributes = attributes.replace(/{/g, "").replace(/}/g, "").replace(/,/g, " ");
 
+        if(finalAttributes === "\"\""){
+            finalAttributes = "";
+        }
 
         var spacing;
         if (finalAttributes.length !== 0) {
@@ -502,16 +505,5 @@ a7.router = function (newPath) {
     a7.path(newPath);
     scrollTo(0, pageXOffset);
 };
-if (window !== undefined) {
-    window.onload = function () {
-        a7.init();
-    };
-} else {
-    //Then use case is on the server
-}
 
-if(module !== undefined){
-
-    module.exports = exports = a7;
-    
-}
+module.exports = exports = a7;

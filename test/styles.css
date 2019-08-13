@@ -1,19 +1,33 @@
 @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700&display=swap');
 
 * {
-    margin:0px;
-    padding:0px;
+    margin: 0px;
+    padding: 0px;
     font-family: 'Source Sans Pro', sans-serif;
-    --mainColor:rgb(22, 127, 247);
+    --mainColor: rgb(22, 127, 247);
     --transition: cubic-bezier(0.165, 0.84, 0.44, 1);
     --slightGray: rgb(169, 173, 182);
+    --dynamicMargin: calc(100vw / 5);
+}
+
+.noSelect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+h1 {
+    font-weight: 600;
 }
 
 nav {
     display: grid;
     grid-template-rows: 70px;
     grid-template-columns: 1 1;
-    background-color:var(--mainColor);
+    background-color: var(--mainColor);
     box-shadow: 0 0 5px rgb(85, 85, 107);
     grid-template-areas: "h1 btn";
     height: 70px;
@@ -22,10 +36,16 @@ nav {
 
 nav h1 {
     grid-area: h1;
-    font-size:30px;
-    color:white;
+    font-size: 30px;
+    color: white;
     line-height: 70px;
-    margin:auto;
+    margin: auto;
+}
+
+nav h1::after {
+    content: " beta";
+    font-size: 15px;
+    color: rgb(255, 222, 130)
 }
 
 .testingStart {
@@ -37,10 +57,11 @@ nav h1 {
     border: solid 2px white;
     box-shadow: 0px 0px 4px rgb(22, 110, 226);
     position: relative;
-    margin:10px auto;
+    margin: 10px auto;
     height: 46px;
     cursor: pointer;
-}   
+}
+
 .testingStart p {
     position: relative;
     text-align: center;
@@ -49,38 +70,54 @@ nav h1 {
     z-index: 2;
     font-weight: 600;
 }
+
 .testingStart::before {
     content: "";
     position: absolute;
-    background-color:white;
+    background-color: white;
     top: 50%;
     left: 50%;
     text-align: start;
     border-radius: 25px;
     z-index: 1;
     transition: 200ms var(--transition);
-    width:46px;
-    height:46px;
+    width: 46px;
+    height: 46px;
     transform: translate(-50%, -50%);
     opacity: 0;
 }
 
 .testingStart:hover p {
-    color:var(--mainColor);
-}
-
-.testingStart:hover {
-
+    color: var(--mainColor);
 }
 
 .testingStart:hover::before {
-    width:146px;
-    height:46px;
+    width: 146px;
+    height: 46px;
     transform: rotateX(0deg) translate(-50%, -50%);
     opacity: 1;
     border-radius: 4px;
 }
 
+.overview {
+    min-height: 300px;
+    width:100vw;
+}
+
+.overview h1 {
+    margin: 20px var(--dynamicMargin);
+    display: block;
+}
+
+.overview::after {
+    content: "";
+    height: 2px;
+    width:100vw;
+    background-color: var(--slightGray);
+    display: block;
+    position: relative;
+    bottom: 0;
+}
 
 .testingInfo {
     display: grid;
@@ -96,4 +133,61 @@ nav h1 {
 
 .testingInfo p {
     font-size: 20px;
+    text-align: center;
+}
+
+.testRes {
+    animation: fadeIn 200ms var(--transition) 1 forwards;
+}
+
+.testRes h1 {
+    padding: 10px;
+    margin: 0 var(--dynamicMargin);
+}
+
+.testRes p {
+    padding: 5px 15px 15px 15px;
+    margin: 0 var(--dynamicMargin);
+}
+
+.openLog {
+    width: 100px;
+    height: 30px;
+    background-color: var(--mainColor);
+    line-height: 30px;
+    text-align: center;
+    color: white;
+    border-radius: 5px;
+    margin: 5px var(--dynamicMargin);
+    font-weight: 600;
+    font-size: 17px;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgb(138, 189, 255);
+    transition: box-shadow 200ms var(--transition)
+}
+
+.openLog:hover {
+    box-shadow: 0 0 10px rgb(19, 119, 250)
+}
+
+.testRes::after {
+    content: "";
+    display: block;
+    background-color: rgb(225, 227, 231);
+    width: 100%;
+    height: 2px;
+}
+
+/*
+ * Animations
+ */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
