@@ -56,13 +56,29 @@ var tester = function(name, testMe, expRes){
         printRes(name, false);
     }
 };
-var test = function(){
+
+var getVer = function() {
+    var re;
+
+    if (a7.ver() ===undefined){
+        re = "could not get version.";
+    } else {
+        re = a7.ver();
+    }
+
+    return re;
+};
+
+var test = function() {
     numOfTests = 0;
 
     numOfTestsPassed = 0;
 
     document.getElementsByClassName("testingApp")[0].innerHTML = "<div class=\"overview\"><h1>Test Overview</h1></div><div class=\"results\"></div>";
     resEl = document.getElementsByClassName("results")[0];
+    overviewEl = document.getElementsByClassName("overview")[0];
+
+    overviewEl.innerHTML += "<div class=\"testVersion\"><span>Tested version: </span>" + getVer() + "</div>";
 
     tester("a7.init()", function(){
         return a7store.initDone;

@@ -47,7 +47,7 @@ a7store = {
 };
 
 a7.ver = function () {
-    return ["Running", a7store.ver].join(" ");
+    return a7store.ver;
 };
 
 a7.app = {

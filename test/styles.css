@@ -113,10 +113,19 @@ nav h1::after {
     content: "";
     height: 2px;
     width:100vw;
-    background-color: var(--slightGray);
+    background-color: rgb(225, 227, 231);
     display: block;
     position: relative;
     bottom: 0;
+}
+
+.testVersion {
+    margin: 0 var(--dynamicMargin);
+    font-size: 17px;
+}
+
+.testVersion span {
+    color: rgb(97, 97, 97);
 }
 
 .testingInfo {
