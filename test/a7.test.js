@@ -81,7 +81,7 @@ var test = function() {
     overviewEl.innerHTML += "<div class=\"testVersion\"><span>Tested version: </span>" + getVer() + "</div>";
 
     tester("a7.init()", function(){
-        return a7store.initDone;
+        return a7store[10];
     }, true);
 
     tester("a7.createElement",function(){
@@ -92,8 +92,8 @@ var test = function() {
         return a7.createElement("div", {class:"homeScreen sizeLarge"}, a7.createElement("h1", "", "Hello, Its me header1!"));
     }, "<div class=\"homeScreen sizeLarge\"><h1>Hello, Its me header1!</h1></div>");
 
-    tester("a7store.title", function(){
-        return a7store.title;
+    tester("a7store[12]", function(){
+        return a7store[12];
     }, document.title);
 
     var i;

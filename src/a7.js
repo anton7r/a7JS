@@ -38,6 +38,7 @@ var a7 = {},
 
 //we changed a7store object to an array because we tested that arrays are simply about 33% faster than objects
 //which would give us a huge performance increase
+a7store = Array(13);
 a7store = [
     "v3.2.1", //Version       0
     {}, //ComponentList       1
@@ -46,6 +47,12 @@ a7store = [
     {}, //PageMethods         4
     {}, //onMenuToggleList    5
     [], //descriptionElements 6
+    {}, //cacheMatch          7
+    false, //closeMenuOnRout  8
+    {}, //pageContainer       9
+    false, //initDone         10
+    "", //description         11
+    "", //title               12
 ];
 
 a7.ver = function () {
@@ -60,7 +67,7 @@ a7.app = {
 a7.createElement = function (element, attributes) {
     var finalElement;
     if (attributes === undefined | null | "null") {
-        attributes = {};
+        attributes = "";
     }
 
     if (a7store[1][element] !== undefined) {
@@ -271,7 +278,7 @@ a7.render = function () {
         args.push(arguments[curVal]);
     }
 
-    a7store.pageContainer.innerHTML = args.join("\n");
+    a7store[9].innerHTML = args.join("\n");
 };
 
 a7.getDesc = function () {
@@ -327,7 +334,7 @@ a7.closeMenu = function (menuName) {
 };
 
 a7.closeMenuOnRout = function (menu) {
-    a7store.closeMenuOnRout = true;
+    a7Store[8] = true;
     a7store[3].push(menu);
 };
 
@@ -338,7 +345,7 @@ a7.onMenuToggle = function (menuName, func) {
 //Init will run once
 a7.init = function () {
 
-    if (a7store.initDone === true) {
+    if (a7store[10] === true) {
         return;
     }
 
@@ -346,11 +353,11 @@ a7.init = function () {
     if (pageContainerEL === null) {
         return a7debug("Page Container Could not be found, It has to have the data attribute \"data-a7-page-container\". Your website wont function without that.");
     }
-    //assignment of a7store.pageContainer
-    a7store.pageContainer = pageContainerEL;
+    //assignment of a7store[9]
+    a7store[9] = pageContainerEL;
     pageContainerEL.setAttribute("a7-page-container", "set");
     pageContainerEL.removeAttribute("data-a7-page-container");
-    a7store.initDone = true;
+    a7store[10] = true;
 
     //menu init
     var menuElements = document.querySelectorAll("[data-a7-menu]");
@@ -393,7 +400,7 @@ a7.init = function () {
 
     //a7 page
     a7.page.find = function (elem) {
-        a7.page.elem = a7store.pageContainer.querySelector(elem);
+        a7.page.elem = a7store[9].querySelector(elem);
         this.get = a7store[4].get;
         this.html = a7store[4].html;
         this.text = a7store[4].text;
@@ -408,7 +415,7 @@ a7.init = function () {
         var descContent = descL[0].getAttribute("content");
 
         if (descContent !== undefined) {
-            a7store.description = descL[0].getAttribute("content");
+            a7store[11] = descL[0].getAttribute("content");
         }
 
     } else {
@@ -417,7 +424,7 @@ a7.init = function () {
     }
 
     //conf
-    a7store.title = document.title;
+    a7store[12] = document.title;
 
     if (a7.app === undefined) {
         return a7debug("Please configure your app check docs for help");
@@ -450,12 +457,10 @@ a7.path = function (newPath) {
     }
 };
 
-a7store.resolvedRoutes = {};
-
 //Resolves any path you give
 a7.router = function (newPath) {
 
-    if (a7store.closeMenuOnRout === true) {
+    if (a7Store[8] === true) {
         a7store[3].forEach(function (menu) {
             a7.closeMenu(menu);
         });
@@ -469,7 +474,7 @@ a7.router = function (newPath) {
         index = newPath.indexOf("/"),
         mainPath = ["/", newPath.slice(0, index + 1), "*"].join(""),
         route,
-        cacheMatch = a7store.resolvedRoutes["/" + newPath],
+        cacheMatch = a7store[7]["/" + newPath],
         subPaths = newPath.split("/");
 
     //tries to match equal
@@ -491,15 +496,15 @@ a7.router = function (newPath) {
     if (title) {
         document.title = title;
     } else {
-        document.title = a7store.title;
+        document.title = a7store[12];
     }
 
     if (description !== undefined) {
 
         a7.setDesc(description);
-    } else if (a7store.description !== undefined) {
+    } else if (a7store[11] !== undefined) {
 
-        a7.setDesc(a7store.description);
+        a7.setDesc(a7store[11]);
     }
     app.pages[app.routes[route]].onRoute(subPaths);
     a7.path(newPath);
