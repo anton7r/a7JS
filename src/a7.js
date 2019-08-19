@@ -36,18 +36,20 @@ function a7debug(message) {
 
 var a7 = {},
 
-a7store = {
-    ver: "v3.2",
-    componentList: {},
-    menus: {},
-    closableMenus: [],
-    pageMethods: {},
-    onMenuToggleList: {},
-    descriptionElements: [],
-};
+//we changed a7store object to an array because we tested that arrays are simply about 33% faster than objects
+//which would give us a huge performance increase
+a7store = [
+    "v3.2.1", //Version       0
+    {}, //ComponentList       1
+    {}, //Menus               2
+    [], //ClosableMenus       3
+    {}, //PageMethods         4
+    {}, //onMenuToggleList    5
+    [], //descriptionElements 6
+];
 
 a7.ver = function () {
-    return a7store.ver;
+    return a7store[0];
 };
 
 a7.app = {
@@ -61,8 +63,8 @@ a7.createElement = function (element, attributes) {
         attributes = {};
     }
 
-    if (a7store.componentList[element] !== undefined) {
-        finalElement = ["<div class=\"", element, "\">", a7store.componentList[element](attributes), "</div>"].join("");
+    if (a7store[1][element] !== undefined) {
+        finalElement = ["<div class=\"", element, "\">", a7store[1][element](attributes), "</div>"].join("");
     } else {
         attributes = JSON.stringify(attributes);
 
@@ -184,9 +186,9 @@ a7.elementCollection = function () {
 };
 
 a7.registerComponent = function (compName, compFunc) {
-    if (a7store.componentList[compName] === undefined) {
+    if (a7store[1][compName] === undefined) {
 
-        a7store.componentList[compName] = compFunc;
+        a7store[1][compName] = compFunc;
 
     } else {
 
@@ -213,21 +215,21 @@ a7.replaceCharAt = function (str, index, repWith) {
 
 a7.page = {};
 
-a7store.pageMethods.html = function (newHTML) {
+a7store[4].html = function (newHTML) {
     if (newHTML === undefined) {
         return a7.page.elem.innerHTML;
     } else {
         a7.page.elem.innerHTML = newHTML;
     }
 };
-a7store.pageMethods.text = function (newText) {
+a7store[4].text = function (newText) {
     if (newText === undefined) {
         return a7.page.elem.innerText;
     } else {
         a7.page.elem.innerText = newText;
     }
 };
-a7store.pageMethods.get = function () {
+a7store[4].get = function () {
     return a7.page.elem;
 };
 
@@ -273,28 +275,26 @@ a7.render = function () {
 };
 
 a7.getDesc = function () {
-    return a7store.descriptionElements[0];
+    return a7store[6][0];
 };
 
 
 a7.setDesc = function (newContent) {
-    a7store.descriptionElements.forEach(function (desc) {
+    a7store[6].forEach(function (desc) {
         desc.setAttribute("content", newContent);
     });
 };
 
 //Menu stuff
 a7.toggleMenu = function (menuName) {
-    var elem = a7store.menus[menuName],
+    var elem = a7store[2][menuName],
         classList = elem.classList,
-        open = ["a7-menu-", menuName, "-open"].join(""),
-        closed = ["a7-menu-", menuName, "-closed"].join(""),
         menuState;
 
-    classList.toggle(open);
-    classList.toggle(closed);
+    classList.toggle("a7-menu-" + menuName + "-open");
+    classList.toggle("a7-menu-" + menuName + "-closed");
 
-    var menuToggleFunc = a7store.onMenuToggleList[menuName];
+    var menuToggleFunc = a7store[5][menuName];
     if (menuToggleFunc === undefined) {
         return;
     }
@@ -311,11 +311,11 @@ a7.toggleMenu = function (menuName) {
 };
 
 a7.closeMenu = function (menuName) {
-    var menuToggleFunc = a7store.onMenuToggleList[menuName];
+    var menuToggleFunc = a7store[5][menuName];
     if (menuToggleFunc !== undefined) {
         menuToggleFunc("closed");
     }
-    var elem = a7store.menus[menuName],
+    var elem = a7store[2][menuName],
         classList = elem.classList,
         open = ["a7-menu-", menuName, "-open"].join(""),
         closed = ["a7-menu-", menuName, "-closed"].join("");
@@ -328,11 +328,11 @@ a7.closeMenu = function (menuName) {
 
 a7.closeMenuOnRout = function (menu) {
     a7store.closeMenuOnRout = true;
-    a7store.closableMenus.push(menu);
+    a7store[3].push(menu);
 };
 
 a7.onMenuToggle = function (menuName, func) {
-    a7store.onMenuToggleList[menuName] = func;
+    a7store[5][menuName] = func;
 };
 
 //Init will run once
@@ -358,7 +358,7 @@ a7.init = function () {
         menuElements.forEach(function (elem) {
             var menuname = elem.getAttribute("data-a7-menu"),
                 state = elem.getAttribute("data-a7-default-state");
-            a7store.menus[menuname] = elem;
+            a7store[2][menuname] = elem;
             if (state === "open") {
                 elem.classList.add(["a7-menu-", menuname, "-open"].join(""));
             } else if (state === "closed") {
@@ -394,9 +394,9 @@ a7.init = function () {
     //a7 page
     a7.page.find = function (elem) {
         a7.page.elem = a7store.pageContainer.querySelector(elem);
-        this.get = a7store.pageMethods.get;
-        this.html = a7store.pageMethods.html;
-        this.text = a7store.pageMethods.text;
+        this.get = a7store[4].get;
+        this.html = a7store[4].html;
+        this.text = a7store[4].text;
         return this;
     };
 
@@ -404,7 +404,7 @@ a7.init = function () {
     var descL = document.getElementsByName("description");
 
     if (descL.length !== 0) {
-        a7store.descriptionElements.push(descL[0]);
+        a7store[6].push(descL[0]);
         var descContent = descL[0].getAttribute("content");
 
         if (descContent !== undefined) {
@@ -413,7 +413,7 @@ a7.init = function () {
 
     } else {
         document.getElementsByTagName("head")[0].innerHTML += "<meta name=\"description\" content=\"\">";
-        a7store.descriptionElements.push(document.getElementsByName("description")[0]);
+        a7store[6].push(document.getElementsByName("description")[0]);
     }
 
     //conf
@@ -456,7 +456,7 @@ a7store.resolvedRoutes = {};
 a7.router = function (newPath) {
 
     if (a7store.closeMenuOnRout === true) {
-        a7store.closableMenus.forEach(function (menu) {
+        a7store[3].forEach(function (menu) {
             a7.closeMenu(menu);
         });
     }
