@@ -54,7 +54,7 @@ var a7 = {},
 //which would give us a huge performance increase
 a7store = Array(13);
 a7store = [
-    "v3.2.1", //Version       0
+    "v3.3.0", //Version       0
     {}, //ComponentList       1
     {}, //Menus               2
     [], //ClosableMenus       3
@@ -97,10 +97,8 @@ a7.createElement = function (element, attributes) {
 
         for (curVal = 0; curVal < argLen; curVal++) {
 
-            var arg = arguments[curVal];
-
             if (2 <= curVal) {
-                contentArray.push(arg);
+                contentArray.push(arguments[curVal]);
             }
         }
 
@@ -255,7 +253,7 @@ a7.render = function () {
     for (curVal = 0; curVal < argLen; curVal++) {
         args.push(arguments[curVal]);
     }
-
+    //a7store[9] is pageContainer
     a7store[9].innerHTML = args.join("\n");
 };
 
@@ -307,13 +305,18 @@ a7.closeMenu = function (menuName) {
     if (classList.contains(open)) {
         classList.remove(open);
         classList.add(closed);
+    } else {
+        new Error("Menu " + menuName + " could not be closed");
     }
-    return;
 };
 
 a7.closeMenuOnRout = function (menu) {
-    a7Store[8] = true;
-    a7store[3].push(menu);
+    if (menu === undefined){
+        new Error("Menu" + menu + "could not be found.");
+    } else {
+        a7Store[8] = true;
+        a7store[3].push(menu);
+    }
 };
 
 a7.onMenuToggle = function (menuName, func) {
@@ -322,16 +325,16 @@ a7.onMenuToggle = function (menuName, func) {
 
 //Init will run once
 a7.init = function () {
-
+    //a7store[10] is initDone
     if (a7store[10] === true) {
         return;
     }
 
     var pageContainerEL = document.querySelector("[data-a7-page-container]");
-    if (pageContainerEL === null) {
+    if (pageContainerEL === null | pageContainerEL === undefined) {
         return a7debug("Page Container Could not be found, It has to have the data attribute \"data-a7-page-container\". Your website wont function without that.");
     }
-    //assignment of a7store[9]
+    //assignment of a7store[9] aka pageContainer
     a7store[9] = pageContainerEL;
     pageContainerEL.setAttribute("a7-page-container", "set");
     pageContainerEL.removeAttribute("data-a7-page-container");
@@ -440,11 +443,9 @@ a7.router = function (newPath) {
     }
 
     var app = a7.app,
-        index = newPath.indexOf("/"),
-        mainPath = ["/", newPath.slice(0, index + 1), "*"].join(""),
+        mainPath = ["/", newPath.slice(0, newPath.indexOf("/") + 1), "*"].join(""),
         route,
-        cacheMatch = a7store[7]["/" + newPath],
-        subPaths = newPath.split("/");
+        cacheMatch = a7store[7]["/" + newPath];
 
     //tries to match equal
     if (cacheMatch) {
@@ -475,7 +476,7 @@ a7.router = function (newPath) {
 
         a7.setDesc(a7store[11]);
     }
-    app.pages[app.routes[route]].onRoute(subPaths);
+    app.pages[app.routes[route]].onRoute(newPath.split("/"));
     a7.path(newPath);
     scrollTo(0, pageXOffset);
 };
