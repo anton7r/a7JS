@@ -23,7 +23,21 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-// internal variables used in a7
+//Older browser support
+
+if (window !== undefined) {
+    if (window.NodeList && !NodeList.prototype.forEach) {
+        NodeList.prototype.forEach = Array.prototype.forEach;
+    }
+
+    if (window.HTMLCollection && !HTMLCollection.prototype.forEach) {
+        HTMLCollection.prototype.forEach = Array.prototype.forEach;
+    }
+}
+//very useful 
+if (!"".trim) String.prototype.trim = function () {
+    return this.replace(/^[\s﻿]+|[\s﻿]+$/g, '');
+};
 
 //debugging function which should not be public facing
 function a7debug(message) {
@@ -220,42 +234,6 @@ a7.replaceCharAt = function (str, index, repWith) {
     return [str.substring(0, index), repWith, str.substring(index + 1, str.length)].join("");
 };
 
-a7.page = {};
-
-a7store[4].html = function (newHTML) {
-    if (newHTML === undefined) {
-        return a7.page.elem.innerHTML;
-    } else {
-        a7.page.elem.innerHTML = newHTML;
-    }
-};
-a7store[4].text = function (newText) {
-    if (newText === undefined) {
-        return a7.page.elem.innerText;
-    } else {
-        a7.page.elem.innerText = newText;
-    }
-};
-a7store[4].get = function () {
-    return a7.page.elem;
-};
-
-a7.fallBacks = (function () {
-    if (window !== undefined) {
-        if (window.NodeList && !NodeList.prototype.forEach) {
-            NodeList.prototype.forEach = Array.prototype.forEach;
-        }
-
-        if (window.HTMLCollection && !HTMLCollection.prototype.forEach) {
-            HTMLCollection.prototype.forEach = Array.prototype.forEach;
-        }
-    }
-    //very useful 
-    if (!"".trim) String.prototype.trim = function () {
-        return this.replace(/^[\s﻿]+|[\s﻿]+$/g, '');
-    };
-}());
-
 a7.renderNewLinks = function () {
     var newLinks = document.querySelectorAll("[data-a7-new-link]");
     newLinks.forEach(function (link) {
@@ -398,15 +376,6 @@ a7.init = function () {
         }
     });
 
-    //a7 page
-    a7.page.find = function (elem) {
-        a7.page.elem = a7store[9].querySelector(elem);
-        this.get = a7store[4].get;
-        this.html = a7store[4].html;
-        this.text = a7store[4].text;
-        return this;
-    };
-
     //descriptions
     var descL = document.getElementsByName("description");
 
@@ -415,7 +384,7 @@ a7.init = function () {
         var descContent = descL[0].getAttribute("content");
 
         if (descContent !== undefined) {
-            a7store[11] = descL[0].getAttribute("content");
+            a7store[11] = descContent;
         }
 
     } else {
