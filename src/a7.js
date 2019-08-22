@@ -23,7 +23,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
 //Older browser support
+
 
 if (window !== undefined) {
     if (window.NodeList && !NodeList.prototype.forEach) {
@@ -54,7 +56,7 @@ var a7 = {},
 //which would give us a huge performance increase
 a7store = Array(13);
 a7store = [
-    "v3.3.0", //Version       0
+    "v3.3.1", //Version       0
     {}, //ComponentList       1
     {}, //Menus               2
     [], //ClosableMenus       3
@@ -118,15 +120,14 @@ a7.createElement = function (element, attributes) {
         }
 
         //checks if ":" is inside a string 
+        //Should be made faster FIXME:
         equalLocations.forEach(function (val) {
-
             //recursive function may cause browsers not wanting to open the site
-            function checker(charPosition, str) {
-                var checkCharPos = charPosition - 1,
-                    char = str.charAt(checkCharPos),
-                    nextChar = str.charAt(checkCharPos - 1);
+            function checker(charPosition) {
+                var char = attributes.charAt(charPosition - 1),
+                    nextChar = attributes.charAt(charPosition - 2);
 
-                //console.log("checkerCharPos:", checkCharPos);
+                //console.log("checkerCharPos:", charPosition - 1);
 
                 if (char === "\"" & nextChar === ":" | char === "\"" & nextChar === "=") {
                     //We dont want to replace this
@@ -137,12 +138,12 @@ a7.createElement = function (element, attributes) {
                     attributes = a7.replaceCharAt(attributes, val, "=");
                 }
                 //fail safe for infite loops and check for the first
-                else if (checkCharPos === 0) {
+                else if (checkCharPos === 1) {
                     //it appears that this is the first ":" so we want to replace it!
                     //console.log("=");
                     attributes = a7.replaceCharAt(attributes, val, "=");
                 } else {
-                    checker(checkCharPos, str);
+                    checker(charPosition - 1);
                 }
             }
             checker(val, attributes);
@@ -197,11 +198,11 @@ a7.createElement = function (element, attributes) {
 a7.elementCollection = function () {
     var length = arguments.length,
         i,
-        res = [];
+        res = "";
     for (i = 0; i < length; i++) {
-        res.push(arguments[i]);
+        res += arguments[i];
     }
-    return res.join("");
+    return res;
 };
 
 a7.registerComponent = function (compName, compFunc) {
@@ -229,7 +230,7 @@ a7.encoder = function (content) {
 };
 
 a7.replaceCharAt = function (str, index, repWith) {
-    return [str.substring(0, index), repWith, str.substring(index + 1, str.length)].join("");
+    return str.substring(0, index) + repWith + str.substring(index + 1, str.length);
 };
 
 a7.renderNewLinks = function () {
@@ -246,15 +247,15 @@ a7.renderNewLinks = function () {
 };
 
 a7.render = function () {
-    var args = [],
+    var args = "",
         curVal,
         argLen = arguments.length;
 
     for (curVal = 0; curVal < argLen; curVal++) {
-        args.push(arguments[curVal]);
+        args += arguments[curVal];
     }
     //a7store[9] is pageContainer
-    a7store[9].innerHTML = args.join("\n");
+    a7store[9].innerHTML = args;
 };
 
 a7.getDesc = function () {
@@ -300,8 +301,8 @@ a7.closeMenu = function (menuName) {
     }
     var elem = a7store[2][menuName],
         classList = elem.classList,
-        open = ["a7-menu-", menuName, "-open"].join(""),
-        closed = ["a7-menu-", menuName, "-closed"].join("");
+        open = "a7-menu-" + menuName + "-open",
+        closed = "a7-menu-" + menuName + "-closed";
     if (classList.contains(open)) {
         classList.remove(open);
         classList.add(closed);
@@ -348,11 +349,11 @@ a7.init = function () {
                 state = elem.getAttribute("data-a7-default-state");
             a7store[2][menuname] = elem;
             if (state === "open") {
-                elem.classList.add(["a7-menu-", menuname, "-open"].join(""));
+                elem.classList.add("a7-menu-" + menuname + "-open");
             } else if (state === "closed") {
-                elem.classList.add(["a7-menu-", menuname, "-closed"].join(""));
+                elem.classList.add("a7-menu-" + menuname + "-closed");
             } else {
-                elem.classList.add(["a7-menu-", menuname, "-closed"].join(""));
+                elem.classList.add("a7-menu-" + menuname + "-closed");
             }
         });
     }
@@ -432,7 +433,7 @@ a7.path = function (newPath) {
 //Resolves any path you give
 a7.router = function (newPath) {
 
-    if (a7Store[8] === true) {
+    if (a7store[8] === true) {
         a7store[3].forEach(function (menu) {
             a7.closeMenu(menu);
         });
@@ -443,15 +444,15 @@ a7.router = function (newPath) {
     }
 
     var app = a7.app,
-        mainPath = ["/", newPath.slice(0, newPath.indexOf("/") + 1), "*"].join(""),
+        mainPath = "/" + newPath.slice(0, newPath.indexOf("/") + 1) + "*",
         route,
         cacheMatch = a7store[7]["/" + newPath];
 
     //tries to match equal
     if (cacheMatch) {
         route = cacheMatch;
-    } else if (app.routes[["/", newPath].join("")]) {
-        route = ["/", newPath].join("");
+    } else if (app.routes["/" + newPath]) {
+        route = "/" + newPath;
     } else if (app.routes[mainPath]) {
         route = mainPath;
     } else if (app.routes["/*"]) {
