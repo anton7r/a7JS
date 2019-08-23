@@ -9,7 +9,7 @@ Link it:
 ```html
 <script src="a7js.netlify.com/dist/3.3.0"></script>
 ```
-or Download it:
+or Install it:
 ```npm
 npm i a7js
 ```
