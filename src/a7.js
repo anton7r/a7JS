@@ -238,16 +238,17 @@ a7.replaceCharAt = function (str, index, repWith) {
 };
 
 a7.renderNewLinks = function () {
-    var newLinks = document.querySelectorAll("[data-a7-new-link]");
-    newLinks.forEach(function (link) {
-        link.addEventListener("click", function (ev) {
+    var newLinks = document.querySelectorAll("[data-a7-new-link]"),
+    i;
+    for(i = 0; i < newLinks.length; i++){
+        newLinks[i].addEventListener("click", function (ev) {
             ev.preventDefault();
             var li = link.getAttribute("href");
             a7.router(li);
             link.removeAttribute("data-a7-new-link");
             link.setAttribute("data-a7-link", "");
         });
-    });
+    }
 };
 
 a7.render = function () {
@@ -268,9 +269,9 @@ a7.getDesc = function () {
 
 
 a7.setDesc = function (newContent) {
-    a7store[6].forEach(function (desc) {
-        desc.setAttribute("content", newContent);
-    });
+    for(var i; i < a7store[6].length; i++) {
+    a7store[6][i].setAttribute("content", newContent);
+    }
 };
 
 //Menu stuff
@@ -348,8 +349,9 @@ a7.init = function () {
     //menu init
     var menuElements = document.querySelectorAll("[data-a7-menu]");
     if (menuElements) {
-        menuElements.forEach(function (elem) {
-            var menuname = elem.getAttribute("data-a7-menu"),
+        for(var i = 0; i < menuElements.length; i++){
+            var elem = menuElements[i],
+                menuname = elem.getAttribute("data-a7-menu"),
                 state = elem.getAttribute("data-a7-default-state");
             a7store[2][menuname] = elem;
             if (state === "open") {
@@ -359,16 +361,16 @@ a7.init = function () {
             } else {
                 elem.classList.add("a7-menu-" + menuname + "-closed");
             }
-        });
+        }
     }
+
     var menuToggles = document.querySelectorAll("[data-a7-menu-toggle]");
     if (menuToggles) {
-        menuToggles.forEach(function (elem) {
-            var togglename = elem.getAttribute("data-a7-menu-toggle");
-            elem.addEventListener("mouseup", function () {
-                a7.toggleMenu(togglename);
-            });
-        });
+        for(var x = 0; x < menuToggles.length; x++) {
+            menuToggles[x].addEventListener("mouseup",
+                a7.toggleMenu(menuToggles[x].getAttribute("data-a7-menu-toggle"))
+            );
+        }
     }
 
     //links init
@@ -486,4 +488,6 @@ a7.router = function (newPath) {
     scrollTo(0, pageXOffset);
 };
 
-module.exports = exports = a7;
+if(typeof module !== "undefined"){
+    module.exports = exports = a7;
+}
