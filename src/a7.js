@@ -119,41 +119,43 @@ a7.createElement = function (element, attributes) {
             }
         }
 
-        //checks if ":" is inside a string 
-        //Should be made faster FIXME:
+        //checks if ":" is inside a string
         var eqLen = equalLocations.length;
 
-        function checker(charPosition) {
-            var char = attributes.charAt(charPosition - 1),
-                nextChar = attributes.charAt(charPosition - 2);
-
-            //console.log("checkerCharPos:", charPosition - 1);
-
-            if (char === "\"" & nextChar === ":" | char === "\"" & nextChar === "=") {
-                //We dont want to replace this
-                //console.log(":");
-            } else if (char === "\"" & nextChar !== ":") {
-                //Replace char
-                //console.log("=");
-                attributes = a7.replaceCharAt(attributes, charPosition, "=");
-            }
-            //fail safe for infite loops and check for the first
-            else if (checkCharPos === 1) {
-                //it appears that this is the first ":" so we want to replace it!
-                //console.log("=");
-                attributes = a7.replaceCharAt(attributes, charPosition, "=");
-            } else {
-                checker(charPosition - 1);
-            }
-        }
-
         for(curVal = 0; curVal < eqLen; curVal++){
-            checker(equalLocations[curVal]);
+            var resolv = true,
+                charPosition = equalLocations[curVal];
+                char = attributes.charAt(charPosition - 1),
+                nextChar = attributes.charAt(charPosition - 2);
+            while(resolv){
+                //console.log("checkerCharPos:", charPosition - 1);
+    
+                if (char === "\"" & nextChar === ":" | char === "\"" & nextChar === "=") {
+                    //We dont want to replace this
+                    //console.log(":");
+                    resolv = false;
+                } else if (char === "\"" & nextChar !== ":") {
+                    //Replace char
+                    //console.log("=");
+                    attributes = a7.replaceCharAt(attributes, charPosition, "=");
+                    resolv = false;
+                }
+                //fail safe for infite loops and check for the first
+                else if (checkCharPos === 1) {
+                    //it appears that this is the first ":" so we want to replace it!
+                    //console.log("=");
+                    attributes = a7.replaceCharAt(attributes, charPosition, "=");
+                    resolv = false;
+                } else {
+                    charPosition -= 1;
+                }
+            }
         }
 
-        curVal = 0;
-        var displacement = 0;
-        quoteLocations.forEach(function (val) {
+        var displacement = 0,
+        quLen = quoteLocations.length;
+        for(curVal = 0; curVal < quLen; curVal++){
+            var val = quoteLocations[curVal];
             //console.log(curVal, attributes.charAt(val + 1 - displacement));
             if (attributes.charAt(val + 1 - displacement) === "=") {
                 var start = quoteLocations[curVal - 1] + 1 - displacement;
@@ -164,8 +166,7 @@ a7.createElement = function (element, attributes) {
                 attributes = attributes.replace(["\"", AttrName, "\""].join(""), AttrName);
                 displacement += 2;
             }
-            curVal++;
-        });
+        }
 
         element = element;
         content = contentArray.join("");

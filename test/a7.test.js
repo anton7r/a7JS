@@ -100,7 +100,6 @@ var test = function() {
 
     for(i = 0; i < numOfTests; i++){
         elList.push(document.getElementsByClassName("openLog")[i]) ;
-        console.log(element);
         var curNum = i;
 
         element.addEventListener("click", function(){
