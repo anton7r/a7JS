@@ -27,6 +27,7 @@ SOFTWARE.
 //Older browser support
 
 
+
 if (window !== undefined) {
     if (window.NodeList && !NodeList.prototype.forEach) {
         NodeList.prototype.forEach = Array.prototype.forEach;
