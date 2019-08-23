@@ -228,7 +228,8 @@ a7.renderNewLinks = function () {
     var newLinks = document.querySelectorAll("[data-a7-new-link]"),
     i;
     for(i = 0; i < newLinks.length; i++){
-        newLinks[i].addEventListener("click", function (ev) {
+        var link = newLinks[i]; 
+        link.addEventListener("click", function (ev) {
             ev.preventDefault();
             var li = link.getAttribute("href");
             a7.router(li);
