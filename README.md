@@ -12,6 +12,12 @@ or Download it:
 ```npm
 npm i a7js
 ```
+# Motivation
+Most of the commonly used libraries / frameworks are really large and pack in features that most of the users.
+And it has 0 dependencies on the framework.
+
+The dependencies that it has are for the cli. 
+
 # Code examples and Documentation
 For documentation and code examples please visit our [Wiki](https://github.com/anton7r/a7JS/wiki)
 
