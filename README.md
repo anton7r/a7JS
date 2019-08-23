@@ -1,5 +1,6 @@
 # a7JS
-!(https://img.shields.io/badge/build-passing-success)
+![](https://img.shields.io/badge/build-passing-success) 
+![](https://img.shields.io/badge/Latest%20version-v.3.3.0-blue)
 # Setup
 You can download the newest version and use something like webpack... or you can link it
 ```html
