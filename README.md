@@ -23,3 +23,6 @@ Its soon to be released and again we have made it lots of times faster.
 ## v3.3.0 - Recent relase
 We got rid of `a7.page` and its `find` method, since it wasn't practical.
 And made the framework more performant.
+
+# License
+License is MIT see [license](https://github.com/anton7r/a7JS/blob/master/LICENSE)
