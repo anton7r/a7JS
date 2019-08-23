@@ -24,19 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-//Older browser support
-
-
-
-if (window !== undefined) {
-    if (window.NodeList && !NodeList.prototype.forEach) {
-        NodeList.prototype.forEach = Array.prototype.forEach;
-    }
-
-    if (window.HTMLCollection && !HTMLCollection.prototype.forEach) {
-        HTMLCollection.prototype.forEach = Array.prototype.forEach;
-    }
-}
 //very useful 
 if (!"".trim) String.prototype.trim = function () {
     return this.replace(/^[\s﻿]+|[\s﻿]+$/g, '');
@@ -376,7 +363,8 @@ a7.init = function () {
     //links init
     var linkcollection = document.getElementsByTagName("a");
 
-    linkcollection.forEach(function (link) {
+    for(var y = 0; y < linkcollection.length; y++) {
+        var link = linkcollection[y];
         if (link.dataset.a7link !== undefined | link.getAttribute("a7-link") !== null) {
             link.addEventListener("click", function (ev) {
                 ev.preventDefault();
@@ -384,7 +372,7 @@ a7.init = function () {
                 a7.router(l);
             });
         }
-    });
+    }
 
     //descriptions
     var descL = document.getElementsByName("description");
@@ -417,8 +405,6 @@ a7.init = function () {
     });
 };
 
-
-
 //if newPath is not defined then it will return the current path
 //Its looking too complex of a function right now.
 a7.path = function (newPath) {
@@ -440,9 +426,9 @@ a7.path = function (newPath) {
 a7.router = function (newPath) {
 
     if (a7store[8] === true) {
-        a7store[3].forEach(function (menu) {
-            a7.closeMenu(menu);
-        });
+        for(var i; i < a7store[3].length; i++) {
+            a7.closeMenu(a7store[3][i]);
+        }
     }
 
     if (newPath.indexOf("/") === 0) {
