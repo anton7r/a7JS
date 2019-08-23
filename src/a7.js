@@ -121,33 +121,35 @@ a7.createElement = function (element, attributes) {
 
         //checks if ":" is inside a string 
         //Should be made faster FIXME:
-        equalLocations.forEach(function (val) {
-            //recursive function may cause browsers not wanting to open the site
-            function checker(charPosition) {
-                var char = attributes.charAt(charPosition - 1),
-                    nextChar = attributes.charAt(charPosition - 2);
+        var eqLen = equalLocations.length;
 
-                //console.log("checkerCharPos:", charPosition - 1);
+        function checker(charPosition) {
+            var char = attributes.charAt(charPosition - 1),
+                nextChar = attributes.charAt(charPosition - 2);
 
-                if (char === "\"" & nextChar === ":" | char === "\"" & nextChar === "=") {
-                    //We dont want to replace this
-                    //console.log(":");
-                } else if (char === "\"" & nextChar !== ":") {
-                    //Replace char
-                    //console.log("=");
-                    attributes = a7.replaceCharAt(attributes, val, "=");
-                }
-                //fail safe for infite loops and check for the first
-                else if (checkCharPos === 1) {
-                    //it appears that this is the first ":" so we want to replace it!
-                    //console.log("=");
-                    attributes = a7.replaceCharAt(attributes, val, "=");
-                } else {
-                    checker(charPosition - 1);
-                }
+            //console.log("checkerCharPos:", charPosition - 1);
+
+            if (char === "\"" & nextChar === ":" | char === "\"" & nextChar === "=") {
+                //We dont want to replace this
+                //console.log(":");
+            } else if (char === "\"" & nextChar !== ":") {
+                //Replace char
+                //console.log("=");
+                attributes = a7.replaceCharAt(attributes, charPosition, "=");
             }
-            checker(val, attributes);
-        });
+            //fail safe for infite loops and check for the first
+            else if (checkCharPos === 1) {
+                //it appears that this is the first ":" so we want to replace it!
+                //console.log("=");
+                attributes = a7.replaceCharAt(attributes, charPosition, "=");
+            } else {
+                checker(charPosition - 1);
+            }
+        }
+
+        for(curVal = 0; curVal < eqLen; curVal++){
+            checker(equalLocations[curVal]);
+        }
 
         curVal = 0;
         var displacement = 0;
