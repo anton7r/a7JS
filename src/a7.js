@@ -44,7 +44,7 @@ var a7 = {},
 //which would give us a huge performance increase
 a7store = Array(13);
 a7store = [
-    "v3.3.1", //Version       0
+    "v3.3.2", //Version       0
     {}, //ComponentList       1
     {}, //Menus               2
     [], //ClosableMenus       3
