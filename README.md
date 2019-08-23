@@ -1,9 +1,6 @@
 # a7JS
-a7 is a Javascript Framework which makes SPA's really easy to make
-
-also it Works in IE 11
-
-## Setup
+!(https://img.shields.io/badge/build-passing-success)
+# Setup
 You can download the newest version and use something like webpack... or you can link it
 ```html
 <script src="a7js.netlify.com/dist/3.3.0"></script>
