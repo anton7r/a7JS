@@ -14,9 +14,9 @@ For documentation and code examples please visit our [Wiki](https://github.com/a
 
 # Versions
 
-## v3.3.1
+## v3.3.1 - Future release
 Its soon to be released and again we have made it lots of times faster.
 
-## v3.3.0
+## v3.3.0 - Recent relase
 We got rid of `a7.page` and its `find` method, since it wasn't practical.
 And made the framework more performant.
