@@ -3,7 +3,9 @@
 ![](https://img.shields.io/badge/Latest%20version-v.3.3.0-blue)
 ![](https://img.shields.io/badge/Size-3kb-success)
 
-A lot of power in a small package.
+🔥 A lot of power in a small package.
+✅ Only 2,6kb
+
 # Setup
 Link it:
 ```html
