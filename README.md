@@ -9,6 +9,11 @@ You can download the newest version and use something like webpack... or you can
 <script src="a7js.netlify.com/dist/3.3.0"></script>
 ```
 
+# Code examples and Documentation
+For documentation and code examples please visit our [Wiki](https://github.com/anton7r/a7JS/wiki)
+
+# Versions
+
 ## v3.3.1
 Its soon to be released and again we have made it lots of times faster.
 
