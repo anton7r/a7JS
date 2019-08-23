@@ -4,6 +4,7 @@
 ![](https://img.shields.io/badge/Size-3kb-success)
 
 🔥 A lot of power in a small package.
+
 ✅ Only 2,6kb
 
 # Setup
