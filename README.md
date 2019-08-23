@@ -10,7 +10,7 @@ Link it:
 ```
 or Download it:
 ```npm
-coming soon...
+npm i a7js
 ```
 # Code examples and Documentation
 For documentation and code examples please visit our [Wiki](https://github.com/anton7r/a7JS/wiki)
