@@ -129,7 +129,7 @@ a7.createElement = function (element, attributes) {
                     resolv = false;
                 }
                 //fail safe for infite loops and check for the first
-                else if (checkCharPos === 1) {
+                else if (charPosition === 1) {
                     //it appears that this is the first ":" so we want to replace it!
                     //console.log("=");
                     attributes = a7.replaceCharAt(attributes, charPosition, "=");
@@ -178,9 +178,7 @@ a7.createElement = function (element, attributes) {
         console.log("Quotes:", quoteLocations);
 
         */
-
         finalElement = ["<", element, spacing, finalAttributes, ">", content, "</", element, ">"].join("");
-
     }
 
     return finalElement;
@@ -198,15 +196,12 @@ a7.elementCollection = function () {
 
 a7.registerComponent = function (compName, compFunc) {
     if (a7store[1][compName] === undefined) {
-
         a7store[1][compName] = compFunc;
-
     } else {
-
         a7debug("That component is already registered!");
-
     }
 };
+
 //html sanitizer
 a7.encoder = function (content) {
     var result = content
@@ -224,18 +219,21 @@ a7.replaceCharAt = function (str, index, repWith) {
     return str.substring(0, index) + repWith + str.substring(index + 1, str.length);
 };
 
+a7.linkHandler = function(link){
+    link.addEventListener("click", function (ev) {
+        console.log(link);
+        ev.preventDefault();
+        a7.router(link.getAttribute("href"));
+    });
+};
+
 a7.renderNewLinks = function () {
     var newLinks = document.querySelectorAll("[data-a7-new-link]"),
     i;
     for(i = 0; i < newLinks.length; i++){
-        var link = newLinks[i]; 
-        link.addEventListener("click", function (ev) {
-            ev.preventDefault();
-            var li = link.getAttribute("href");
-            a7.router(li);
-            link.removeAttribute("data-a7-new-link");
-            link.setAttribute("data-a7-link", "");
-        });
+        a7.linkHandler(newLinks[i]);
+        newLinks[i].removeAttribute("data-a7-new-link");
+        newLinks[i].setAttribute("data-a7-link", "");
     }
 };
 
@@ -254,7 +252,6 @@ a7.render = function () {
 a7.getDesc = function () {
     return a7store[6][0];
 };
-
 
 a7.setDesc = function (newContent) {
     for(var i; i < a7store[6].length; i++) {
@@ -308,7 +305,7 @@ a7.closeMenuOnRout = function (menu) {
     if (menu === undefined){
         new Error("Menu" + menu + "could not be found.");
     } else {
-        a7Store[8] = true;
+        a7store[8] = true;
         a7store[3].push(menu);
     }
 };
@@ -365,13 +362,8 @@ a7.init = function () {
     var linkcollection = document.getElementsByTagName("a");
 
     for(var y = 0; y < linkcollection.length; y++) {
-        var link = linkcollection[y];
-        if (link.dataset.a7link !== undefined | link.getAttribute("a7-link") !== null) {
-            link.addEventListener("click", function (ev) {
-                ev.preventDefault();
-                var l = link.getAttribute("href");
-                a7.router(l);
-            });
+        if (linkcollection[y].dataset.a7link !== undefined | linkcollection[y].getAttribute("a7-link") !== null) {
+            a7.linkHandler(linkcollection[y]);
         }
     }
 
@@ -464,10 +456,8 @@ a7.router = function (newPath) {
     }
 
     if (description !== undefined) {
-
         a7.setDesc(description);
     } else if (a7store[11] !== undefined) {
-
         a7.setDesc(a7store[11]);
     }
     app.pages[app.routes[route]].onRoute(newPath.split("/"));
