@@ -53,7 +53,7 @@ a7.app.pages = {
 const a7greet = function () {
     log();
     log("================", chalk.blue("a7JS"), "================");
-    log("installed version:", chalk.green("v3.1.3"));
+    log("installed version:", chalk.green("v3.3.5"));
     log();
 };
 
