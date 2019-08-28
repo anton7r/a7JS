@@ -151,14 +151,15 @@ a7.createElement = function (element, attributes) {
                 /*
                 console.log("AttrName:",AttrName);
                 //*/
-                attributes = attributes.replace(["\"", AttrName, "\""].join(""), AttrName);
+                attributes = attributes.replace("\"" + AttrName + "\"", AttrName);
                 displacement += 2;
             }
         }
 
         element = element;
         content = contentArray.join("");
-        var finalAttributes = attributes.replace(/{/g, "").replace(/}/g, "").replace(/,/g, " ");
+        var finalAttributes = attributes.replace(/({|})/g, "").replace(/,/g, " ");
+        //console.log(finalAttributes);
 
         if(finalAttributes === "\"\""){
             finalAttributes = "";
