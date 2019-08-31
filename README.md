@@ -10,7 +10,7 @@
 # Setup
 Link it:
 ```html
-<script src="a7js.netlify.com/dist/3.3.0"></script>
+<script src="a7js.netlify.com/dist/3.3.5"></script>
 ```
 or Install it:
 ```npm
