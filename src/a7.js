@@ -74,8 +74,9 @@ a7.createElement = function (element, attributes) {
         attributes = "";
     }
 
+    //if the element is a component
     if (a7store[1][element] !== undefined) {
-        finalElement = ["<div class=\"", element, "\">", a7store[1][element](attributes), "</div>"].join("");
+        finalElement = "<div class=\"a7-component-" + element + "\">" + a7store[1][element](attributes) +"</div>";
     } else {
         attributes = JSON.stringify(attributes);
 
@@ -179,7 +180,7 @@ a7.createElement = function (element, attributes) {
         console.log("Quotes:", quoteLocations);
 
         */
-        finalElement = ["<", element, spacing, finalAttributes, ">", content, "</", element, ">"].join("");
+        finalElement = "<" + element + spacing + finalAttributes + ">" + content + "</" + element + ">";
     }
 
     return finalElement;
@@ -188,11 +189,11 @@ a7.createElement = function (element, attributes) {
 a7.elementCollection = function () {
     var length = arguments.length,
         i,
-        res = "";
+        result = "";
     for (i = 0; i < length; i++) {
-        res += arguments[i];
+        result += arguments[i];
     }
-    return res;
+    return result;
 };
 
 a7.registerComponent = function (compName, compFunc) {
@@ -411,7 +412,7 @@ a7.path = function (newPath) {
         if (!history.pushState) {
             window.location = newPath;
         } else {
-            history.pushState({}, undefined, ["/", newPath].join(""));
+            history.pushState({}, undefined, "/" + newPath);
         }
     }
 };
@@ -469,3 +470,7 @@ a7.router = function (newPath) {
 if(typeof module !== "undefined"){
     module.exports = exports = a7;
 }
+
+a7.registerComponent("audioplayer", function(name){
+
+});
