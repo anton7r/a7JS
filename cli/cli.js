@@ -16,11 +16,11 @@ const createHtmlDoc = function (name) {
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>`, name, `</title>
     <meta name="description" content="`, name, `"></meta>
-    <link href="/app/css/style.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
 </head>
 <body>
     <div data-a7-page-container></div>
-    <script src="/app/js/index.js"></script>
+    <script type="module" src="/app.build.js"></script>
 </body>
 </html>`].join("");
 };
@@ -34,32 +34,29 @@ const cssDoc = `:root{
     padding:0px;
 }`;
 const jsDoc = `const a7 = require("a7");
+import a7 from "a7.js"
 
-a7.a7.routes = {
-    "/*": "home"
+a7.routes = {
+    "/*": home
 };
-a7.app.pages = {
-    home:{
-        title:"Home",
-        description:"Welcome to my site",
-        onRoute:function(){
-            a7.render(
-                a7.createElement("h1", "", "Welcome to a7JS!")
-            );
-        }
-    }
-};`
+var home = function(){
+    a7.render(
+        <div class="hello">I am Hello</div>
+    )
+};
+`
 
 const a7greet = function () {
     log();
     log("================", chalk.blue("a7JS"), "================");
-    log("installed version:", chalk.green("v3.3.5"));
+    log("installed version:", chalk.green("v4-pre"));
     log();
 };
 
 const a7helper = function () {
     log("=============", chalk.blue("a7JS Help"), "==============");
     log(chalk.cyan("newproject"), "- create a new project with a7.");
+    log(chalk.cyan("build"), "- build the a7 project.");
     log(endbar);
 
 };
@@ -67,23 +64,16 @@ const a7helper = function () {
 const a7newproject = function (name) {
 
     if (name === undefined) {
-
         return log(chalk.red("ERROR:"), "name of the project is not defined.");
-
     } else if (fs.existsSync(name) !== false) {
-
         return log(chalk.red("ERROR:"), name, "folder already exists.");
-
     }
 
     log(chalk.cyan("creating a new project in " + name));
 
-    
-
     fs.mkdir(name, {
         recursive: true
     }, function (err) {
-
         if (err) {
             log(chalk.red("ERROR:"), "there was an error while creating project folder.");
         } else {
@@ -97,12 +87,14 @@ const a7newproject = function (name) {
         }
     });
 
-    fs.mkdirSync([name,"/src"].join(""));
+    fs.mkdirSync([name,"/js"].join(""));
+
     fs.writeFile(name + "/index.html", createHtmlDoc(name), function (err) {
         if (err) {
             log(chalk.red("ERROR:"), "index.html could not be created.");
         }
     });
+
     fs.mkdir(name + "/css", {
         recursive: true
     }, function (err) {
@@ -110,17 +102,50 @@ const a7newproject = function (name) {
             log(chalk.red("ERROR:"), "css folder could not be created.");
         }
     });
+
     fs.writeFile(name + "/css/style.css", cssDoc, function (err) {
         if (err) {
             log(chalk.red("ERROR:"), "index.html could not be created.");
         }
     });
-    fs.writeFile(name + "/src/index.js", jsDoc, function (err) {
+
+    fs.writeFile(name + "/js/index.js", jsDoc, function (err) {
         if (err) {
             log(chalk.red("ERROR:"), "index.html could not be created.");
         }
     });
+
     log(chalk.green("SUCCESS:"), "The Project was created without any errors!");
+};
+
+const a7build = function() {
+    var jsFileList,
+    config;
+    function builder1(){
+        if(config.mode === "development"){
+            log("Building a7 project in \"development\" mode.");
+        } else if (config.mode === "production"){
+            log("Building a7 project in \"production\" mode.");
+        } else {
+            return log(chalk.red("a7.config.json error:"), "mode can be either \"development\" or \"production\". mode is currently set as", chalk.red("\""+config.mode + "\"."));
+        }
+    }
+
+    fs.readdir("js/", function(err, list){
+        if(err){
+            console.log(err);
+        } else {
+            jsFileList = list;
+        }
+    });
+    fs.readFile("./a7.config.json", function(err, file){
+        if (err){
+            console.log(err);
+        }
+        config = JSON.parse(file);
+        builder1();
+    });
+
 };
 
 const a7unknownArg = function () {
@@ -137,6 +162,9 @@ switch (args[0]) {
         break;
     case "newproject":
         a7newproject(args[1]);
+        break;
+    case "build":
+        a7build();
         break;
     default:
         a7unknownArg();

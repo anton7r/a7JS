@@ -1,5 +1,4 @@
 import a7 from "../src/a7.js";
-
 var el = a7.createElement;
 var resEl;
 var numOfTests;
@@ -55,15 +54,12 @@ var tester = function(name, testMe, expRes){
 };
 
 var getVer = function() {
-    var re;
 
     if (a7.ver() ===undefined){
-        re = "could not get version.";
+        return "could not get version.";
     } else {
-        re = a7.ver();
+        return a7.ver();
     }
-
-    return re;
 };
 
 var test = function() {
@@ -97,7 +93,7 @@ var test = function() {
 
     for(i = 0; i < numOfTests; i++){
         elList.push(document.getElementsByClassName("openLog")[i]) ;
-        var curNum = i;
+        const curNum = i;
 
         element.addEventListener("click", function(){
             var data = elList[curNum];

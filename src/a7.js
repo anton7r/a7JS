@@ -25,6 +25,9 @@ SOFTWARE.
 */
 
 //internal methods
+var documentLoad = function(url, func){
+};
+
 var objectToAttributes = function(obj){
     obj = JSON.stringify(obj);
     var lenght = obj.length,
@@ -98,10 +101,7 @@ var objectToAttributes = function(obj){
         obj = "";
     }
 
-    var spacing;
-
     return obj;
-
 };
 
 //very useful 
@@ -124,7 +124,7 @@ var a7 = {},
 //which would give us a huge performance increase
 a7store = Array(14);
 a7store = [
-    "v3.3.5", //Version       0
+    "v4-pre", //Version       0
     {}, //ComponentList       1
     {}, //Menus               2
     [], //ClosableMenus       3
@@ -144,9 +144,7 @@ a7.ver = function () {
     return a7store[0];
 };
 
-a7.routes = {
-
-};
+a7.routes = {};
 
 a7.secureProps = function (mode) {
     if(mode === true || mode === false){
@@ -218,7 +216,7 @@ a7.elementCollection = function () {
 
 a7.registerComponent = function (compName, compFunc) {
     if(compName === "div" | compName === "p" | compName === "span" | compName === "h1"){
-        return a7debug("please choose a different Component name because the name " + compName + " is a basic html tag name.");
+        return a7debug("please choose a different Component name because the name " + compName + " is a common html tag name.");
     }else if (a7store[1][compName] === undefined) {
         a7store[1][compName] = compFunc;
     } else {
@@ -234,7 +232,6 @@ a7.sanitizer = function (content) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#x27;")
-        //not a good idea TO DO THIS!!!!!!!!!!! because it is escaping and escapes can be escaped
         .replace(/\//g, "&#x2F;");
     return result;
 };
@@ -268,6 +265,10 @@ a7.render = function () {
 
     for (curVal = 0; curVal < argLen; curVal++) {
         final += arguments[curVal];
+    }
+
+    if (final.search("onclick=\"") | final.search("onerror=\"") | final.search("onload=\"") | final.search("onhover=\"")) {
+        return a7debug("a possible security vulnerability found in your application, ERROR: on[event] attributes deprecated.");
     }
 
     //a7store[9] is pageContainer
