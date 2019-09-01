@@ -35,7 +35,7 @@ const cssDoc = `:root{
 }`;
 const jsDoc = `const a7 = require("a7");
 
-a7.app.routes = {
+a7.a7.routes = {
     "/*": "home"
 };
 a7.app.pages = {

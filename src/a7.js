@@ -63,9 +63,8 @@ a7.ver = function () {
     return a7store[0];
 };
 
-a7.app = {
-    routes: {},
-    pages: {}
+a7.routes = {
+
 };
 
 a7.createElement = function (element, attributes) {
@@ -76,7 +75,7 @@ a7.createElement = function (element, attributes) {
 
     //if the element is a component
     if (a7store[1][element] !== undefined) {
-        finalElement = "<div class=\"a7-component-" + element + "\">" + a7store[1][element](attributes) +"</div>";
+        finalElement = "<div class=\"a7-component " + element + "\">" + a7store[1][element](attributes) +"</div>";
     } else {
         attributes = JSON.stringify(attributes);
 
@@ -197,7 +196,9 @@ a7.elementCollection = function () {
 };
 
 a7.registerComponent = function (compName, compFunc) {
-    if (a7store[1][compName] === undefined) {
+    if(compName !== "div" | compName !== "p" | compName !== ""){
+        return a7debug("please choose a different Component name because the name " + compName + " is a basic html tag name.");
+    }else if (a7store[1][compName] === undefined) {
         a7store[1][compName] = compFunc;
     } else {
         a7debug("That component is already registered!");
@@ -223,7 +224,7 @@ a7.replaceCharAt = function (str, index, repWith) {
 
 a7.linkHandler = function(link){
     link.addEventListener("click", function (ev) {
-        console.log(link);
+        //console.log(link);
         ev.preventDefault();
         a7.router(link.getAttribute("href"));
     });
@@ -240,15 +241,16 @@ a7.renderNewLinks = function () {
 };
 
 a7.render = function () {
-    var args = "",
+    var final = "",
         curVal,
         argLen = arguments.length;
 
     for (curVal = 0; curVal < argLen; curVal++) {
-        args += arguments[curVal];
+        final += arguments[curVal];
     }
+
     //a7store[9] is pageContainer
-    a7store[9].innerHTML = args;
+    a7store[9].innerHTML = final;
 };
 
 a7.getDesc = function () {
@@ -259,6 +261,10 @@ a7.setDesc = function (newContent) {
     for(var i; i < a7store[6].length; i++) {
     a7store[6][i].setAttribute("content", newContent);
     }
+};
+
+a7.setTitle = function(newTitle){
+    document.title = newTitle;
 };
 
 //Menu stuff
@@ -388,10 +394,6 @@ a7.init = function () {
     //conf
     a7store[12] = document.title;
 
-    if (a7.app === undefined) {
-        return a7debug("Please configure your app check docs for help");
-    }
-
     //first route and enabling back button
     a7.router(a7.path());
 
@@ -430,47 +432,27 @@ a7.router = function (newPath) {
         newPath = newPath.replace("/", "");
     }
 
-    var app = a7.app,
-        mainPath = "/" + newPath.slice(0, newPath.indexOf("/") + 1) + "*",
+    var mainPath = "/" + newPath.slice(0, newPath.indexOf("/") + 1) + "*",
         route,
+        routes = a7.routes,
         cacheMatch = a7store[7]["/" + newPath];
 
     //tries to match equal
     if (cacheMatch) {
         route = cacheMatch;
-    } else if (app.routes["/" + newPath]) {
+    } else if (routes["/" + newPath]) {
         route = "/" + newPath;
-    } else if (app.routes[mainPath]) {
+    } else if (routes[mainPath]) {
         route = mainPath;
-    } else if (app.routes["/*"]) {
+    } else if (routes["/*"]) {
         route = "/*";
     } else {
         return a7debug("we could not find the page which you were looking for");
     }
 
-    var title = app.pages[app.routes[route]].title,
-        description = app.pages[app.routes[route]].description;
-
-    if (title) {
-        document.title = title;
-    } else {
-        document.title = a7store[12];
-    }
-
-    if (description !== undefined) {
-        a7.setDesc(description);
-    } else if (a7store[11] !== undefined) {
-        a7.setDesc(a7store[11]);
-    }
-    app.pages[app.routes[route]].onRoute(newPath.split("/"));
+    routes[route](newPath.split("/"));
     a7.path(newPath);
     scrollTo(0, pageXOffset);
 };
 
-if(typeof module !== "undefined"){
-    module.exports = exports = a7;
-}
-
-a7.registerComponent("audioplayer", function(name){
-
-});
+export default a7;
