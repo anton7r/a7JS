@@ -25,9 +25,6 @@ SOFTWARE.
 */
 
 //internal methods
-var documentLoad = function(url, func){
-};
-
 var objectToAttributes = function(obj){
     obj = JSON.stringify(obj);
     var lenght = obj.length,

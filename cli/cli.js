@@ -20,7 +20,7 @@ const createHtmlDoc = function (name) {
 </head>
 <body>
     <div data-a7-page-container></div>
-    <script type="module" src="/app.build.js"></script>
+    <script type="module" src="/build.js"></script>
 </body>
 </html>`].join("");
 };
@@ -105,7 +105,13 @@ const a7newproject = function (name) {
 
     fs.writeFile(name + "/css/style.css", cssDoc, function (err) {
         if (err) {
-            log(chalk.red("ERROR:"), "index.html could not be created.");
+            log(chalk.red("ERROR:"), "css file could not be created.");
+        }
+    });
+
+    fs.writeFile(name + "/a7.config.json", "{\n    \"mode\":\"development\"\n    \"output\":\"build.js\"}", function (err) {
+        if (err) {
+            log(chalk.red("ERROR:"), "config could not be created.");
         }
     });
 
@@ -119,7 +125,8 @@ const a7newproject = function (name) {
 };
 
 const a7build = function() {
-    var jsFileList,
+    var jsFileList = [],
+    bundled = "",
     config;
     function builder1(){
         if(config.mode === "development"){
@@ -129,7 +136,72 @@ const a7build = function() {
         } else {
             return log(chalk.red("a7.config.json error:"), "mode can be either \"development\" or \"production\". mode is currently set as", chalk.red("\""+config.mode + "\"."));
         }
+
+        var i,
+        listlen = jsFileList.length;
+
+        for(i = 0; i < listlen; i++){
+            fs.readFile("js/"+jsFileList[i], function(err, data){
+                if(err){
+                    log(err);
+                }
+                bundled += data;
+                if (i === listlen){
+                    compressAndTranspile();
+                }
+            });
+        }
+
     }
+
+    var compressAndTranspile = function(){
+        var orginalLength = bundled.length;
+
+        bundled = bundled.replace(/\n/g, "") //put into a single line
+        .replace(/\s+/g, " ") //remove extra white space
+        .replace(/(\s|)=(\s|)/g, "=") //removes spaces around "=" signs
+        .replace(/(\s|){(\s|)/g, "{") //removes spaces around "{}"
+        .replace(/(\s|)}(\s|)/g, "}")
+        .replace(/(\s|)\((\s|)/g, "(") //removes spaces around "()"
+        .replace(/(\s|)\)(\s|)/g, ")")
+        .replace(/(\s|);(\s|)/g, ";") //removes spaces around colons and semicolons
+        .replace(/(\s|),(\s|)/g, ",");
+        //transpiling here
+        var bundleLength = bundled.length,
+        i = 0;
+        log(chalk.red("orginal size:"), (orginalLength/1024).toFixed(2), "KB");
+        log(chalk.green("bundle size:"), (bundleLength/1024).toFixed(2), "KB");
+
+        //find a7.render
+        var a7renderStartLocations = [],
+        a7renderEndLocations = [];
+
+        for(i = 0; i < bundleLength; i++){
+            start = i + bundled.substring(i, bundleLength).indexOf("a7.render(");
+            if(start !== -1){
+                end = start + bundled.substring(start, bundleLength).indexOf(")");
+                a7renderStartLocations.push(start);
+                a7renderEndLocations.push(end);
+                i = end;
+                log(end);
+            } else {
+                outputBundle();
+                break;
+            }
+        }
+        console.log(a7renderStartLocations, a7renderEndLocations);
+    };
+
+    var outputBundle = function (){
+        if(config.output === undefined){
+            config.output = "build.js";
+        }
+        fs.writeFile(config.output, bundled, function(err){
+            if(err){
+                log(err);
+            }
+        });
+    };
 
     fs.readdir("js/", function(err, list){
         if(err){
