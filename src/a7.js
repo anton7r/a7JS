@@ -24,6 +24,86 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+//internal methods
+var objectToAttributes = function(obj){
+    obj = JSON.stringify(obj);
+    var lenght = obj.length,
+    quoteLocations = [],
+    equalLocations = [],
+    curVal;
+    for (curVal = 0; curVal < lenght; curVal++) {
+        var curChar = obj.charAt(curVal);
+        if (curChar === "\"") {
+
+            quoteLocations.push(curVal);
+        } else if (curChar === ":") {
+
+            equalLocations.push(curVal);
+        }
+    }
+
+    //checks if ":" is inside a string
+    var eqLen = equalLocations.length;
+
+    for(curVal = 0; curVal < eqLen; curVal++){
+        var resolv = true,
+            charPosition = equalLocations[curVal],
+            char = obj.charAt(charPosition - 1),
+            nextChar = obj.charAt(charPosition - 2);
+        while(resolv){
+            //console.log("checkerCharPos:", charPosition - 1);
+
+            if (char === "\"" & nextChar === ":" | char === "\"" & nextChar === "=") {
+                //We dont want to replace this
+                //console.log(":");
+                resolv = false;
+            } else if (char === "\"" & nextChar !== ":") {
+                //Replace char
+                //console.log("=");
+                obj = a7.replaceCharAt(obj, charPosition, "=");
+                resolv = false;
+            }
+            //fail safe for infite loops and check for the first
+            else if (charPosition === 1) {
+                //it appears that this is the first ":" so we want to replace it!
+                //console.log("=");
+                obj = a7.replaceCharAt(obj, charPosition, "=");
+                resolv = false;
+            } else {
+                charPosition -= 1;
+            }
+        }
+    }
+
+    var displacement = 0,
+    quLen = quoteLocations.length;
+    for(curVal = 0; curVal < quLen; curVal++){
+        var val = quoteLocations[curVal];
+        //console.log(curVal, obj.charAt(val + 1 - displacement));
+        if (obj.charAt(val + 1 - displacement) === "=") {
+            var start = quoteLocations[curVal - 1] + 1 - displacement;
+            var AttrName = obj.slice(start, val - displacement);
+            /*
+            console.log("AttrName:",AttrName);
+            //*/
+            obj = obj.replace("\"" + AttrName + "\"", AttrName);
+            displacement += 2;
+        }
+    }
+
+    obj = obj.replace(/({|})/g, "").replace(/,/g, " ");
+    //console.log(finalAttributes);
+
+    if(obj === "\"\""){
+        obj = "";
+    }
+
+    var spacing;
+
+    return obj;
+
+};
+
 //very useful 
 if (!"".trim) String.prototype.trim = function () {
     return this.replace(/^[\s﻿]+|[\s﻿]+$/g, '');
@@ -42,7 +122,7 @@ var a7 = {},
 
 //we changed a7store object to an array because we tested that arrays are simply about 33% faster than objects
 //which would give us a huge performance increase
-a7store = Array(13);
+a7store = Array(14);
 a7store = [
     "v3.3.5", //Version       0
     {}, //ComponentList       1
@@ -57,6 +137,7 @@ a7store = [
     false, //initDone         10
     "", //description         11
     "", //title               12
+    true, //secureProps mode  13
 ];
 
 a7.ver = function () {
@@ -67,119 +148,59 @@ a7.routes = {
 
 };
 
+a7.secureProps = function (mode) {
+    if(mode === true || mode === false){
+        a7store[13] = mode;
+    }
+
+    if (mode === false){
+        a7debug("BEWARE: Props are secure by default and setting them unsecure means that your app can potentially have an xss vulnerability.");
+    }
+};
+
 a7.createElement = function (element, attributes) {
-    var finalElement;
+    var finalElement,
+    props;
+
     if (attributes === undefined | null | "null") {
         attributes = "";
+    } else if (attributes.props){
+        props = attributes.props;
+        delete attributes.props;
+    }
+
+    attributes = objectToAttributes(attributes);
+
+    //If secure mode is enabled
+    if(a7store[13] === true){
+        //sanitize props
+        var key;
+        for(key in props) {
+            props[key] = a7.sanitizer(props[key]);
+        }
     }
 
     //if the element is a component
     if (a7store[1][element] !== undefined) {
-        finalElement = "<div class=\"a7-component " + element + "\">" + a7store[1][element](attributes) +"</div>";
+        finalElement = "<div class=\"a7-component " + element + "\" " + attributes + ">" + a7store[1][element](props) +"</div>";
     } else {
-        attributes = JSON.stringify(attributes);
 
         //console.log(attributes);
-
+        //Join content
         var contentArray = [];
         var curVal;
         var argLen = arguments.length;
 
-        for (curVal = 0; curVal < argLen; curVal++) {
-
-            if (2 <= curVal) {
-                contentArray.push(arguments[curVal]);
-            }
+        for (curVal = 2; curVal < argLen; curVal++) {
+            contentArray.push(arguments[curVal]);
         }
 
-        var lenght = attributes.length,
-            quoteLocations = [],
-            equalLocations = [];
-
-        for (curVal = 0; curVal < lenght; curVal++) {
-            var curChar = attributes.charAt(curVal);
-            if (curChar === "\"") {
-
-                quoteLocations.push(curVal);
-            } else if (curChar === ":") {
-
-                equalLocations.push(curVal);
-            }
-        }
-
-        //checks if ":" is inside a string
-        var eqLen = equalLocations.length;
-
-        for(curVal = 0; curVal < eqLen; curVal++){
-            var resolv = true,
-                charPosition = equalLocations[curVal];
-                char = attributes.charAt(charPosition - 1),
-                nextChar = attributes.charAt(charPosition - 2);
-            while(resolv){
-                //console.log("checkerCharPos:", charPosition - 1);
-    
-                if (char === "\"" & nextChar === ":" | char === "\"" & nextChar === "=") {
-                    //We dont want to replace this
-                    //console.log(":");
-                    resolv = false;
-                } else if (char === "\"" & nextChar !== ":") {
-                    //Replace char
-                    //console.log("=");
-                    attributes = a7.replaceCharAt(attributes, charPosition, "=");
-                    resolv = false;
-                }
-                //fail safe for infite loops and check for the first
-                else if (charPosition === 1) {
-                    //it appears that this is the first ":" so we want to replace it!
-                    //console.log("=");
-                    attributes = a7.replaceCharAt(attributes, charPosition, "=");
-                    resolv = false;
-                } else {
-                    charPosition -= 1;
-                }
-            }
-        }
-
-        var displacement = 0,
-        quLen = quoteLocations.length;
-        for(curVal = 0; curVal < quLen; curVal++){
-            var val = quoteLocations[curVal];
-            //console.log(curVal, attributes.charAt(val + 1 - displacement));
-            if (attributes.charAt(val + 1 - displacement) === "=") {
-                var start = quoteLocations[curVal - 1] + 1 - displacement;
-                var AttrName = attributes.slice(start, val - displacement);
-                /*
-                console.log("AttrName:",AttrName);
-                //*/
-                attributes = attributes.replace("\"" + AttrName + "\"", AttrName);
-                displacement += 2;
-            }
-        }
-
-        element = element;
         content = contentArray.join("");
-        var finalAttributes = attributes.replace(/({|})/g, "").replace(/,/g, " ");
-        //console.log(finalAttributes);
-
-        if(finalAttributes === "\"\""){
-            finalAttributes = "";
-        }
-
-        var spacing;
-        if (finalAttributes.length !== 0) {
-            spacing = " ";
-        } else {
-            spacing = "";
-        }
         //debugger!! comment it when it is not needed
         /*
-
         console.log("Content:",content);
-        console.log("Attributes:", finalAttributes);
-        console.log("Quotes:", quoteLocations);
-
         */
-        finalElement = "<" + element + spacing + finalAttributes + ">" + content + "</" + element + ">";
+        finalElement = "<" + element + " " + attributes + ">" + content + "</" + element + ">";
     }
 
     return finalElement;
@@ -196,7 +217,7 @@ a7.elementCollection = function () {
 };
 
 a7.registerComponent = function (compName, compFunc) {
-    if(compName !== "div" | compName !== "p" | compName !== ""){
+    if(compName === "div" | compName === "p" | compName === "span" | compName === "h1"){
         return a7debug("please choose a different Component name because the name " + compName + " is a basic html tag name.");
     }else if (a7store[1][compName] === undefined) {
         a7store[1][compName] = compFunc;
@@ -206,7 +227,7 @@ a7.registerComponent = function (compName, compFunc) {
 };
 
 //html sanitizer
-a7.encoder = function (content) {
+a7.sanitizer = function (content) {
     var result = content
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
