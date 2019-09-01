@@ -8,14 +8,16 @@
 ✅ Only 2,6kb
 
 # Setup
-Link it:
-```html
-<script src="a7js.netlify.com/dist/3.3.5"></script>
-```
-or Install it:
-```npm
+Install it:
+```shell
 npm i a7js
 ```
+
+Start a new project:
+```shell
+a7 newproject [projectname]
+```
+
 # Motivation
 Most of the commonly used libraries / frameworks are really large and pack in features that most of the users.
 
