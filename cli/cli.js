@@ -134,6 +134,7 @@ const a7build = function() {
 
     mainFile = mainFile.replace(/import a7 from \"@a7JS\"(;|)/i, fs.readFileSync(pathToA7JS, "utf-8"));
     log(mainFile);
+    fs.writeFileSync(config.output, mainFile);
 };
 
 const a7unknownArg = function () {
