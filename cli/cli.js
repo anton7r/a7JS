@@ -109,7 +109,7 @@ const a7newproject = function (name) {
         }
     });
 
-    fs.writeFile(name + "/a7.config.json", "{\n    \"mode\":\"development\"\n    \"output\":\"build.js\"}", function (err) {
+    fs.writeFile(name + "/a7.config.json", "{\n        \"mode\":\"development\",\n        \"entry\":\"./app/index.js\",\n        \"output\":\"appbuild.js\"\n    }", function (err) {
         if (err) {
             log(chalk.red("ERROR:"), "config could not be created.");
         }
@@ -125,99 +125,15 @@ const a7newproject = function (name) {
 };
 
 const a7build = function() {
-    var jsFileList = [],
-    bundled = "",
-    config;
-    function builder1(){
-        if(config.mode === "development"){
-            log("Building a7 project in \"development\" mode.");
-        } else if (config.mode === "production"){
-            log("Building a7 project in \"production\" mode.");
-        } else {
-            return log(chalk.red("a7.config.json error:"), "mode can be either \"development\" or \"production\". mode is currently set as", chalk.red("\""+config.mode + "\"."));
-        }
-
-        var i,
-        listlen = jsFileList.length;
-
-        for(i = 0; i < listlen; i++){
-            fs.readFile("js/"+jsFileList[i], function(err, data){
-                if(err){
-                    log(err);
-                }
-                bundled += data;
-                if (i === listlen){
-                    compressAndTranspile();
-                }
-            });
-        }
-
+    var config = JSON.parse(fs.readFileSync("./a7.config.json", "utf-8"));
+    if(config.entry === undefined){
+        log("You have not defined the entrypoint of your app.");
     }
+    var mainFile = fs.readFileSync(config.entry, "utf-8"),
+    pathToA7JS = require.resolve("../dist/a7.js");
 
-    var compressAndTranspile = function(){
-        var orginalLength = bundled.length;
-
-        bundled = bundled.replace(/\n/g, "") //put into a single line
-        .replace(/\s+/g, " ") //remove extra white space
-        .replace(/(\s|)=(\s|)/g, "=") //removes spaces around "=" signs
-        .replace(/(\s|){(\s|)/g, "{") //removes spaces around "{}"
-        .replace(/(\s|)}(\s|)/g, "}")
-        .replace(/(\s|)\((\s|)/g, "(") //removes spaces around "()"
-        .replace(/(\s|)\)(\s|)/g, ")")
-        .replace(/(\s|);(\s|)/g, ";") //removes spaces around colons and semicolons
-        .replace(/(\s|),(\s|)/g, ",");
-        //transpiling here
-        var bundleLength = bundled.length,
-        i = 0;
-        log(chalk.red("orginal size:"), (orginalLength/1024).toFixed(2), "KB");
-        log(chalk.green("bundle size:"), (bundleLength/1024).toFixed(2), "KB");
-
-        //find a7.render
-        var a7renderStartLocations = [],
-        a7renderEndLocations = [];
-
-        for(i = 0; i < bundleLength; i++){
-            start = i + bundled.substring(i, bundleLength).indexOf("a7.render(");
-            if(start !== -1){
-                end = start + bundled.substring(start, bundleLength).indexOf(")");
-                a7renderStartLocations.push(start);
-                a7renderEndLocations.push(end);
-                i = end;
-                log(end);
-            } else {
-                outputBundle();
-                break;
-            }
-        }
-        console.log(a7renderStartLocations, a7renderEndLocations);
-    };
-
-    var outputBundle = function (){
-        if(config.output === undefined){
-            config.output = "build.js";
-        }
-        fs.writeFile(config.output, bundled, function(err){
-            if(err){
-                log(err);
-            }
-        });
-    };
-
-    fs.readdir("js/", function(err, list){
-        if(err){
-            console.log(err);
-        } else {
-            jsFileList = list;
-        }
-    });
-    fs.readFile("./a7.config.json", function(err, file){
-        if (err){
-            console.log(err);
-        }
-        config = JSON.parse(file);
-        builder1();
-    });
-
+    mainFile = mainFile.replace(/import a7 from \"@a7JS\"(;|)/i, fs.readFileSync(pathToA7JS, "utf-8"));
+    log(mainFile);
 };
 
 const a7unknownArg = function () {

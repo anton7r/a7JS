@@ -2,7 +2,7 @@
   "name": "a7js",
   "version": "3.3.5",
   "description": "a7JS is a spa framework",
-  "main": ".\\src\\js\\a7.js",
+  "main": ".\\src\\a7.js",
   "scripts": {
     "test": "node ./src/a7.test.js",
     "build": "npx webpack"
