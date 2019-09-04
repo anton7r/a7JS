@@ -81,7 +81,7 @@ const a7newproject = function (name) {
         }
     });
 
-    fs.mkdirSync([name,"/js"].join(""));
+    fs.mkdirSync(name +"/app");
 
     fs.writeFile(name + "/index.html", createHtmlDoc(name), function (err) {
         if (err) {
@@ -112,6 +112,12 @@ const a7newproject = function (name) {
     fs.writeFile(name + "/app/index.js", jsDoc, function (err) {
         if (err) {
             log(chalk.red("ERROR:"), "app/index.js could not be created.");
+        }
+    });
+
+    fs.mkdir(name + "/app/components", function (err){
+        if(err){
+            log(chalk.red("ERROR:"), "app/components folder could not be created.");
         }
     });
 
