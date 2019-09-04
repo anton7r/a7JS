@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/anton7r/a7JS#readme",
   "dependencies": {
-    "chalk": "^2.4.2"
+    "chalk": "^2.4.2",
+    "uglify-js": "^3.6.0"
   }
 }

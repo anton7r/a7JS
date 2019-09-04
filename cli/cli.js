@@ -3,6 +3,7 @@
 const log = console.log;
 const fs = require("fs");
 const chalk = require("chalk");
+const UglifyJS = require("uglify-js");
 // arguments
 const [, , ...args] = process.argv;
 const endbar = "======================================";
@@ -107,9 +108,9 @@ const a7newproject = function (name) {
         }
     });
 
-    fs.writeFile(name + "/js/index.js", jsDoc, function (err) {
+    fs.writeFile(name + "/app/index.js", jsDoc, function (err) {
         if (err) {
-            log(chalk.red("ERROR:"), "index.html could not be created.");
+            log(chalk.red("ERROR:"), "app/index.js could not be created.");
         }
     });
 
@@ -125,8 +126,8 @@ const a7build = function() {
     pathToA7JS = require.resolve("../dist/a7.js");
 
     mainFile = mainFile.replace(/import a7 from \"@a7JS\"(;|)/i, fs.readFileSync(pathToA7JS, "utf-8"));
-    log(mainFile);
-    fs.writeFileSync(config.output, mainFile);
+    var minified = UglifyJS.minify(mainFile);
+    fs.writeFileSync(config.output, minified.code);
 };
 
 const a7createComponent = function(name) {
@@ -134,7 +135,7 @@ const a7createComponent = function(name) {
     fs.writeFileSync(pathToComponents + name + ".component.js");
     fs.writeFileSync(pathToComponents + name + ".component.html");
     fs.writeFileSync(pathToComponents + name + ".component.css");
-}
+};
 
 const a7unknownArg = function () {
     log(chalk.red("ERROR:"), chalk.cyan(args.join(" ")), "is not a valid argument.");
