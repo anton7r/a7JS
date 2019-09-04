@@ -32,6 +32,10 @@ const cssDoc = `:root{
 * {
     margin:0px;
     padding:0px;
+}
+
+body {
+    font:"FONT HERE";
 }`;
 const jsDoc = `const a7 = require("a7");
 import a7 from "a7.js"
