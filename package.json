@@ -28,9 +28,5 @@
   "homepage": "https://github.com/anton7r/a7JS#readme",
   "dependencies": {
     "chalk": "^2.4.2"
-  },
-  "devDependencies": {
-    "webpack": "^4.39.2",
-    "webpack-cli": "^3.3.7"
   }
 }
