@@ -4,6 +4,7 @@ const log = console.log;
 const fs = require("fs");
 const chalk = require("chalk");
 const UglifyJS = require("uglify-js");
+
 // arguments
 const [, , ...args] = process.argv;
 const endbar = "======================================";
@@ -116,18 +117,43 @@ const a7newproject = function (name) {
 
     log(chalk.green("SUCCESS:"), "The Project was created without any errors!");
 };
-
+//todo
 const a7build = function() {
     var config = JSON.parse(fs.readFileSync("./a7.config.json", "utf-8"));
+
     if(config.entry === undefined){
         log("You have not defined the entrypoint of your app.");
+        return;
+    } 
+    else {
+        log(chalk.cyan("LOADED:"), "config");
     }
+
     var mainFile = fs.readFileSync(config.entry, "utf-8"),
     pathToA7JS = require.resolve("../dist/a7.js");
 
     mainFile = mainFile.replace(/import a7 from \"@a7JS\"(;|)/i, fs.readFileSync(pathToA7JS, "utf-8"));
-    var minified = UglifyJS.minify(mainFile);
-    fs.writeFileSync(config.output, minified.code);
+    var imports = mainFile.match(/import .+ from \".+\"/g);
+    imports.forEach(function(val){
+        var pathToComponent = val.match(/".+"/),
+        document;
+        var documentPath;
+        pathToComponent[0] = pathToComponent[0].replace(/\"/g, "");
+        if(pathToComponent[0].charAt(0) === "."){
+            documentPath = "./app" + pathToComponent[0].replace(/\./, "");
+            document = fs.readFileSync(documentPath, "utf-8");
+        } else {
+            documentPath = pathToComponent[0];
+            document = fs.readFileSync(documentPath, "utf-8");
+        }
+        console.log(document, documentPath);
+    });
+    var minify = UglifyJS.minify(mainFile);
+    if(minify.error){
+        log(chalk.red("ERROR:"), minify.error.message, minify.error.line + ":" + minify.error.line);
+    }
+
+    fs.writeFileSync(config.output, minify.code);
 };
 
 const a7createComponent = function(name) {
@@ -135,6 +161,7 @@ const a7createComponent = function(name) {
     fs.writeFileSync(pathToComponents + name + ".component.js");
     fs.writeFileSync(pathToComponents + name + ".component.html");
     fs.writeFileSync(pathToComponents + name + ".component.css");
+    log("Component", name, chalk.green("created."));
 };
 
 const a7unknownArg = function () {
@@ -157,6 +184,7 @@ switch (args[0]) {
         break;
     case "newcomponent":
         a7createComponent(args[1]);
+        break;
     default:
         a7unknownArg();
         break;
