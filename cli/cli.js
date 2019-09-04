@@ -20,23 +20,11 @@ const createHtmlDoc = function (name) {
 </head>
 <body>
     <div data-a7-page-container></div>
-    <script type="module" src="/build.js"></script>
+    <script type="module" src="/appbuild.js"></script>
 </body>
 </html>`].join("");
 };
-const cssDoc = `:root{
-    --main-color:black;
-    --bg-color:white;
-}
-
-* {
-    margin:0px;
-    padding:0px;
-}
-
-body {
-    font:"FONT HERE";
-}`;
+const cssDoc = `:root{\n    --main-color:black;\n    --bg-color:white;\n}\n\n* {\n    margin:0px;\n    padding:0px;\n}\n\nbody {\n    font:"FONT HERE";\n}`;
 const jsDoc = `const a7 = require("a7");
 import a7 from "a7.js"
 
@@ -141,6 +129,13 @@ const a7build = function() {
     fs.writeFileSync(config.output, mainFile);
 };
 
+const a7createComponent = function(name) {
+    var pathToComponents = "./app/components/";
+    fs.writeFileSync(pathToComponents + name + ".component.js");
+    fs.writeFileSync(pathToComponents + name + ".component.html");
+    fs.writeFileSync(pathToComponents + name + ".component.css");
+}
+
 const a7unknownArg = function () {
     log(chalk.red("ERROR:"), chalk.cyan(args.join(" ")), "is not a valid argument.");
 };
@@ -159,6 +154,8 @@ switch (args[0]) {
     case "build":
         a7build();
         break;
+    case "newcomponent":
+        a7createComponent(args[1]);
     default:
         a7unknownArg();
         break;

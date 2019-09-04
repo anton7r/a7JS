@@ -4,8 +4,8 @@
   "description": "a7JS is a spa framework",
   "main": ".\\src\\a7.js",
   "scripts": {
-    "test": "node ./src/a7.test.js",
-    "build": "npx webpack"
+    "test": "node ./test/a7.test.js",
+    "build": "node ./tools/builder.js"
   },
   "repository": {
     "type": "git",
