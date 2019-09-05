@@ -153,20 +153,25 @@ const a7build = function() {
 
     mainFile = mainFile.replace(/import a7 from \"@a7JS\"(;|)/i, fs.readFileSync(pathToA7JS, "utf-8"));
     var imports = mainFile.match(/import .+ from \".+\"/g);
-    imports.forEach(function(val){
-        var pathToComponent = val.match(/".+"/),
-        document;
-        var documentPath;
-        pathToComponent[0] = pathToComponent[0].replace(/\"/g, "");
-        if(pathToComponent[0].charAt(0) === "."){
-            documentPath = "./app" + pathToComponent[0].replace(/\./, "");
-            document = fs.readFileSync(documentPath, "utf-8");
-        } else {
-            documentPath = pathToComponent[0];
-            document = fs.readFileSync(documentPath, "utf-8");
-        }
-        console.log(document, documentPath);
-    });
+    if (imports !== null){
+        imports.forEach(function(val){
+            var pathToComponent = val.match(/".+"/),
+            document;
+            var documentPath;
+            pathToComponent[0] = pathToComponent[0].replace(/\"/g, "");
+            if(pathToComponent[0].charAt(0) === "."){
+                documentPath = "./app" + pathToComponent[0].replace(/\./, "");
+                document = fs.readFileSync(documentPath, "utf-8");
+            } else {
+                documentPath = pathToComponent[0];
+                document = fs.readFileSync(documentPath, "utf-8");
+            }
+            console.log(document, documentPath);
+        });
+    } else {
+        infoLog("no component imports detected.");
+    }
+
     var minify = UglifyJS.minify(mainFile);
     if(minify.error){
         log(chalk.red("ERROR:"), minify.error.message, minify.error.line + ":" + minify.error.line);
@@ -177,13 +182,13 @@ const a7build = function() {
 
 const a7createComponent = function(name) {
     var pathToComponents = "./app/";
-    var jsFileName = pathToComponents + name + "/" + name + ".component.js";
-    var cssFileName = pathToComponents + name + "/" + name + ".component.css";
-    var htmlFileName = pathToComponents + name + "/" + name + ".component.html";
+    var jsFileName = pathToComponents + name + "/" + name + ".js";
+    var cssFileName = pathToComponents + name + "/" + name + ".css";
+    var htmlFileName = pathToComponents + name + "/" + name + ".html";
     fs.mkdirSync(pathToComponents + "/" + name);
-    fs.writeFileSync(jsFileName);
-    fs.writeFileSync(htmlFileName);
-    fs.writeFileSync(cssFileName);
+    fs.writeFileSync(jsFileName, "export default {\n    documentSource:\"./"+name+".html\",\n    styleSource:\"./"+name+".css\"\n};");
+    fs.writeFileSync(htmlFileName, "");
+    fs.writeFileSync(cssFileName, "");
     log("Component", name, chalk.green("created."));
 };
 
