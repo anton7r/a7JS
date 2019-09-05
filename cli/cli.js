@@ -8,12 +8,17 @@ const UglifyJS = require("uglify-js");
 //TODO:
 //ALSO UPDATE HELPER!!!!!!
 function successMsg (msg){
-    log(msg);
+    log(chalk.green("SUCCESS:"), msg);
 }
 
 function errorMsg (msg){
-    log(msg);
+    log(chalk.red("ERROR:"), msg);
 }
+
+function fileCreated (fileName, fileByteSize){
+    log("INFO: file ");
+}
+
 // arguments
 const [, , ...args] = process.argv;
 const endbar = "======================================";
@@ -55,11 +60,22 @@ const a7greet = function () {
     log("installed version:", chalk.green("v4-pre"));
     log();
 };
+function helperLog (argument, text){
+    log(chalk.cyan(argument), "-", text);
+}
+
+function syntaxLog (syntax){
+    log(chalk.gray(" - Syntax: " + syntax));
+}
 
 const a7helper = function () {
     log("=============", chalk.blue("a7JS Help"), "==============");
-    log(chalk.cyan("newproject"), "- create a new project with a7.");
-    log(chalk.cyan("build"), "- build the a7 project.");
+    helperLog("newproject", "create a new project with a7.");
+    syntaxLog("a7 newproject [projectname]");
+    helperLog("newcomponent", "create a new component into the current project.");
+    syntaxLog("a7 newcomponent [componentname]");
+    helperLog("build", "build the a7 project.");
+    syntaxLog("a7 build");
     log(endbar);
 
 };
@@ -163,10 +179,6 @@ const a7build = function() {
     }
 
     fs.writeFileSync(config.output, minify.code);
-};
-
-const fileCreated = function (fileName, fileByteSize){
-    log("INFO: file ");
 };
 
 const a7createComponent = function(name) {
