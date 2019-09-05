@@ -53,18 +53,6 @@ const createHtmlDoc = function (name) {
 </html>`].join("");
 };
 const cssDoc = `:root{\n    --main-color:black;\n    --bg-color:white;\n}\n\n* {\n    margin:0px;\n    padding:0px;\n}\n\nbody {\n    font:"FONT HERE";\n}`;
-const jsDoc = `const a7 = require("a7");
-import a7 from "a7.js"
-
-a7.routes = {
-    "/*": home
-};
-var home = function(){
-    a7.render(
-        <div class="hello">I am Hello</div>
-    )
-};
-`
 
 const a7greet = function () {
     log();
@@ -134,14 +122,14 @@ const a7newproject = function (name) {
             return errorLog("css file could not be created.");
         }
     });
-    var conf = fs.readFileSync(require.resolve("../cli/defaultconfig.json"));
+    var conf = fs.readFileSync(require.resolve("./project-template/defaultconfig.json"));
     fs.writeFile(name + "/a7.config.json", conf, function (err) {
         if (err) {
             return errorLog("config could not be created.");
         }
     });
 
-    fs.writeFile(name + "/app/index.js", jsDoc, function (err) {
+    fs.writeFile(name + "/app/index.js", fs.readFileSync(require.resolve("./project-template/index.js")), function (err) {
         if (err) {
             return errorLog("app/index.js could not be created.");
         }
