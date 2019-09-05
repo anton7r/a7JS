@@ -3,7 +3,8 @@
 const log = console.log;
 const fs = require("fs");
 const chalk = require("chalk");
-const UglifyJS = require("uglify-js");
+const UglifyJS = require("uglify-js"),
+pathToA7JS = require.resolve("../dist/a7.js");
 
 //TODO:
 function successLog (msg){
@@ -86,14 +87,13 @@ const a7helper = function () {
 };
 
 const a7newproject = function (name) {
-
     if (name === undefined) {
-        return errorLog("name of the project is not defined.");
+        return errorLog("You have not defined a name for your project.");
     } else if (fs.existsSync(name) !== false) {
-        return errorLog(name + "folder already exists.");
+        return errorLog(name + " folder already exists in this directory.");
     }
 
-    log(chalk.cyan("creating a new project in " + name));
+    infoLog("creating a new project in " + name);
 
     fs.mkdir(name, {
         recursive: true
@@ -108,6 +108,8 @@ const a7newproject = function (name) {
     fs.writeFile(name + "/package.json", "empty", function (err) {
         if (err) {
             log(chalk.red("ERROR:"), "package.json could not be created.");
+        } else {
+
         }
     });
 
@@ -123,25 +125,25 @@ const a7newproject = function (name) {
         recursive: true
     }, function (err) {
         if (err) {
-            log(chalk.red("ERROR:"), "css folder could not be created.");
+            return errorLog("css folder could not be created.");
         }
     });
 
     fs.writeFile(name + "/css/style.css", cssDoc, function (err) {
         if (err) {
-            log(chalk.red("ERROR:"), "css file could not be created.");
+            return errorLog("css file could not be created.");
         }
     });
-
-    fs.writeFile(name + "/a7.config.json", "{\n        \"mode\":\"development\",\n        \"entry\":\"./app/index.js\",\n        \"output\":\"appbuild.js\"\n    }", function (err) {
+    var conf = fs.readFileSync(require.resolve("../cli/defaultconfig.json"));
+    fs.writeFile(name + "/a7.config.json", conf, function (err) {
         if (err) {
-            log(chalk.red("ERROR:"), "config could not be created.");
+            return errorLog("config could not be created.");
         }
     });
 
     fs.writeFile(name + "/app/index.js", jsDoc, function (err) {
         if (err) {
-            log(chalk.red("ERROR:"), "app/index.js could not be created.");
+            return errorLog("app/index.js could not be created.");
         }
     });
 
@@ -159,8 +161,7 @@ const a7build = function() {
         log(chalk.cyan("LOADED:"), "config");
     }
 
-    var mainFile = fs.readFileSync(config.entry, "utf-8"),
-    pathToA7JS = require.resolve("../dist/a7.js");
+    var mainFile = fs.readFileSync(config.entry, "utf-8");
 
     mainFile = mainFile.replace(/import a7 from \"@a7JS\"(;|)/i, fs.readFileSync(pathToA7JS, "utf-8"));
     var imports = mainFile.match(/import .+ from \".+\"/g);
@@ -199,7 +200,7 @@ const a7createComponent = function(name) {
 };
 
 const a7unknownArg = function () {
-    log(chalk.red("ERROR:"), chalk.cyan(args.join(" ")), "is not a valid argument.");
+    errorLog(chalk.cyan(args.join(" ")) + " is not a valid argument.");
 };
 
 switch (args[0]) {

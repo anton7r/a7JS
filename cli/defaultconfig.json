@@ -1,0 +1,5 @@
+{
+    "mode":"development",
+    "entry":"./app/index.js",
+    "output":"./appbuild.js"
+}
