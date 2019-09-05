@@ -6,17 +6,28 @@ const chalk = require("chalk");
 const UglifyJS = require("uglify-js");
 
 //TODO:
-//ALSO UPDATE HELPER!!!!!!
-function successMsg (msg){
+function successLog (msg){
     log(chalk.green("SUCCESS:"), msg);
 }
 
-function errorMsg (msg){
-    log(chalk.red("ERROR:"), msg);
+function errorLog (msg){
+    log(chalk.red("ERROR:"), msg) ;
 }
 
-function fileCreated (fileName, fileByteSize){
-    log("INFO: file ");
+function infoLog (msg){
+    log(chalk.cyan("INFO:"), msg);
+}
+
+function fileCreatedLog (fileName, fileByteSize){
+    log(chalk.cyan("INFO:"), " file", fileName, "was created.");
+}
+
+function helperLog (argument, text){
+    log(chalk.cyan(argument), "-", text);
+}
+
+function syntaxLog (syntax){
+    log(chalk.gray(" - Syntax: " + syntax));
 }
 
 // arguments
@@ -60,32 +71,26 @@ const a7greet = function () {
     log("installed version:", chalk.green("v4-pre"));
     log();
 };
-function helperLog (argument, text){
-    log(chalk.cyan(argument), "-", text);
-}
-
-function syntaxLog (syntax){
-    log(chalk.gray(" - Syntax: " + syntax));
-}
 
 const a7helper = function () {
-    log("=============", chalk.blue("a7JS Help"), "==============");
-    helperLog("newproject", "create a new project with a7.");
-    syntaxLog("a7 newproject [projectname]");
-    helperLog("newcomponent", "create a new component into the current project.");
-    syntaxLog("a7 newcomponent [componentname]");
-    helperLog("build", "build the a7 project.");
-    syntaxLog("a7 build");
-    log(endbar);
-
+        log("=============", chalk.blue("a7JS Help"), "==============");
+        helperLog("newproject", "create a new project with a7.");
+        syntaxLog("a7 newproject [projectname]");
+        syntaxLog("a7 np [projectname]");
+        helperLog("newcomponent", "create a new component into the current project.");
+        syntaxLog("a7 newcomponent [componentname]");
+        syntaxLog("a7 nc [componentname]");
+        helperLog("build", "build the a7 project.");
+        syntaxLog("a7 build");
+        log(endbar);
 };
 
 const a7newproject = function (name) {
 
     if (name === undefined) {
-        return log(chalk.red("ERROR:"), "name of the project is not defined.");
+        return errorLog("name of the project is not defined.");
     } else if (fs.existsSync(name) !== false) {
-        return log(chalk.red("ERROR:"), name, "folder already exists.");
+        return errorLog(name + "folder already exists.");
     }
 
     log(chalk.cyan("creating a new project in " + name));
@@ -208,10 +213,16 @@ switch (args[0]) {
     case "newproject":
         a7newproject(args[1]);
         break;
+    case "np":
+        a7newproject(args[1]);
+        break;
     case "build":
         a7build();
         break;
     case "newcomponent":
+        a7createComponent(args[1]);
+        break;
+    case "nc":
         a7createComponent(args[1]);
         break;
     default:
