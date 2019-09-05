@@ -5,6 +5,15 @@ const fs = require("fs");
 const chalk = require("chalk");
 const UglifyJS = require("uglify-js");
 
+//TODO:
+//ALSO UPDATE HELPER!!!!!!
+function successMsg (msg){
+    log(msg);
+}
+
+function errorMsg (msg){
+    log(msg);
+}
 // arguments
 const [, , ...args] = process.argv;
 const endbar = "======================================";
@@ -115,12 +124,6 @@ const a7newproject = function (name) {
         }
     });
 
-    fs.mkdir(name + "/app/components", function (err){
-        if(err){
-            log(chalk.red("ERROR:"), "app/components folder could not be created.");
-        }
-    });
-
     log(chalk.green("SUCCESS:"), "The Project was created without any errors!");
 };
 //todo
@@ -162,11 +165,19 @@ const a7build = function() {
     fs.writeFileSync(config.output, minify.code);
 };
 
+const fileCreated = function (fileName, fileByteSize){
+    log("INFO: file ");
+};
+
 const a7createComponent = function(name) {
-    var pathToComponents = "./app/components/";
-    fs.writeFileSync(pathToComponents + name + ".component.js");
-    fs.writeFileSync(pathToComponents + name + ".component.html");
-    fs.writeFileSync(pathToComponents + name + ".component.css");
+    var pathToComponents = "./app/";
+    var jsFileName = pathToComponents + name + "/" + name + ".component.js";
+    var cssFileName = pathToComponents + name + "/" + name + ".component.css";
+    var htmlFileName = pathToComponents + name + "/" + name + ".component.html";
+    fs.mkdirSync(pathToComponents + "/" + name);
+    fs.writeFileSync(jsFileName);
+    fs.writeFileSync(htmlFileName);
+    fs.writeFileSync(cssFileName);
     log("Component", name, chalk.green("created."));
 };
 
