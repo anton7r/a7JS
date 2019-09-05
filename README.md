@@ -1,6 +1,6 @@
 # a7JS
 ![](https://img.shields.io/badge/build-passing-success) 
-![](https://img.shields.io/badge/Latest%20version-v.3.3.5-blue)
+![](https://img.shields.io/badge/Latest%20version-v3.3.5-blue)
 ![](https://img.shields.io/badge/Size-3kb-success)
 ![](https://img.shields.io/badge/v4%20status-in%20Development-red)
 
