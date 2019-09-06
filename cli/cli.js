@@ -117,7 +117,7 @@ const a7createComponent = function(name) {
     var cssFileName = pathToComponents + name + "/" + name + ".css";
     var htmlFileName = pathToComponents + name + "/" + name + ".html";
     fs.mkdirSync(pathToComponents + "/" + name);
-    fs.writeFileSync(jsFileName, "export default {\n    template:\"./"+name+".html\",\n    styles:\"./"+name+".css\"\n};");
+    fs.writeFileSync(jsFileName, "export default {\n    tag:\""+name+"\",\n    template:\"./"+name+".html\",\n    styles:\"./"+name+".css\"\n};");
     fs.writeFileSync(htmlFileName, "");
     fs.writeFileSync(cssFileName, "");
     clicore.successLog("Component" + name + " was successfully created.");

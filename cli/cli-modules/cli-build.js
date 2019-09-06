@@ -43,6 +43,7 @@ module.exports = function() {
             var stylesRawUrl = clicore.componentSource(document.match(/styles(|\s+):(|\s+)\".+\"/i)[0]);
             var templateUrl;
             var stylesUrl;
+            var componentTag = document.match(/tag(|\s+):(|\s+)\".+\"/i)[0].match(/\".+\"/)[0].replace(/\"/g, "");
 
             if(clicore.isRelativePath(templateRawUrl)){
                 templateUrl = documentFolder + templateRawUrl.replace(/\.\//, "");
@@ -66,26 +67,29 @@ module.exports = function() {
             containerStyles.forEach(function(style){
                 containerOutStyles += style;
             });
-            //remember to add component name rule also
-            containerOutStyles = containerOutStyles.replace(/\.container/g, ".a7-component-container");
+
+            containerOutStyles = containerOutStyles.replace(/\.container/g, ".a7-component-container." + componentTag);
 
             var childrenStyles = styles.replace(/\.container(.|\s)+\{(.|\s)+\}/g, "");
             var template = fs.readFileSync(templateUrl, "utf-8");
             var templateOut = "";
-
             //HTML minifier
             template.split("\r\n").forEach(function(line){
                 templateOut += line.replace(/^\s+/g, "");
             });
             templateOut = templateOut.replace(/\s+/g, " ");
 
-            compiled = "<style>" + containerOutStyles + "</style><div class=\"a7-component-container\"><style>"+childrenStyles+"</style>"+ templateOut + "</div>";
-            log(compiled);
+            compiled = "<style>" + containerOutStyles + "</style><div class=\"a7-component " + componentTag + "\"><style>"+childrenStyles+"</style>"+ templateOut + "</div>";
+            var importerName = val.replace(/(import|from \".+\"| )/g, "");
+            log(importerName);
+            log(val);
+            //Replaces component import with the boilerplate
+            mainFile = mainFile.replace(val, "a7.registerComponent(\"" + componentTag + "\", function(props){return"+compiled+"}) function "+ importerName +"(props){return a7.createElement(\""+ componentTag + "\", {props:props})}");
         });
     } else {
         clicore.infoLog("no component imports detected.");
     }
-
+    console.log(mainFile);
     var minify = UglifyJS.minify(mainFile);
     if(minify.error){
         log(chalk.red("ERROR:"), minify.error.message, minify.error.line + ":" + minify.error.line);

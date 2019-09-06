@@ -28,9 +28,38 @@ SOFTWARE.
     "use strict";
 
     //internal methods
-
-    //we changed a7store object to an array because we tested that arrays are simply about 33% faster than objects
-    //which would give us a huge performance increase
+//these things are upto removal or keeping depending on how fast this comparison will be on elements
+    var htmlTags = [
+        "a",
+        "abbr",
+        "address",
+        "area",
+        "article",
+        "aside",
+        "audio",
+        "b",
+        "base",
+        "bdi",
+        "bdo",
+        "blockquote",
+        "body",
+        "br",
+        "button",
+        "canvas",
+        "caption",
+        "cite",
+        "code",
+        "col",
+        "colgroup",
+        "data",
+        "datalist",
+        "dd",
+        "del",
+        "details",
+        "dfn",
+        "dialog",
+        ""
+    ];
 
 
     var objectToAttributes = function (obj) {
@@ -123,6 +152,8 @@ SOFTWARE.
         );
     }
 
+    //we changed a7store object to an array because we tested that arrays are simply about 33% faster than objects
+    //which would give us a huge performance increase
     var a7store = Array(14);
     a7store = [
         "v4-pre", //Version       0
@@ -220,7 +251,7 @@ SOFTWARE.
         
         a7.registerComponent = function (compName, compFunc) {
             if (compName === "div" | compName === "p" | compName === "span" | compName === "h1") {
-                return a7debug("please choose a different Component name because the name " + compName + " is a common html tag name.");
+                return a7debug("please choose a different Component name because the name " + compName + " is a htmltag name.");
             } else if (a7store[1][compName] === undefined) {
                 a7store[1][compName] = compFunc;
             } else {
@@ -237,6 +268,14 @@ SOFTWARE.
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#x27;")
                 .replace(/\//g, "&#x2F;");
+
+            //finds typical xss vectors
+            var findScript = /<script>(.|\s)+<\/script>/g;            
+            if(result.match(findScript) !== null){
+                a7debug("a script tag were fed into the sanitizer and it was blocked due to it potentially being malicious.");
+                result.replace(findScript, "");
+            }
+
             return result;
         };
         
