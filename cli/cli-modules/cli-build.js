@@ -67,19 +67,20 @@ module.exports = function() {
                 containerOutStyles += style;
             });
             //remember to add component name rule also
-            containerOutStyles = containerOutStyles.replace(/\.container/g, "a7-component-container");
+            containerOutStyles = containerOutStyles.replace(/\.container/g, ".a7-component-container");
 
             var childrenStyles = styles.replace(/\.container(.|\s)+\{(.|\s)+\}/g, "");
             var template = fs.readFileSync(templateUrl, "utf-8");
-            var templateLines = template.split("\n");
-            var templateOut;
+            var templateOut = "";
 
-            templateLines.forEach(function(line){
-                templateOut += line.replace(/'\s+/g, "");
-                log(line.replace(/'\s+/g, ""));
+            //HTML minifier
+            template.split("\r\n").forEach(function(line){
+                templateOut += line.replace(/^\s+/g, "");
             });
+            templateOut = templateOut.replace(/\s+/g, " ");
 
-            console.log(templateOut);
+            compiled = "<style>" + containerOutStyles + "</style><div class=\"a7-component-container\"><style>"+childrenStyles+"</style>"+ templateOut + "</div>";
+            log(compiled);
         });
     } else {
         clicore.infoLog("no component imports detected.");
