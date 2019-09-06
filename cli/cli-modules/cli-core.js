@@ -8,6 +8,9 @@ clicore.componentSource = function (string){
     return string.match(/\".+\"/g)[0].replace(/\"/g, "");
 };
 
+//finds the a7 import
+clicore.importA7rx = /import a7 from \"@a7JS\"(;|)/i;
+
 clicore.isRelativePath = function (url){
     if (url[0].charAt(0) === "."){
         return true;

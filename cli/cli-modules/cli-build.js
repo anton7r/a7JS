@@ -17,7 +17,7 @@ module.exports = function() {
 
     var mainFile = fs.readFileSync(config.entry, "utf-8");
 
-    mainFile = mainFile.replace(/import a7 from \"@a7JS\"(;|)/i, fs.readFileSync(clicore.pathToA7JS, "utf-8"));
+    mainFile = mainFile.replace(clicore.importA7rx, fs.readFileSync(clicore.pathToA7JS, "utf-8"));
     var imports = mainFile.match(/import .+ from \".+\"/g);
     console.log(imports);
 
