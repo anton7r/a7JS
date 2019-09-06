@@ -3,33 +3,10 @@
 const log = console.log;
 const fs = require("fs");
 const chalk = require("chalk");
-const UglifyJS = require("uglify-js"),
-pathToA7JS = require.resolve("../dist/a7.js");
+const a7build = require("./cli-modules/cli-build.js");
+const clicore = require("./cli-modules/cli-core.js");
 
-//TODO:
-function successLog (msg){
-    log(chalk.green("SUCCESS:"), msg);
-}
 
-function errorLog (msg){
-    log(chalk.red("ERROR:"), msg) ;
-}
-
-function infoLog (msg){
-    log(chalk.cyan("INFO:"), msg);
-}
-
-function fileCreatedLog (fileName, fileByteSize){
-    log(chalk.cyan("INFO:"), " file", fileName, "was created.");
-}
-
-function helperLog (argument, text){
-    log(chalk.cyan(argument), "-", text);
-}
-
-function syntaxLog (syntax){
-    log(chalk.gray(" - Syntax: " + syntax));
-}
 
 // arguments
 const [, , ...args] = process.argv;
@@ -138,48 +115,6 @@ const a7newproject = function (name) {
     log(chalk.green("SUCCESS:"), "The Project was created without any errors!");
 };
 //todo
-const a7build = function() {
-    var config = JSON.parse(fs.readFileSync("./a7.config.json", "utf-8"));
-
-    if(config.entry === undefined){
-        log("You have not defined the entrypoint of your app.");
-        return;
-    } 
-    else {
-        log(chalk.cyan("LOADED:"), "config");
-    }
-
-    var mainFile = fs.readFileSync(config.entry, "utf-8");
-
-    mainFile = mainFile.replace(/import a7 from \"@a7JS\"(;|)/i, fs.readFileSync(pathToA7JS, "utf-8"));
-    var imports = mainFile.match(/import .+ from \".+\"/g);
-    if (imports !== null){
-        imports.forEach(function(val){
-            var pathToComponent = val.match(/".+"/),
-            document;
-            var documentPath;
-            pathToComponent[0] = pathToComponent[0].replace(/\"/g, "");
-            if(pathToComponent[0].charAt(0) === "."){
-                documentPath = "./app" + pathToComponent[0].replace(/\./, "");
-                document = fs.readFileSync(documentPath, "utf-8");
-            } else {
-                documentPath = pathToComponent[0];
-                document = fs.readFileSync(documentPath, "utf-8");
-            }
-            console.log(document, documentPath);
-        });
-    } else {
-        infoLog("no component imports detected.");
-    }
-
-    var minify = UglifyJS.minify(mainFile);
-    if(minify.error){
-        log(chalk.red("ERROR:"), minify.error.message, minify.error.line + ":" + minify.error.line);
-    }
-
-    fs.writeFileSync(config.output, minify.code);
-};
-
 const a7createComponent = function(name) {
     var pathToComponents = "./app/";
     var jsFileName = pathToComponents + name + "/" + name + ".js";
