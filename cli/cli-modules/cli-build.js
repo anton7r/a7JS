@@ -7,12 +7,12 @@ const clicore = require("./cli-core.js");
 module.exports = function() {
     var config = JSON.parse(fs.readFileSync("./a7.config.json", "utf-8"));
 
-    if(config.entry === undefined){
-        log("You have not defined the entrypoint of your app.");
+    if (config.entry === undefined){
+        clicore.errorLog("You have not defined the entrypoint of your app.");
         return;
     } 
     else {
-        log(chalk.cyan("LOADED:"), "config");
+        clicore.infoLog("config was successfully loaded.");
     }
 
     var mainFile = fs.readFileSync(config.entry, "utf-8");
@@ -37,6 +37,8 @@ module.exports = function() {
             }
             var documentFolder = documentPath.replace(/(\w|\n)+\.js/g, "");
 
+
+            //FIXME: So many variable declarations, could be simplified
             var templateRawUrl = clicore.componentSource(document.match(/template(|\s+):(|\s+)\".+\"/i)[0]);
             var stylesRawUrl = clicore.componentSource(document.match(/styles(|\s+):(|\s+)\".+\"/i)[0]);
             var templateUrl;
@@ -55,12 +57,32 @@ module.exports = function() {
             }
 
             var styles = fs.readFileSync(stylesUrl, "utf-8");
-            var template = fs.readFileSync(templateUrl, "utf-8");
 
-            console.log(styles, template);
+            //Add css compressor here!!!!
+
+            var containerStyles = styles.match(/\.container(.|\s)+\{(.|\s)+\}/g, "");
+            var containerOutStyles = "";
+
+            containerStyles.forEach(function(style){
+                containerOutStyles += style;
+            });
+            //remember to add component name rule also
+            containerOutStyles = containerOutStyles.replace(/\.container/g, "a7-component-container");
+
+            var childrenStyles = styles.replace(/\.container(.|\s)+\{(.|\s)+\}/g, "");
+            var template = fs.readFileSync(templateUrl, "utf-8");
+            var templateLines = template.split("\n");
+            var templateOut;
+
+            templateLines.forEach(function(line){
+                templateOut += line.replace(/'\s+/g, "");
+                log(line.replace(/'\s+/g, ""));
+            });
+
+            console.log(templateOut);
         });
     } else {
-        infoLog("no component imports detected.");
+        clicore.infoLog("no component imports detected.");
     }
 
     var minify = UglifyJS.minify(mainFile);

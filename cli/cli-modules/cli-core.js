@@ -9,7 +9,7 @@ clicore.componentSource = function (string){
 };
 
 clicore.isRelativePath = function (url){
-    if(url[0].charAt(0) === "."){
+    if (url[0].charAt(0) === "."){
         return true;
     } else {
         return false;

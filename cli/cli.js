@@ -49,9 +49,9 @@ const a7helper = function () {
 
 const a7newproject = function (name) {
     if (name === undefined) {
-        return errorLog("You have not defined a name for your project.");
+        return clicore.errorLog("You have not defined a name for your project.");
     } else if (fs.existsSync(name) !== false) {
-        return errorLog(name + " folder already exists in this directory.");
+        return clicore.errorLog(name + " folder already exists in this directory.");
     }
 
     infoLog("creating a new project in " + name);
@@ -86,25 +86,25 @@ const a7newproject = function (name) {
         recursive: true
     }, function (err) {
         if (err) {
-            return errorLog("css folder could not be created.");
+            return clicore.errorLog("css folder could not be created.");
         }
     });
 
     fs.writeFile(name + "/css/style.css", cssDoc, function (err) {
         if (err) {
-            return errorLog("css file could not be created.");
+            return clicore.errorLog("css file could not be created.");
         }
     });
     var conf = fs.readFileSync(require.resolve("./project-template/defaultconfig.json"));
     fs.writeFile(name + "/a7.config.json", conf, function (err) {
         if (err) {
-            return errorLog("config could not be created.");
+            return clicore.errorLog("config could not be created.");
         }
     });
 
     fs.writeFile(name + "/app/index.js", fs.readFileSync(require.resolve("./project-template/index.js")), function (err) {
         if (err) {
-            return errorLog("app/index.js could not be created.");
+            return clicore.errorLog("app/index.js could not be created.");
         }
     });
 
@@ -117,7 +117,7 @@ const a7createComponent = function(name) {
     var cssFileName = pathToComponents + name + "/" + name + ".css";
     var htmlFileName = pathToComponents + name + "/" + name + ".html";
     fs.mkdirSync(pathToComponents + "/" + name);
-    fs.writeFileSync(jsFileName, "export default {\n    documentSource:\"./"+name+".html\",\n    styleSource:\"./"+name+".css\"\n};");
+    fs.writeFileSync(jsFileName, "export default {\n    template:\"./"+name+".html\",\n    styles:\"./"+name+".css\"\n};");
     fs.writeFileSync(htmlFileName, "");
     fs.writeFileSync(cssFileName, "");
     clicore.successLog("Component" + name + " was successfully created.");
