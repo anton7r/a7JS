@@ -54,10 +54,10 @@ module.exports = function() {
                 stylesUrl = stylesRawUrl;
             }
 
-            var styles = fs.readFileSync();
+            var styles = fs.readFileSync(stylesUrl, "utf-8");
+            var template = fs.readFileSync(templateUrl, "utf-8");
 
-
-            console.log(templateUrl, stylesUrl, documentFolder);
+            console.log(styles, template);
         });
     } else {
         infoLog("no component imports detected.");

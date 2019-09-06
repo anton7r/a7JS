@@ -5,10 +5,6 @@ const fs = require("fs");
 const chalk = require("chalk");
 const a7build = require("./cli-modules/cli-build.js");
 const clicore = require("./cli-modules/cli-core.js");
-
-
-
-// arguments
 const [, , ...args] = process.argv;
 const endbar = "======================================";
 
@@ -40,14 +36,14 @@ const a7greet = function () {
 
 const a7helper = function () {
         log("=============", chalk.blue("a7JS Help"), "==============");
-        helperLog("newproject", "create a new project with a7.");
-        syntaxLog("a7 newproject [projectname]");
-        syntaxLog("a7 np [projectname]");
-        helperLog("newcomponent", "create a new component into the current project.");
-        syntaxLog("a7 newcomponent [componentname]");
-        syntaxLog("a7 nc [componentname]");
-        helperLog("build", "build the a7 project.");
-        syntaxLog("a7 build");
+        clicore.helperLog("newproject", "create a new project with a7.");
+        clicore.syntaxLog("a7 newproject [projectname]");
+        clicore.syntaxLog("a7 np [projectname]");
+        clicore.helperLog("newcomponent", "create a new component into the current project.");
+        clicore.syntaxLog("a7 newcomponent [componentname]");
+        clicore.syntaxLog("a7 nc [componentname]");
+        clicore.helperLog("build", "build the a7 project.");
+        clicore.syntaxLog("a7 build");
         log(endbar);
 };
 
@@ -114,7 +110,7 @@ const a7newproject = function (name) {
 
     log(chalk.green("SUCCESS:"), "The Project was created without any errors!");
 };
-//todo
+//TODO:
 const a7createComponent = function(name) {
     var pathToComponents = "./app/";
     var jsFileName = pathToComponents + name + "/" + name + ".js";
@@ -124,24 +120,20 @@ const a7createComponent = function(name) {
     fs.writeFileSync(jsFileName, "export default {\n    documentSource:\"./"+name+".html\",\n    styleSource:\"./"+name+".css\"\n};");
     fs.writeFileSync(htmlFileName, "");
     fs.writeFileSync(cssFileName, "");
-    log("Component", name, chalk.green("created."));
+    clicore.successLog("Component" + name + " was successfully created.");
 };
 
 const a7unknownArg = function () {
-    errorLog(chalk.cyan(args.join(" ")) + " is not a valid argument.");
+    clicore.errorLog(chalk.cyan(args.join(" ")) + " is not a valid argument.");
 };
 
 switch (args[0]) {
     case undefined:
         a7greet();
-        a7helper();
-        break;
     case "help":
         a7helper();
         break;
     case "newproject":
-        a7newproject(args[1]);
-        break;
     case "np":
         a7newproject(args[1]);
         break;
@@ -149,8 +141,6 @@ switch (args[0]) {
         a7build();
         break;
     case "newcomponent":
-        a7createComponent(args[1]);
-        break;
     case "nc":
         a7createComponent(args[1]);
         break;
