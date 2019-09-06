@@ -84,7 +84,7 @@ module.exports = function() {
             log(importerName);
             log(val);
             //Replaces component import with the boilerplate
-            mainFile = mainFile.replace(val, "a7.registerComponent(\"" + componentTag + "\", function(props){return"+compiled+"}) function "+ importerName +"(props){return a7.createElement(\""+ componentTag + "\", {props:props})}");
+            mainFile = mainFile.replace(val, "a7.registerComponent(\"" + componentTag + "\", function(props){return "+compiled+"}) function "+ importerName +"(props){return a7.createElement(\""+ componentTag + "\", {props:props})}");
         });
     } else {
         clicore.infoLog("no component imports detected.");
