@@ -2,9 +2,10 @@
   "name": "a7js",
   "version": "3.3.5",
   "description": "a7JS is a spa framework",
-  "main": ".\\src\\js\\a7.js",
+  "main": ".\\src\\a7.js",
   "scripts": {
-    "test": "node ./src/a7.test.js"
+    "test": "node ./test/a7.test.js",
+    "build": "node ./tools/builder.js"
   },
   "repository": {
     "type": "git",
@@ -26,10 +27,7 @@
   },
   "homepage": "https://github.com/anton7r/a7JS#readme",
   "dependencies": {
-    "chalk": "^2.4.2"
-  },
-  "devDependencies": {
-    "webpack": "^4.39.2",
-    "webpack-cli": "^3.3.7"
+    "chalk": "^2.4.2",
+    "uglify-js": "^3.6.0"
   }
 }

@@ -1,4 +1,4 @@
-var app = a7.app;
+import a7 from "../src/a7.js";
 var el = a7.createElement;
 var resEl;
 var numOfTests;
@@ -7,18 +7,14 @@ var tests = {};
 a7.init();
 var elList = [];
 
-app.routes = {
+a7.routes = {
 
-    "/*": "testPage"
+    "/*": testPage
 };
 
-app.pages = {
-
-    "testPage":{
-        onRoute:function(){
-        }
-    }
+var testPage = function(){
 };
+
 var openLog = function(logName){
     console.log(logName);
 
@@ -58,15 +54,12 @@ var tester = function(name, testMe, expRes){
 };
 
 var getVer = function() {
-    var re;
 
     if (a7.ver() ===undefined){
-        re = "could not get version.";
+        return "could not get version.";
     } else {
-        re = a7.ver();
+        return a7.ver();
     }
-
-    return re;
 };
 
 var test = function() {
@@ -76,7 +69,7 @@ var test = function() {
 
     document.getElementsByClassName("testingApp")[0].innerHTML = "<div class=\"overview\"><h1>Test Overview</h1></div><div class=\"results\"></div>";
     resEl = document.getElementsByClassName("results")[0];
-    overviewEl = document.getElementsByClassName("overview")[0];
+    var overviewEl = document.getElementsByClassName("overview")[0];
 
     overviewEl.innerHTML += "<div class=\"testVersion\"><span>Tested version: </span>" + getVer() + "</div>";
 
@@ -100,7 +93,7 @@ var test = function() {
 
     for(i = 0; i < numOfTests; i++){
         elList.push(document.getElementsByClassName("openLog")[i]) ;
-        var curNum = i;
+        const curNum = i;
 
         element.addEventListener("click", function(){
             var data = elList[curNum];
