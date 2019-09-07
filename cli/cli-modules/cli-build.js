@@ -60,6 +60,7 @@ module.exports = function() {
             var styles = fs.readFileSync(stylesUrl, "utf-8");
 
             //Add css compressor here!!!!
+            styles = styles.replace(/\s/g, " ");
 
             var containerStyles = styles.match(/\.container(.|\s)+\{(.|\s)+\}/g, "");
             var containerOutStyles = "";
@@ -79,12 +80,14 @@ module.exports = function() {
             });
             templateOut = templateOut.replace(/\s+/g, " ");
 
-            compiled = "<style>" + containerOutStyles + "</style><div class=\"a7-component " + componentTag + "\"><style>"+childrenStyles+"</style>"+ templateOut + "</div>";
+            templateLiterals = templateOut.match();
+            log(templateLiterals);
+            
             var importerName = val.replace(/(import|from \".+\"| )/g, "");
             log(importerName);
             log(val);
             //Replaces component import with the boilerplate
-            mainFile = mainFile.replace(val, "a7.registerComponent(\"" + componentTag + "\", function(props){return "+compiled+"}) function "+ importerName +"(props){return a7.createElement(\""+ componentTag + "\", {props:props})}");
+            mainFile = mainFile.replace(val, "//import \na7.registerComponent(\"" + componentTag + "\", function(props){return \""+templateOut+"\"}); function "+ importerName +"(props){return a7.createElement(\""+ componentTag + "\", {props:props})}");
         });
     } else {
         clicore.infoLog("no component imports detected.");
@@ -92,7 +95,7 @@ module.exports = function() {
     console.log(mainFile);
     var minify = UglifyJS.minify(mainFile);
     if(minify.error){
-        log(chalk.red("ERROR:"), minify.error.message, minify.error.line + ":" + minify.error.line);
+        log(chalk.red("ERROR:"), minify.error.message, minify.error.line + ":" + minify.error.col);
     }
 
     fs.writeFileSync(config.output, minify.code);

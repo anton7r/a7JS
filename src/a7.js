@@ -310,7 +310,7 @@ SOFTWARE.
                 final += arguments[curVal];
             }
         
-            if (final.search("onclick=\"") | final.search("onerror=\"") | final.search("onload=\"") | final.search("onhover=\"")) {
+            if (final.search("onclick=\"") !== -1 | final.search("onerror=\"") !== -1 | final.search("onload=\"") !== -1 | final.search("onhover=\"") !== -1 ) {
                 return a7debug("a possible security vulnerability found in your application, ERROR: on[event] attributes deprecated.");
             }
         
