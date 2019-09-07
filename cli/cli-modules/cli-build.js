@@ -19,7 +19,6 @@ module.exports = function() {
 
     mainFile = mainFile.replace(clicore.importA7rx, fs.readFileSync(clicore.pathToA7JS, "utf-8"));
     var imports = mainFile.match(/import .+ from \".+\"/g);
-    console.log(imports);
 
     if (imports !== null){
         imports.forEach(function(val){
@@ -61,11 +60,11 @@ module.exports = function() {
 
             //Add css compressor here!!!!
             styles = styles.replace(/\s+/g, " ");
-            
+
             //container RegExp
             containerRx = new RegExp(componentTag, "g");
-
-            var containerStyles = styles.match(/\.container(.|\s)+\{(.|\s)+\}/g, "");
+            containerStylesRx = new RegExp(componentTag + "(.|\s)+?\{(.|\s)+?\}", "g");
+            var containerStyles = styles.match(containerStylesRx);
             var containerOutStyles = "";
 
             if (containerStyles !== null){
@@ -74,9 +73,8 @@ module.exports = function() {
                 });
             }
             containerOutStyles = containerOutStyles.replace(containerRx, ".a7-component-container." + componentTag);
-
-            if(componentTag.match(containerRx) !== null){console.log("testworked");}
-            var childrenStyles = styles.replace(/\.container(.|\s)+\{(.|\s)+\}/g, "");
+            var childrenStyles = styles.replace(containerStylesRx, "");
+            
             var template = fs.readFileSync(templateUrl, "utf-8");
             var templateOut = "";
             //HTML minifier
@@ -96,19 +94,18 @@ module.exports = function() {
 
             }
 
-            log(templateLiterals);
-
             var importerName = val.replace(/(import|from \".+\"| )/g, "");
-            //Replaces component import with the boilerplate
-            mainFile = mainFile.replace(val, "//import \na7.registerComponent(\"" + componentTag + "\", function(props){return \""+templateOut+"\"}); function "+ importerName +"(props){return a7.createElement(\""+ componentTag + "\", {props:props})}");
+            //Replaces component import with actual code that works
+            mainFile = mainFile.replace(val, "//import \na7.registerComponent(\"" + componentTag + "\", function(props){return \"<style>"+childrenStyles+"</style>"+templateOut+"\"}); function "+ importerName +"(props){return a7.createElement(\""+ componentTag + "\", {props:props})}");
         });
     } else {
         clicore.infoLog("no component imports detected.");
     }
-    console.log(mainFile);
     var minify = UglifyJS.minify(mainFile);
     if(minify.error){
         log(chalk.red("ERROR:"), minify.error.message, minify.error.line + ":" + minify.error.col);
+    } else {
+        clicore.successLog("App was successfully built.");
     }
 
     fs.writeFileSync(config.output, minify.code);
