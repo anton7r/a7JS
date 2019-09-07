@@ -60,17 +60,22 @@ module.exports = function() {
             var styles = fs.readFileSync(stylesUrl, "utf-8");
 
             //Add css compressor here!!!!
-            styles = styles.replace(/\s/g, " ");
+            styles = styles.replace(/\s+/g, " ");
+            
+            //container RegExp
+            containerRx = new RegExp(componentTag, "g");
 
             var containerStyles = styles.match(/\.container(.|\s)+\{(.|\s)+\}/g, "");
             var containerOutStyles = "";
 
-            containerStyles.forEach(function(style){
-                containerOutStyles += style;
-            });
+            if (containerStyles !== null){
+                containerStyles.forEach(function(style){
+                    containerOutStyles += style;
+                });
+            }
+            containerOutStyles = containerOutStyles.replace(containerRx, ".a7-component-container." + componentTag);
 
-            containerOutStyles = containerOutStyles.replace(/\.container/g, ".a7-component-container." + componentTag);
-
+            if(componentTag.match(containerRx) !== null){console.log("testworked");}
             var childrenStyles = styles.replace(/\.container(.|\s)+\{(.|\s)+\}/g, "");
             var template = fs.readFileSync(templateUrl, "utf-8");
             var templateOut = "";
