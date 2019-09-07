@@ -8,6 +8,9 @@ clicore.componentSource = function (string){
     return string.match(/\".+\"/g)[0].replace(/\"/g, "");
 };
 
+clicore.htmlTags = ["a","abbr","address","area","article","aside","audio","b","base","bdi","bdo","blockquote","body","br","button","canvas","caption","cite","code","col","colgroup","data","datalist","dd","del","details","dfn","dialog","div","dl","dt","em","embed","fieldset","figcaption",""
+];
+
 //finds the a7 import
 clicore.importA7rx = /import a7 from \"@a7JS\"(;|)/i;
 

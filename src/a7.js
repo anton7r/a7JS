@@ -29,38 +29,6 @@ SOFTWARE.
 
     //internal methods
 //these things are upto removal or keeping depending on how fast this comparison will be on elements
-    var htmlTags = [
-        "a",
-        "abbr",
-        "address",
-        "area",
-        "article",
-        "aside",
-        "audio",
-        "b",
-        "base",
-        "bdi",
-        "bdo",
-        "blockquote",
-        "body",
-        "br",
-        "button",
-        "canvas",
-        "caption",
-        "cite",
-        "code",
-        "col",
-        "colgroup",
-        "data",
-        "datalist",
-        "dd",
-        "del",
-        "details",
-        "dfn",
-        "dialog",
-        ""
-    ];
-
 
     var objectToAttributes = function (obj) {
         obj = JSON.stringify(obj);

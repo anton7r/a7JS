@@ -96,17 +96,38 @@ module.exports = function() {
 
             var importerName = val.replace(/(import|from \".+\"| )/g, "");
             //Replaces component import with actual code that works
-            mainFile = mainFile.replace(val, "//import \na7.registerComponent(\"" + componentTag + "\", function(props){return \"<style>"+childrenStyles+"</style>"+templateOut+"\"}); function "+ importerName +"(props){return a7.createElement(\""+ componentTag + "\", {props:props})}");
+
+            var importComment = "";
+            if(config.mode === "development"){
+                importComment = "/*" + val + "*/";
+            }
+
+            mainFile = mainFile.replace(val, importComment + "a7.registerComponent(\"" + componentTag + "\", function(props){return \"<style>"+childrenStyles+"</style>"+templateOut+"\"}); function "+ importerName +"(props){return a7.createElement(\""+ componentTag + "\", {props:props})}");
         });
     } else {
         clicore.infoLog("no component imports detected.");
     }
-    var minify = UglifyJS.minify(mainFile);
-    if(minify.error){
-        log(chalk.red("ERROR:"), minify.error.message, minify.error.line + ":" + minify.error.col);
-    } else {
-        clicore.successLog("App was successfully built.");
-    }
 
-    fs.writeFileSync(config.output, minify.code);
+    if(config.mode === "development"){
+        fs.writeFileSync(config.output, mainFile);
+        clicore.successLog("App was successfully buit. (in development mode)");
+
+    } else if (config.mode === "production"){
+        var minify = UglifyJS.minify(mainFile);
+        if(minify.error){
+            log(chalk.red("ERROR:"), minify.error.message, minify.error.line + ":" + minify.error.col);
+        } else {
+            clicore.successLog("App was successfully built.");
+        }
+    
+        fs.writeFileSync(config.output, minify.code);
+    } else {
+        var additionalMessage;
+        if(config.mode !== undefined){
+            additionalMessage = "is not either \"development\" or \"production\"";
+        } else {
+            additionalMessage = "is undefined";
+        }
+        clicore.errorLog("could not build app since mode " + additionalMessage);
+    }
 };
