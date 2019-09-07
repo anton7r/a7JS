@@ -1,3 +1,4 @@
+![](./designs/banner.svg)
 # a7JS
 ![](https://img.shields.io/badge/build-passing-success) 
 ![](https://img.shields.io/badge/Latest%20version-v.3.3.5-blue)
