@@ -80,12 +80,20 @@ module.exports = function() {
             });
             templateOut = templateOut.replace(/\s+/g, " ");
 
-            templateLiterals = templateOut.match();
+            templateLiterals = templateOut.match(/{{.+}}/g);
+
+            if (templateLiterals !== null) {
+                templateLiterals.forEach(function(literal){
+                    newliteral = literal.replace(/{{/, "\"+props\.").replace(/}}/, "+\"");
+                    templateOut = templateOut.replace(literal, newliteral);
+                });
+            } else {
+
+            }
+
             log(templateLiterals);
-            
+
             var importerName = val.replace(/(import|from \".+\"| )/g, "");
-            log(importerName);
-            log(val);
             //Replaces component import with the boilerplate
             mainFile = mainFile.replace(val, "//import \na7.registerComponent(\"" + componentTag + "\", function(props){return \""+templateOut+"\"}); function "+ importerName +"(props){return a7.createElement(\""+ componentTag + "\", {props:props})}");
         });
