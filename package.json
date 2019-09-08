@@ -8,6 +8,7 @@
     "cli/cli-modules/cli-core.js",
     "cli/cli-modules/cli-build.js",
     "cli/cli-modules/cli-tags.js",
+    "cli/cli-modules/cli-importer.js",
     "cli/project-template/defaultconfig.json",
     "cli/project-template/index.js"
   ],
