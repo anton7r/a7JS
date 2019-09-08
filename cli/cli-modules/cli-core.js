@@ -68,10 +68,11 @@ clicore.importFrom = function(ImportStatement){
 };
 
 clicore.importName = function(ImportStatement){
-    return ImportStatement.replace(/import\s*/, "").replace(/\s*from\s*\".+?;*\"/, "");
+    return ImportStatement.replace(/import\s*/, "").replace(/\s*from\s*\".+?\";*/, "");
 };
 
 clicore.importer = function(sourceCode){
+    var moduleExport = /module.exports\s*=\s*(\w|\d)*;*/g;
     var wholeImports = sourceCode.match(/import\s+(\d|\w)+\s+from\s*\".+\";*/gi);
     var partialImports = sourceCode.match(/import\s*{\s*.*?\s*}\s+from\s*\".+?\";*/gi);
     //TODO:(Pro tip) make foreach into for loop because it is faster
@@ -83,11 +84,15 @@ clicore.importer = function(sourceCode){
             var importFrom = clicore.replaceSelf(clicore.importFrom(Import));
             var importName = clicore.importName(Import);
             var importableModule = require.resolve(importFrom);
-            var moduleSourceCode = fs.readFileSync(importableModule, "utf-8").replace(/\s+/g, " ").replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, "");
+            var moduleSourceCode = fs.readFileSync(importableModule, "utf-8");
 
             var exportDefaultName = "";
-            if(moduleSourceCode.match(/module.exports\s*=\s*(\w|\d)*;*/g) !== null){
-                log("found a match", moduleSourceCode.match(/module\.exports\s*=\s*(\w|\d)*;*/g));
+            var moduleSourceCodeMatches = moduleSourceCode.match(moduleExport);
+            if(moduleSourceCodeMatches !== null){
+                console.log(moduleSourceCodeMatches);
+                moduleSourceCode = moduleSourceCode.replace(moduleSourceCodeMatches[0], "");
+                exportDefaultName = moduleSourceCodeMatches[0].replace(/module.exports\s*=\s*/, "").replace(/;/, "");
+
             }
             var importedModule = `/* `+ Import +` */(function(window){` + moduleSourceCode + ` if(typeof (window.` + importName + `) === "undefined"){window.` + importName + `=` + exportDefaultName + `}})(window)`;
             sourceCode = sourceCode.replace(Import, importedModule);
@@ -100,6 +105,7 @@ clicore.importer = function(sourceCode){
         partialImports.forEach(Import =>{
             var importFrom = clicore.importFrom(Import);
         });
+        return clicore.errorLog("Importing only a part of a framework is not yet supported!");
     }
 
     //Development helpers
