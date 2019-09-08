@@ -1,3 +1,4 @@
+/* jshint -W104 */
 const fs = require("fs");
 const chalk = require("chalk");
 const log = console.log;
@@ -17,7 +18,18 @@ module.exports = function() {
 
     var mainFile = fs.readFileSync(config.entry, "utf-8");
 
-    mainFile = mainFile.replace(clicore.importA7rx, fs.readFileSync(clicore.pathToA7JS, "utf-8"));
+    /*
+    if(mainFile.match(clicore.importA7rx) !== null){
+        mainFile = mainFile.replace(clicore.importA7rx, fs.readFileSync(clicore.pathToA7JS, "utf-8"));
+    } else {
+        return clicore.errorLog("Did not find a7JS import.");
+    }
+    */
+
+    mainFile = clicore.importer(mainFile).output;
+    fs.writeFileSync(config.output, mainFile);
+    return;
+
     var imports = mainFile.match(/import .+ from \".+\"/g);
 
     if (imports !== null){

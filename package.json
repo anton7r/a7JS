@@ -2,10 +2,18 @@
   "name": "a7js",
   "version": "3.3.5",
   "description": "a7JS is a spa framework",
-  "main": ".\\src\\a7.js",
+  "files": [
+    "src/a7.js",
+    "cli/cli.js",
+    "cli/cli-modules/cli-core.js",
+    "cli/cli-modules/cli-build.js",
+    "cli/cli-modules/cli-tags.js",
+    "cli/project-template/defaultconfig.json",
+    "cli/project-template/index.js"
+  ],
+  "main": "src/a7.js",
   "scripts": {
-    "test": "node ./test/a7.test.js",
-    "build": "node ./tools/builder.js"
+    "test": "node ./test/a7.test.js"
   },
   "repository": {
     "type": "git",
@@ -29,5 +37,6 @@
   "dependencies": {
     "chalk": "^2.4.2",
     "uglify-js": "^3.6.0"
-  }
+  },
+  "types": "src/a7.d.ts"
 }

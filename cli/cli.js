@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-
+/* jshint -W104 */
+/* jshint -W119 */
 const log = console.log;
 const fs = require("fs");
 const chalk = require("chalk");
@@ -66,7 +67,7 @@ const a7newproject = function (name) {
         }
     });
 
-    fs.writeFile(name + "/package.json", "empty", function (err) {
+    fs.writeFile(name + "/package.json", "{\n   \"name\":\"" + name + "\"\n    }", function (err) {
         if (err) {
             log(chalk.red("ERROR:"), "package.json could not be created.");
         } else {
@@ -129,8 +130,10 @@ const a7unknownArg = function () {
 
 switch (args[0]) {
     case undefined:
+        /* jshint -W086 */
         a7greet();
     case "help":
+        /* jshint +W086 */
         a7helper();
         break;
     case "newproject":
