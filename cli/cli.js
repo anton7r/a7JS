@@ -117,7 +117,14 @@ const a7createComponent = function(name) {
     var jsFileName = pathToComponents + name + "/" + name + ".js";
     var cssFileName = pathToComponents + name + "/" + name + ".css";
     var htmlFileName = pathToComponents + name + "/" + name + ".html";
-    fs.mkdirSync(pathToComponents + "/" + name);
+    
+    if(clicore.htmlTags.indexOf(name) !== -1){
+        return clicore.errorLog(name + " is a html tag, please choose a different tag name");
+    } else if (fs.existsSync(pathToComponents + name) === true){
+        return clicore.errorLog(name+" is already defined as a component.");
+    }
+
+    fs.mkdirSync(pathToComponents + name);
     fs.writeFileSync(jsFileName, "export default {\n    tag:\""+name+"\",\n    template:\"./"+name+".html\",\n    styles:\"./"+name+".css\"\n};");
     fs.writeFileSync(htmlFileName, "");
     fs.writeFileSync(cssFileName, "");
