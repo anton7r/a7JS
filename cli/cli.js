@@ -45,6 +45,8 @@ const a7helper = function () {
         clicore.syntaxLog("a7 nc [componentname]");
         clicore.helperLog("build", "build the a7 project.");
         clicore.syntaxLog("a7 build");
+        clicore.helperLog("devserver", "start a development server [beta]");
+        clicore.syntaxLog("a7 devserver [port(optional)]");
         log(endbar);
 };
 
@@ -76,6 +78,8 @@ const a7newproject = function (name) {
     });
 
     fs.mkdirSync(name +"/app");
+
+    fs.mkdirSync(name +"/app/components");
 
     fs.writeFile(name + "/index.html", createHtmlDoc(name), function (err) {
         if (err) {
@@ -113,7 +117,7 @@ const a7newproject = function (name) {
 };
 //TODO:
 const a7createComponent = function(name) {
-    var pathToComponents = "./app/";
+    var pathToComponents = "./app/components/";
     var jsFileName = pathToComponents + name + "/" + name + ".js";
     var cssFileName = pathToComponents + name + "/" + name + ".css";
     var htmlFileName = pathToComponents + name + "/" + name + ".html";
@@ -135,6 +139,8 @@ const a7unknownArg = function () {
     clicore.errorLog(chalk.cyan(args.join(" ")) + " is not a valid argument.");
 };
 
+const a7devServer = require("./cli-modules/cli-devserver.js"); 
+
 switch (args[0]) {
     case undefined:
         /* jshint -W086 */
@@ -153,6 +159,9 @@ switch (args[0]) {
     case "newcomponent":
     case "nc":
         a7createComponent(args[1]);
+        break;
+    case "devserver":
+        a7devServer(args[1]);
         break;
     default:
         a7unknownArg();

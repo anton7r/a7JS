@@ -2,6 +2,7 @@ const fs = require("fs");
 const log = console.log;
 const pathToA7JS = require.resolve("../../src/a7.js");
 const self = "a7js";
+const uglifyJS = require("uglify-js");
 //Since the cli is inside the a7JS node cannot find the module a7js for some reason.
 const replaceSelf = function(Module){
     if(Module === self){
@@ -42,8 +43,9 @@ module.exports = function(sourceCode){
                 exportDefaultName = moduleSourceCodeMatches[0].replace(/module.exports\s*=\s*/, "").replace(/;/, "");
 
             }
-            var importedModule = `/* `+ Import +` */(function(window){` + moduleSourceCode + ` if(typeof (window.` + importNameVar + `) === "undefined"){window.` + importNameVar + `=` + exportDefaultName + `}})(window)`;
-            sourceCode = sourceCode.replace(Import, importedModule);
+            var importedModule = `(function(window){` + moduleSourceCode + ` if(typeof (window.` + importNameVar + `) === "undefined"){window.` + importNameVar + `=` + exportDefaultName + `}})(window)`;
+            var minifiedModule = uglifyJS.minify(importedModule);
+            sourceCode = sourceCode.replace(Import, "/* " + Import + " */" + minifiedModule.code);
             imports += {from:importableModule,as:importNameVar};
         });
     
@@ -56,11 +58,9 @@ module.exports = function(sourceCode){
         });
         return clicore.errorLog("Importing only a part of a framework is not yet supported!");
     }
-    log(imports);
     //Development helpers
-    log("whole imports:"+wholeImports);
-    log("partial imports:"+partialImports);
-    log("imported", this.imports, module);
+    //log("whole imports:"+wholeImports);
+    //log("partial imports:"+partialImports);
     this.output = sourceCode;
     return this;
 };
