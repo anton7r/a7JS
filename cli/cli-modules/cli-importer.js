@@ -49,8 +49,8 @@ module.exports = function(sourceCode){
             var importNameVar = importName(Import);
             var importableModule = importFrom(Import);
 
-            log(importableModule);
             var componentSourceCode = fs.readFileSync("./app/" + importableModule.replace(/(\.|\.\/)/, ""), "utf-8");
+            log(componentSourceCode);
         });
     }
 
