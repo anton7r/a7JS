@@ -50,7 +50,8 @@ module.exports = function(sourceCode){
             var importableModule = importFrom(Import);
 
             var componentSourceCode = fs.readFileSync("./app/" + importableModule.replace(/(\.|\.\/)/, ""), "utf-8");
-            log(componentSourceCode);
+            //var componentTemplate = componentSourceCode.match(/return\(\{(\s|.)*\}\);*/);
+            //log(componentTemplate);
         });
     }
 
