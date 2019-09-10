@@ -9,12 +9,33 @@ const requestLog = function(msg){
     log(chalk.default("Requesting file:"), msg);
 };
 
+const os = require("os").type();
+
+const openInDefaultBrowser = function(url){
+    if(os === "Windows_NT"){
+        //The user has windows nt which is windows 10
+        require('child_process').spawn('explorer', ["http://"+url]);
+    } else {
+        infoLog("We dont have support yet for the OS youre using. Open a new issue, so we can add support!");
+    }
+};
+
 uinput.setEncoding("utf-8");
 
 const resolveFile = function(url){
 
-    if(fs.existsSync("."+url) === true){
-        var file = fs.readFileSync("."+url, "utf-8");
+    if(url.charAt(0) === "/"){
+        url.replace("/", "");
+    }
+
+    if(url === "/"){
+
+        return {code: fs.readFileSync("./index.html", "utf-8"), type: "text/html"};
+
+    } else if (fs.existsSync("./"+url) === true){
+        
+        log(url);
+        var file = fs.readFileSync("./"+url, "utf-8");
         var rawType = url.match(/\..+/g)[0];
         var type ="";
 
@@ -58,4 +79,6 @@ module.exports = function(prefport){
         res.write(file.code);
         res.end();
     }).listen(port);
+
+    openInDefaultBrowser("localhost:" + port);
 };
