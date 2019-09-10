@@ -28,7 +28,7 @@ a7 newproject [projectname]
 
 # Motivation
 
-Most of the commonly used libraries / frameworks are really large and pack in features that most of the users.
+Most of the commonly used libraries / frameworks are really large and also packs in features that most of the users will never use.
 
 And it has 0 dependencies on the framework.
 
