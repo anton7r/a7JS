@@ -10,7 +10,7 @@
 
 🔥 A lot of power in a small package.
 
-✅ Only 2,6kb
+✅ Frontend framework only 2,6kb gzipped and minified. 
 
 # Setup
 
@@ -26,17 +26,25 @@ Start a new project:
 a7 newproject [projectname]
 ```
 
+Run development server
+
+```shell
+Coming soon..
+```
+
 # Motivation
 
 Most of the commonly used libraries / frameworks are really large and also packs in features that most of the users will never use.
 
-And it has 0 dependencies on the framework.
+And it has 0 dependencies on the code that runs at the front end and also it is fully es5.
 
-The dependencies that it has are for the cli.
+The dependencies that it has are for the cli and other useful tools.
 
 # Code examples and Documentation
 
 For documentation and code examples please visit our [Wiki](https://github.com/anton7r/a7JS/wiki)
+
+v4 Documentation coming soon...
 
 # License
 
