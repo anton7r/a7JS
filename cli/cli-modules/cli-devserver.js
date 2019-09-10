@@ -13,7 +13,7 @@ const os = require("os").type();
 
 const openInDefaultBrowser = function(url){
     if(os === "Windows_NT"){
-        //The user has windows nt which is windows 10
+        //The os is windows
         require('child_process').spawn('explorer', ["http://"+url]);
     } else {
         infoLog("We dont have support yet for the OS youre using. Open a new issue, so we can add support!");
@@ -34,11 +34,9 @@ const resolveFile = function(url){
 
     } else if (fs.existsSync("./"+url) === true){
 
-        log(url);
         var file = fs.readFileSync("./"+url, "utf-8");
         var rawType = url.match(/\..+/g)[0];
         var type ="";
-        log(rawType);
 
         if (rawType === ".js"){
             type = "application/javascript";
