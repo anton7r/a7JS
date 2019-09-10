@@ -17,17 +17,7 @@ module.exports = function() {
     }
 
     var mainFile = fs.readFileSync(config.entry, "utf-8");
-
-    /*
-    if(mainFile.match(clicore.importA7rx) !== null){
-        mainFile = mainFile.replace(clicore.importA7rx, fs.readFileSync(clicore.pathToA7JS, "utf-8"));
-    } else {
-        return clicore.errorLog("Did not find a7JS import.");
-    }
-    */
-
-    mainFile = clicore.importer(mainFile).output;
-    fs.writeFileSync(config.output, mainFile);
+    fs.writeFileSync(config.output, clicore.importer(mainFile).output);
     return;
 
     var imports = mainFile.match(/import .+ from \".+\"/g);
@@ -55,7 +45,6 @@ module.exports = function() {
             var templateUrl;
             var stylesUrl;
             var componentTag = document.match(/tag(|\s+):(|\s+)\".+\"/i)[0].match(/\".+\"/)[0].replace(/\"/g, "");
-
             if(clicore.isRelativePath(templateRawUrl)){
                 templateUrl = documentFolder + templateRawUrl.replace(/\.\//, "");
             } else {
@@ -68,6 +57,7 @@ module.exports = function() {
                 stylesUrl = stylesRawUrl;
             }
 
+            //TODO: at this point in cli-importer, move the rest also there
             var styles = fs.readFileSync(stylesUrl, "utf-8");
 
             //Add css compressor here!!!!

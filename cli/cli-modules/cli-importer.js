@@ -3,6 +3,20 @@ const log = console.log;
 const pathToA7JS = require.resolve("../../src/a7.js");
 const self = "a7js";
 const uglifyJS = require("uglify-js");
+const config = JSON.parse(fs.readFileSync("./a7.config.json", "utf-8"));
+
+
+const isRelativePath = function (url){
+    if (url[0].charAt(0) === "."){
+        return true;
+    } else {
+        return false;
+    }
+};
+
+const componentSource = function (string){
+    return string.match(/\".+\"/g)[0].replace(/\"/g, "");
+};
 
 //Since the cli is inside the a7JS node cannot find the module a7js for some reason.
 const replaceSelf = function(Module){
@@ -12,6 +26,11 @@ const replaceSelf = function(Module){
         return Module;
     }
 };
+const getEntryFolder = function(){
+    return config.entry.replace(/(\w|\d)+\.js/i, "");
+};
+
+const entryFolder = getEntryFolder();
 
 const importFrom = function(ImportStatement){
     return ImportStatement.match(/(\"|\').+(\"|\')/i)[0].replace(/\"/g, "");
@@ -48,10 +67,18 @@ module.exports = function(sourceCode){
         componentImports.forEach(Import => {
             var importNameVar = importName(Import);
             var importableModule = importFrom(Import);
+            var documentFolder = importableModule.replace(/(\w|\n)+\.js/g, "");
+            var componentSourceCode = fs.readFileSync(entryFolder + importableModule.replace(/(\.|\.\/)/, ""), "utf-8");
+            var componentSetup = componentSourceCode.replace(/\s+/g, " ").match(/return\(.+\)/)[0];
+            var templatePath = componentSource(componentSetup.match(/template(|\s+):(|\s+)\".+?\"/i)[0]);
+            var CSSPath = componentSource(componentSetup.match(/styles(|\s+):(|\s+)\".+?\"/i)[0]);
+            if(isRelativePath(templatePath)){
+                templatePath = documentFolder + templatePath.replace(/\.\//, "");
+            }
 
-            var componentSourceCode = fs.readFileSync("./app/" + importableModule.replace(/(\.|\.\/)/, ""), "utf-8");
-            //var componentTemplate = componentSourceCode.match(/return\(\{(\s|.)*\}\);*/);
-            //log(componentTemplate);
+            if(isRelativePath(CSSPath)){
+                CSSPath = documentFolder + CSSPath.replace(/\.\//, "");
+            }
         });
     }
 

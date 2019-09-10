@@ -4,10 +4,12 @@ const http = require("http");
 const log = console.log;
 const fs = require("fs");
 const clicore = require("./cli-core.js");
-
+const uinput = process.stdin;
 const requestLog = function(msg){
     log(chalk.default("Requesting file:"), msg);
 };
+
+uinput.setEncoding("utf-8");
 
 const resolveFile = function(url){
 
@@ -29,6 +31,7 @@ const resolveFile = function(url){
 };
 
 module.exports = function(prefport){
+    //set host port number
     var port;
 
     if(prefport === undefined){
@@ -38,6 +41,16 @@ module.exports = function(prefport){
     } 
 
     clicore.infoLog("Development server is starting at port "+ port);
+    clicore.infoLog("in order to stop the server type \"stop\".");
+
+    uinput.on("data", data => {
+        if(data === "stop\r\n"){
+            clicore.infoLog("Development server stopped.");
+            process.exit();
+        } else {
+            clicore.infoLog("cant understand " + data);
+        }
+    });
 
     var server = http.createServer(function (req, res){
         var file = resolveFile(req.url);
