@@ -33,16 +33,19 @@ const resolveFile = function(url){
         return {code: fs.readFileSync("./index.html", "utf-8"), type: "text/html"};
 
     } else if (fs.existsSync("./"+url) === true){
-        
+
         log(url);
         var file = fs.readFileSync("./"+url, "utf-8");
         var rawType = url.match(/\..+/g)[0];
         var type ="";
+        log(rawType);
 
         if (rawType === ".js"){
             type = "application/javascript";
         } else if (rawType === ".css"){
             type = "text/css";
+        } else {
+            type = "text/plain";
         }
         
         return {code: file, type: type};
