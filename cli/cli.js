@@ -129,7 +129,7 @@ const a7createComponent = function(name) {
     }
 
     fs.mkdirSync(path + name);
-    fs.writeFileSync(jsFileName, "export default {\n    tag:\""+name+"\",\n    template:\"./"+name+".html\",\n    styles:\"./"+name+".css\"\n};");
+    fs.writeFileSync(jsFileName, "export default function(){\n\nreturn({\n    tag:\""+name+"\",\n    template:\"./"+name+".html\",\n    styles:\"./"+name+".css\"\n});\n}");
     fs.writeFileSync(htmlFileName, "");
     fs.writeFileSync(cssFileName, "");
     clicore.successLog("Component" + name + " was successfully created.");

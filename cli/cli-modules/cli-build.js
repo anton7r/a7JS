@@ -4,12 +4,19 @@ const chalk = require("chalk");
 const log = console.log;
 const UglifyJS = require("uglify-js");
 const clicore = require("./cli-core.js");
+const importer = require("./cli-importer");
 
 module.exports = function(settings) {
-    var silent = false;
+    var silent;
 
-    if (settings.silent === true){
-        silent = true;
+    //loads passed in settings
+    if (settings !== undefined) {
+        if (settings.silent === true){
+            silent = true;
+        }
+
+    } else {
+        silent = false;
     }
 
     var config = JSON.parse(fs.readFileSync("./a7.config.json", "utf-8"));
@@ -27,7 +34,7 @@ module.exports = function(settings) {
     }
 
     var mainFile = fs.readFileSync(config.entry, "utf-8");
-    fs.writeFileSync(config.output, clicore.importer(mainFile).output);
+    fs.writeFileSync(config.output, importer(mainFile).output);
     return;
 
     var imports = mainFile.match(/import .+ from \".+\"/g);

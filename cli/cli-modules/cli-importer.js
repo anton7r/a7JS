@@ -4,6 +4,8 @@ const pathToA7JS = require.resolve("../../src/a7.js");
 const self = "a7js";
 const uglifyJS = require("uglify-js");
 const configPath = "./a7.config.json";
+const clicore = require("./cli-core");
+
 var config;
 
 if(fs.existsSync(configPath)){
@@ -12,6 +14,15 @@ if(fs.existsSync(configPath)){
     config = {entry:"noEntry"};
 }
 
+
+const existsRead = function(path){
+    if(fs.existsSync(path)){
+        return fs.readFileSync(path, "utf-8");
+    } else {
+        clicore.errorLog("File could not be located. "+ path);
+        return process.exit(); 
+    }
+};
 
 const isRelativePath = function (url){
     if (url[0].charAt(0) === "."){
@@ -58,9 +69,35 @@ const eliminateComponents = function(val){
     }
 };
 
+const htmlCompressor = function(htmlsrc){
+    htmlsrc = htmlsrc.replace(/\s+/g, " ");
+    htmlsrc = htmlsrc.replace(/\r\n/g, "");
+    htmlsrc = htmlsrc.replace(/\>\s/g, ">");
+    htmlsrc = htmlsrc.replace(/\s\</g, "<");
+    return htmlsrc;
+};
+
+const cssSplitter = function(csssrc, componentTag){
+    //container RegExp
+    containerRx = new RegExp(componentTag, "g");
+    containerStylesRx = new RegExp(componentTag + "(.|\s)+?\{(.|\s)+?\}", "g");
+    var containerStyles = csssrc.match(containerStylesRx);
+    var parsedContainerStyles = "";
+
+    if (containerStyles !== null){
+        containerStyles.forEach(function(style){
+            parsedContainerStyles += style;
+        });
+    }
+    parsedContainerStyles = parsedContainerStyles.replace(containerRx, ".a7-component-container." + componentTag);
+    innerStyles = csssrc.replace(containerStylesRx, "");
+    return {container:parsedContainerStyles,innerStyles:innerStyles};     
+};
+
 module.exports = function(sourceCode){
+    var containerCSS = "";
     var imports = [];
-    var moduleExport = /module.exports\s*=\s*(\w|\d)*;*/g;
+    var moduleExportEquals = /module.exports\s*=\s*(\w|\d)*;*/g;
 
     var componentImports = sourceCode.match(/import\s+(\d|\w|\_)+\s+from\s*\"\.\/components\/.+?\";*/gi);
     var wholeImports = sourceCode.match(/import\s+(\d|\w|\_)+\s+from\s*\".+\";*/gi);
@@ -78,17 +115,54 @@ module.exports = function(sourceCode){
             var importNameVar = importName(Import);
             var importableModule = importFrom(Import);
             var documentFolder = importableModule.replace(/(\w|\n)+\.js/g, "");
-            var componentSourceCode = fs.readFileSync(entryFolder + importableModule.replace(/(\.|\.\/)/, ""), "utf-8");
-            var componentSetup = componentSourceCode.replace(/\s+/g, " ").match(/return\(.+\)/)[0];
-            var templatePath = componentSource(componentSetup.match(/template(|\s+):(|\s+)\".+?\"/i)[0]);
-            var CSSPath = componentSource(componentSetup.match(/styles(|\s+):(|\s+)\".+?\"/i)[0]);
-            if(isRelativePath(templatePath)){
-                templatePath = documentFolder + templatePath.replace(/\.\//, "");
+            var componentSourceCode = fs.readFileSync(entryFolder + importableModule.replace(/(\.|\.\/)/, ""), "utf-8").replace(/\s+/g, " ");
+            var componentSetup = componentSourceCode.match(/return\(.+\)/)[0];
+            var htmlPath = componentSource(componentSetup.match(/template\s*:\s*\".+?\"/i)[0]);
+            var CSSPath = componentSource(componentSetup.match(/styles\s*:\s*\".+?\"/i)[0]);
+
+            var componentTag = componentSetup.match(/tag\s*:\s*\".+?\"/i)[0];
+            componentTag = componentTag.match(/\".+?\"/)[0].replace(/\"/g, "");
+
+            documentFolder = entryFolder + documentFolder.replace(/\./, "");
+            
+            if(isRelativePath(htmlPath)){
+                htmlPath = documentFolder + htmlPath.replace(/\.\//, "");
             }
 
             if(isRelativePath(CSSPath)){
                 CSSPath = documentFolder + CSSPath.replace(/\.\//, "");
             }
+
+            var css = existsRead(CSSPath);
+            var html = existsRead(htmlPath);
+
+            //Add css compressor here!!!! instead of this compressing method
+            css = css.replace(/\s+/g, " ");
+
+            html = htmlCompressor(html);
+            //replace literals
+            templateLiterals = html.match(/{{\s*.+?\s*}}/);
+
+            if(templateLiterals !== null){
+                templateLiterals.forEach(function(literal){
+                    var cleanLiteral = literal.replace(/({{|}})/g, "");
+                    html = html.replace(literal, "\"+"+cleanLiteral+"+\"");
+                });
+            }
+
+            cssObject = cssSplitter(css, componentTag);
+            innerCSS = "<style>" + cssObject.innerStyles + "</style>";
+
+            if (cssObject.container != ""){
+                containerCSS += cssObject.container;
+            }
+
+            cssAndHtml = innerCSS + html;
+
+            var componentOutput = componentSourceCode.replace(/export default function/, "function");
+            componentOutput = componentOutput.replace(componentSetup, "return \""+ cssAndHtml +"\"");
+            var executableComponent = "a7.registerComponent(\""+componentTag+"\"," + componentOutput + ");function "+importNameVar+"(a){return a7.createElement(\""+componentTag+"\",a)}";
+            sourceCode = sourceCode.replace(Import, "/* "+Import+" */"+executableComponent);
         });
     }
 
@@ -100,7 +174,7 @@ module.exports = function(sourceCode){
             var moduleSourceCode = fs.readFileSync(importableModule, "utf-8");
 
             var exportDefaultName = "";
-            var moduleSourceCodeMatches = moduleSourceCode.match(moduleExport);
+            var moduleSourceCodeMatches = moduleSourceCode.match(moduleExportEquals);
             if(moduleSourceCodeMatches !== null){
                 moduleSourceCode = moduleSourceCode.replace(moduleSourceCodeMatches[0], "");
                 exportDefaultName = moduleSourceCodeMatches[0].replace(/(module.exports\s*=\s*|;)/g, "");
@@ -120,6 +194,10 @@ module.exports = function(sourceCode){
             var importFromVar = importFrom(Import);
         });
         return clicore.errorLog("Importing only a part of a framework is not yet supported!");
+    }
+
+    if(containerCSS != ""){
+        sourceCode += "a7.loadCSS("+ containerCSS + ")";
     }
     //Development helpers
     //log("whole imports:"+wholeImports);

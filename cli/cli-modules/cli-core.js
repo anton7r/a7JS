@@ -49,6 +49,4 @@ clicore.syntaxLog = function(syntax){
     log(chalk.gray(" - Syntax: " + syntax));
 };
 
-clicore.importer = require("./cli-importer.js");
-
 module.exports = clicore;

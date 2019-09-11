@@ -194,6 +194,10 @@ a7.elementCollection = function () {
     return result;
 };
 
+a7.loadCSS = function(css){
+    document.head.insertAdjacentHTML("beforeend", "<style>" + css + "</style>");
+};
+
 a7.registerComponent = function (compName, compFunc) {
     if (compName === "div" | compName === "p" | compName === "span" | compName === "h1") {
         return a7debug("please choose a different Component name because the name " + compName + " is a htmltag name.");
@@ -459,8 +463,8 @@ a7.router = function (newPath) {
     } else {
         return a7debug("we could not find the page which you were looking for");
     }
-
-    a7.render(routes[route](newPath.split("/")));
+    console.log(routes[route]());
+    a7.render(routes[route]());
     a7.path(newPath);
     scrollTo(0, pageXOffset);
 };
