@@ -57,7 +57,7 @@ const a7newproject = function (name) {
         return clicore.errorLog(name + " folder already exists in this directory.");
     }
 
-    infoLog("creating a new project in " + name);
+    clicore.infoLog("creating a new project in " + name);
 
     fs.mkdir(name, {
         recursive: true

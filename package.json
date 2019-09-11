@@ -27,7 +27,9 @@
     "SPA",
     "spa-framework",
     "js-framework",
-    "router"
+    "router",
+    "javascript-compiler",
+    "compiler"
   ],
   "author": "anton7r",
   "license": "MIT",

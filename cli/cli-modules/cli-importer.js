@@ -3,7 +3,14 @@ const log = console.log;
 const pathToA7JS = require.resolve("../../src/a7.js");
 const self = "a7js";
 const uglifyJS = require("uglify-js");
-const config = JSON.parse(fs.readFileSync("./a7.config.json", "utf-8"));
+const configPath = "./a7.config.json";
+var config;
+
+if(fs.existsSync(configPath)){
+    config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+} else {
+    config = {entry:"noEntry"};
+}
 
 
 const isRelativePath = function (url){
@@ -26,8 +33,11 @@ const replaceSelf = function(Module){
         return Module;
     }
 };
+
 const getEntryFolder = function(){
-    return config.entry.replace(/(\w|\d)+\.js/i, "");
+    if(config.entry !== "noEntry"){
+        return config.entry.replace(/(\w|\d)+\.js/i, "");
+    }
 };
 
 const entryFolder = getEntryFolder();
