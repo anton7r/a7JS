@@ -5,9 +5,20 @@ const log = console.log;
 const fs = require("fs");
 const clicore = require("./cli-core.js");
 const uinput = process.stdin;
+
 const requestLog = function(msg){
     log(chalk.default("Requesting file:"), msg);
 };
+
+const configPath = "./a7.config.json";
+var config;
+
+if(fs.existsSync(configPath)){
+    config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+} else {
+    config = {entry:"./app/index.js", output:"./appbuild.js"};
+}
+
 const build = require("./cli-build");
 
 const os = require("os").type();
@@ -53,10 +64,6 @@ const resolveFile = function(url){
     }
 };
 
-const refreshClient = function(){
-
-};
-
 module.exports = function(prefport){
     //set host port number
     var port;
@@ -86,10 +93,21 @@ module.exports = function(prefport){
         res.end();
     }).listen(port);
     
+    var changes = 0;
+
     fs.watch("./", {recursive:true, encoding:"utf-8"}, function (event, trigger){
-        //build the app
-        // use setTimeout to limit the amount of builds
-        build({silent:true});
+        if(trigger !== config.output){
+            //build the app
+            // use setTimeout to limit the amount of builds
+            setTimeout(function(){
+                if (changes !== 0){
+                    build({silent:true});
+                    changes = 0;
+                    log("App built. refresh page to see changes!");
+                }
+            }, 2000);
+            changes++;
+        }
     });
 
     openInDefaultBrowser("localhost:" + port);
