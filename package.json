@@ -1,6 +1,6 @@
 {
   "name": "a7js",
-  "version": "3.3.5",
+  "version": "4.0.0-alpha.0",
   "description": "a7JS is a spa framework",
   "files": [
     "src/a7.js",
