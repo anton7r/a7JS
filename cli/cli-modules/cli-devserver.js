@@ -8,6 +8,7 @@ const uinput = process.stdin;
 const requestLog = function(msg){
     log(chalk.default("Requesting file:"), msg);
 };
+const build = require("./cli-build");
 
 const os = require("os").type();
 
@@ -52,6 +53,10 @@ const resolveFile = function(url){
     }
 };
 
+const refreshClient = function(){
+
+};
+
 module.exports = function(prefport){
     //set host port number
     var port;
@@ -80,6 +85,12 @@ module.exports = function(prefport){
         res.write(file.code);
         res.end();
     }).listen(port);
+    
+    fs.watch("./", {recursive:true, encoding:"utf-8"}, function (event, trigger){
+        //build the app
+        // use setTimeout to limit the amount of builds
+        build({silent:true});
+    });
 
     openInDefaultBrowser("localhost:" + port);
 };

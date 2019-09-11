@@ -5,15 +5,25 @@ const log = console.log;
 const UglifyJS = require("uglify-js");
 const clicore = require("./cli-core.js");
 
-module.exports = function() {
+module.exports = function(settings) {
+    var silent = false;
+
+    if (settings.silent === true){
+        silent = true;
+    }
+
     var config = JSON.parse(fs.readFileSync("./a7.config.json", "utf-8"));
 
     if (config.entry === undefined){
-        clicore.errorLog("You have not defined the entrypoint of your app.");
+        if(silent === false){
+            clicore.errorLog("You have not defined the entrypoint of your app.");
+        }
         return;
     } 
     else {
-        clicore.infoLog("config was successfully loaded.");
+        if(silent === false){
+            clicore.infoLog("config was successfully loaded.");
+        }
     }
 
     var mainFile = fs.readFileSync(config.entry, "utf-8");
