@@ -6,10 +6,6 @@ const fs = require("fs");
 const clicore = require("./cli-core.js");
 const uinput = process.stdin;
 
-const requestLog = function(msg){
-    log(chalk.default("Requesting file:"), msg);
-};
-
 const configPath = "./a7.config.json";
 var config;
 

@@ -117,18 +117,18 @@ const a7newproject = function (name) {
 };
 //TODO:
 const a7createComponent = function(name) {
-    var pathToComponents = "./app/components/";
-    var jsFileName = pathToComponents + name + "/" + name + ".js";
-    var cssFileName = pathToComponents + name + "/" + name + ".css";
-    var htmlFileName = pathToComponents + name + "/" + name + ".html";
+    var path = "./app/components/";
+    var jsFileName = path + name + "/" + name + ".js";
+    var cssFileName = path + name + "/" + name + ".css";
+    var htmlFileName = path + name + "/" + name + ".html";
     
     if(clicore.htmlTags.indexOf(name) !== -1){
         return clicore.errorLog(name + " is a html tag, please choose a different tag name");
-    } else if (fs.existsSync(pathToComponents + name) === true){
+    } else if (fs.existsSync(path + name) === true){
         return clicore.errorLog(name+" is already defined as a component.");
     }
 
-    fs.mkdirSync(pathToComponents + name);
+    fs.mkdirSync(path + name);
     fs.writeFileSync(jsFileName, "export default {\n    tag:\""+name+"\",\n    template:\"./"+name+".html\",\n    styles:\"./"+name+".css\"\n};");
     fs.writeFileSync(htmlFileName, "");
     fs.writeFileSync(cssFileName, "");
