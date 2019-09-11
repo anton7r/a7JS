@@ -12,9 +12,10 @@
     "cli/project-template/defaultconfig.json",
     "cli/project-template/index.js"
   ],
-  "main": "src/a7.js",
+  "main": "build/a7.js",
   "scripts": {
-    "test": "node ./test/a7.test.js"
+    "test": "node ./test/a7.test.js",
+    "install": "node ./scripts/build.js"
   },
   "repository": {
     "type": "git",
