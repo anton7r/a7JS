@@ -126,10 +126,10 @@ module.exports = function(sourceCode){
             componentSourceCode = componentSourceCode.replace("export default function", "function");
             componentSourceCode = minifier(componentSourceCode);
             
-            var componentSetup = componentSourceCode.match(/return\{.+\}/)[0];
+            var componentSetup = componentSourceCode.match(/return\{.+?\}/)[0];
             var htmlPath = componentSource(componentSetup.match(/template\s*:\s*\".+?\"/i)[0]);
             var CSSPath = componentSource(componentSetup.match(/styles\s*:\s*\".+?\"/i)[0]);
-
+            console.log(componentSetup);
             var componentTag = componentSetup.match(/tag\s*:\s*\".+?\"/i)[0];
             componentTag = componentTag.match(/\".+?\"/)[0].replace(/\"/g, "");
 
@@ -161,16 +161,22 @@ module.exports = function(sourceCode){
             }
 
             cssObject = cssSplitter(css, componentTag);
-            innerCSS = "<style>" + cssObject.innerStyles + "</style>";
+            innerCSS = cssObject.innerStyles;
+
+            cssRules = innerCSS.match(/(\w|\d|\s)+{.+?}/);
+
+            cssRules.forEach(function (rule){
+                containerCSS += ".a7-component-container." + componentTag+ " " + rule;
+            });
 
             if (cssObject.container != ""){
                 containerCSS += cssObject.container;
             }
 
             //Remove this and replace it with the cssloader
-            cssAndHtml = innerCSS + html;
+            
 
-            var componentOutput = componentSourceCode.replace(componentSetup, "return \""+ cssAndHtml +"\"");
+            var componentOutput = componentSourceCode.replace(componentSetup, "return \""+ html +"\"");
             var executableComponent = "a7.registerComponent(\""+componentTag+"\"," + componentOutput + ");function "+importNameVar+"(a){return a7.createElement(\""+componentTag+"\",a)}";
             sourceCode = sourceCode.replace(Import, "/* "+Import+" */"+executableComponent);
         });
@@ -207,7 +213,7 @@ module.exports = function(sourceCode){
     }
 
     if(containerCSS != ""){
-        sourceCode += "a7.loadCSS("+ containerCSS + ")";
+        sourceCode += "\n\n/* components css bundled */a7.loadCSS(\""+ containerCSS + "\")";
     }
     //Development helpers
     //log("whole imports:"+wholeImports);
