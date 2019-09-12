@@ -14,6 +14,13 @@ if(fs.existsSync(configPath)){
     config = {entry:"noEntry"};
 }
 
+const minifier = function (source){
+    var min = uglifyJS.minify(source);
+    if (min.error){
+        return clicore.errorLog(min.error.message);
+    }
+    return min.code;
+};
 
 const existsRead = function(path){
     if(fs.existsSync(path)){
@@ -115,8 +122,11 @@ module.exports = function(sourceCode){
             var importNameVar = importName(Import);
             var importableModule = importFrom(Import);
             var documentFolder = importableModule.replace(/(\w|\n)+\.js/g, "");
-            var componentSourceCode = fs.readFileSync(entryFolder + importableModule.replace(/(\.|\.\/)/, ""), "utf-8").replace(/\s+/g, " ");
-            var componentSetup = componentSourceCode.match(/return\(.+\)/)[0];
+            var componentSourceCode = fs.readFileSync(entryFolder + importableModule.replace(/(\.|\.\/)/, ""), "utf-8");
+            componentSourceCode = componentSourceCode.replace("export default function", "function");
+            componentSourceCode = minifier(componentSourceCode);
+            console.log(componentSourceCode);
+            var componentSetup = componentSourceCode.match(/return\{.+\}/)[0];
             var htmlPath = componentSource(componentSetup.match(/template\s*:\s*\".+?\"/i)[0]);
             var CSSPath = componentSource(componentSetup.match(/styles\s*:\s*\".+?\"/i)[0]);
 
@@ -159,8 +169,7 @@ module.exports = function(sourceCode){
 
             cssAndHtml = innerCSS + html;
 
-            var componentOutput = componentSourceCode.replace(/export default function/, "function");
-            componentOutput = componentOutput.replace(componentSetup, "return \""+ cssAndHtml +"\"");
+            var componentOutput = componentSourceCode.replace(componentSetup, "return \""+ cssAndHtml +"\"");
             var executableComponent = "a7.registerComponent(\""+componentTag+"\"," + componentOutput + ");function "+importNameVar+"(a){return a7.createElement(\""+componentTag+"\",a)}";
             sourceCode = sourceCode.replace(Import, "/* "+Import+" */"+executableComponent);
         });
