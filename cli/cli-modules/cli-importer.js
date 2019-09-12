@@ -7,6 +7,7 @@ const configPath = "./a7.config.json";
 const clicore = require("./cli-core");
 
 var config;
+var sourceMaps = [];
 
 if(fs.existsSync(configPath)){
     config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
@@ -15,7 +16,11 @@ if(fs.existsSync(configPath)){
 }
 
 const minifier = function (source){
-    var min = uglifyJS.minify(source);
+    var min = uglifyJS.minify(source, {
+        sourceMap:true
+    });
+    log(min.map);
+    sourceMaps.push(min.map);
     if (min.error){
         return clicore.errorLog(min.error.message);
     }
