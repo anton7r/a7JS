@@ -125,7 +125,7 @@ module.exports = function(sourceCode){
             var componentSourceCode = fs.readFileSync(entryFolder + importableModule.replace(/(\.|\.\/)/, ""), "utf-8");
             componentSourceCode = componentSourceCode.replace("export default function", "function");
             componentSourceCode = minifier(componentSourceCode);
-            console.log(componentSourceCode);
+            
             var componentSetup = componentSourceCode.match(/return\{.+\}/)[0];
             var htmlPath = componentSource(componentSetup.match(/template\s*:\s*\".+?\"/i)[0]);
             var CSSPath = componentSource(componentSetup.match(/styles\s*:\s*\".+?\"/i)[0]);
@@ -167,6 +167,7 @@ module.exports = function(sourceCode){
                 containerCSS += cssObject.container;
             }
 
+            //Remove this and replace it with the cssloader
             cssAndHtml = innerCSS + html;
 
             var componentOutput = componentSourceCode.replace(componentSetup, "return \""+ cssAndHtml +"\"");
@@ -190,8 +191,8 @@ module.exports = function(sourceCode){
 
             }
             var importedModule = `(function(window){` + moduleSourceCode + ` if(typeof (window.` + importNameVar + `) === "undefined"){window.` + importNameVar + `=` + exportDefaultName + `}})(window)`;
-            var minifiedModule = uglifyJS.minify(importedModule);
-            sourceCode = sourceCode.replace(Import, "/* " + Import + " */" + minifiedModule.code);
+            var minifiedModule = minifier(importedModule);
+            sourceCode = sourceCode.replace(Import, "/* " + Import + " */" + minifiedModule);
             imports += {from:importableModule,as:importNameVar};
         });
     
