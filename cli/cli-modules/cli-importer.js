@@ -146,7 +146,6 @@ module.exports = function(sourceCode){
             var css = existsRead(CSSPath);
             var html = existsRead(htmlPath);
 
-            //Add css compressor here!!!! instead of this compressing method
             css = css.replace(/\s+/g, " ");
 
             html = htmlCompressor(html);
