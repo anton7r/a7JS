@@ -19,7 +19,6 @@ const minifier = function (source){
     var min = uglifyJS.minify(source, {
         sourceMap:true
     });
-    log(min.map);
     sourceMaps.push(min.map);
     if (min.error){
         return clicore.errorLog(min.error.message);
