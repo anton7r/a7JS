@@ -95,6 +95,7 @@ module.exports = function(prefport){
     var changes = 0;
 
     setInterval(function(){
+        console.clear();
         build({silent:true});
         log("Build", buildN);
         buildN++;
