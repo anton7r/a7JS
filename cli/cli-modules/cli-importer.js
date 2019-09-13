@@ -161,7 +161,16 @@ module.exports = function(sourceCode){
             html = htmlCompressor(html);
             html = html.replace(/\"/g, "\'");
             htmlApi = html.match(/\<.+?(\s|.)*?\>\<\/.+?(\s|.)*?\>/g);
+
+            if(htmlApi === null){
+                htmlApi = [];
+            }
+
             htmlApi2 = html.match(/\<.+?(\s|.)*?\/\s*\>/g);
+            
+            if(htmlApi2 !== null){
+                htmlApi = htmlApi.concat(htmlApi2);
+            }
 
             if(htmlApi !== null){
                 htmlApi.forEach(function(val){
