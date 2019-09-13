@@ -133,8 +133,8 @@ module.exports = function(sourceCode){
 
             var documentFolder = importableModule.replace(/(\w|\n)+\.js/g, "");
             var componentSourceCode = fs.readFileSync(entryFolder + importableModule.replace(/(\.|\.\/)/, ""), "utf-8");
-            componentSourceCode = componentSourceCode.replace(/export default function\s*\(\)/, "function e()");
-            componentSourceCode = componentSourceCode.replace("export default function", "function");
+            componentSourceCode = componentSourceCode.replace(/export default function\s*\(/, "function e(");
+            componentSourceCode = componentSourceCode.replace(/export default function/, "function");
             
             var componentSetup = componentSourceCode.match(/return\s*\(\{(.|\s)*\}\)/)[0];
             var htmlPath = componentSource(findProp(componentSetup, "template"));
@@ -159,6 +159,39 @@ module.exports = function(sourceCode){
             css = css.replace(/\s+/g, " ");
 
             html = htmlCompressor(html);
+            html = html.replace(/\"/g, "\'");
+            htmlApi = html.match(/\<.+?(\s|.)*?\>\<\/.+?(\s|.)*?\>/g);
+            htmlApi2 = html.match(/\<.+?(\s|.)*?\/\s*\>/g);
+
+            if(htmlApi !== null){
+                htmlApi.forEach(function(val){
+                    var tagName = val.match(/[^\<\s]+/);
+                    var props = val.match(/(\@|)(\w|\d|\.)+?\=\'[^']+\'/g);
+                    var parsedProps = {};
+
+                    if(props !== null){
+                        props.forEach(function(pval){
+                            var propName = pval.match(/[^=]+/)[0];
+                            var propValue = pval.match(/[^=]+$/)[0].replace(/\'/g, "");
+
+                            if(propName.charAt(0) === "@"){
+                                propName = propName.replace("@", "");
+                                if(parsedProps.props === undefined){
+                                    parsedProps.props = {};
+                                }
+
+                                parsedProps.props[propName] = propValue;
+                            } else {
+                                parsedProps[propName] = propValue;
+                            }
+                        });
+                    }
+
+                    parsedProps = JSON.stringify(parsedProps);
+                    log(parsedProps);
+                    html = html.replace(val, "\"+a7.createElement(\""+tagName+"\", " + parsedProps + ")+\"");
+                });
+            }
             //replace literals
             templateLiterals = html.match(/{{\s*.+?\s*}}/);
 
@@ -174,9 +207,11 @@ module.exports = function(sourceCode){
 
             cssRules = innerCSS.match(/.+?\s*?\{.+?\}/);
 
-            cssRules.forEach(function (rule){
-                containerCSS += ".a7-component." + componentTag+ " " + rule;
-            });
+            if(cssRules !== null){
+                cssRules.forEach(function (rule){
+                    containerCSS += ".a7-component." + componentTag+ " " + rule;
+                });
+            }
 
             if (cssObject.container != ""){
                 containerCSS += cssObject.container;
