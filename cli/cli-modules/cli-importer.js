@@ -102,7 +102,6 @@ const cssSplitter = function(csssrc, componentTag){
     containerRx = new RegExp(componentTag, "g");
     containerStylesRx = new RegExp(componentTag + "(.|\s)+?\{(.|\s)+?\}", "g");
     var containerStyles = csssrc.match(containerStylesRx);
-    log(containerStyles);
     var parsedContainerStyles = "";
 
     if (containerStyles !== null){
@@ -110,8 +109,7 @@ const cssSplitter = function(csssrc, componentTag){
             parsedContainerStyles += style;
         });
     }
-    parsedContainerStyles = parsedContainerStyles.replace(containerRx, ".a7-component-container." + componentTag);
-    log(parsedContainerStyles);
+    parsedContainerStyles = parsedContainerStyles.replace(containerRx, ".a7-component." + componentTag);
     innerStyles = csssrc.replace(containerStylesRx, "");
     return {container:parsedContainerStyles,innerStyles:innerStyles};     
 };
@@ -184,10 +182,10 @@ module.exports = function(sourceCode){
             cssObject = cssSplitter(css, componentTag);
             innerCSS = cssObject.innerStyles;
 
-            cssRules = innerCSS.match(/(\w|\d|\s)+{.+?}/);
-            console.log(cssRules);
+            cssRules = innerCSS.match(/.+?\s*?\{.+?\}/);
+
             cssRules.forEach(function (rule){
-                containerCSS += ".a7-component-container." + componentTag+ " " + rule;
+                containerCSS += ".a7-component." + componentTag+ " " + rule;
             });
 
             if (cssObject.container != ""){

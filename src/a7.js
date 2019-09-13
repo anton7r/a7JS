@@ -464,7 +464,7 @@ a7.router = function (newPath) {
     } else {
         return a7debug("we could not find the page which you were looking for");
     }
-    
+
     a7.render(routes[route]());
     a7.path(newPath);
     scrollTo(0, pageXOffset);
