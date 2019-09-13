@@ -7,7 +7,10 @@ const configPath = "./a7.config.json";
 const clicore = require("./cli-core");
 
 var config;
+
+//we can build the big source maps from these!!
 var sourceMaps = [];
+var sources = [];
 
 if(fs.existsSync(configPath)){
     config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
@@ -21,7 +24,7 @@ const minifier = function (source){
     });
     sourceMaps.push(min.map);
     if (min.error){
-        return clicore.errorLog(min.error.message);
+        return clicore.errorLog(min.error);
     }
     return min.code;
 };
@@ -88,11 +91,18 @@ const htmlCompressor = function(htmlsrc){
     return htmlsrc;
 };
 
+//Searches properties from stringified objects
+function findProp (findFrom, find){
+    var finder = new RegExp(find + "\s*:\s*\".+?\"", "i");
+    return findFrom.match(finder)[0];
+}
+
 const cssSplitter = function(csssrc, componentTag){
     //container RegExp
     containerRx = new RegExp(componentTag, "g");
     containerStylesRx = new RegExp(componentTag + "(.|\s)+?\{(.|\s)+?\}", "g");
     var containerStyles = csssrc.match(containerStylesRx);
+    log(containerStyles);
     var parsedContainerStyles = "";
 
     if (containerStyles !== null){
@@ -101,9 +111,15 @@ const cssSplitter = function(csssrc, componentTag){
         });
     }
     parsedContainerStyles = parsedContainerStyles.replace(containerRx, ".a7-component-container." + componentTag);
+    log(parsedContainerStyles);
     innerStyles = csssrc.replace(containerStylesRx, "");
     return {container:parsedContainerStyles,innerStyles:innerStyles};     
 };
+
+function addToSources(modulePath){
+    this.source = modulePath.replace(/(\.\/|\/)(.+?\/)*/g, "");
+    return sources.push(this.source);
+}
 
 module.exports = function(sourceCode){
     var containerCSS = "";
@@ -125,16 +141,19 @@ module.exports = function(sourceCode){
         componentImports.forEach(Import => {
             var importNameVar = importName(Import);
             var importableModule = importFrom(Import);
+            addToSources(importableModule);
+
             var documentFolder = importableModule.replace(/(\w|\n)+\.js/g, "");
             var componentSourceCode = fs.readFileSync(entryFolder + importableModule.replace(/(\.|\.\/)/, ""), "utf-8");
+            componentSourceCode = componentSourceCode.replace(/export default function\s*\(\)/, "function e()");
             componentSourceCode = componentSourceCode.replace("export default function", "function");
             componentSourceCode = minifier(componentSourceCode);
             
             var componentSetup = componentSourceCode.match(/return\{.+?\}/)[0];
-            var htmlPath = componentSource(componentSetup.match(/template\s*:\s*\".+?\"/i)[0]);
-            var CSSPath = componentSource(componentSetup.match(/styles\s*:\s*\".+?\"/i)[0]);
-            console.log(componentSetup);
-            var componentTag = componentSetup.match(/tag\s*:\s*\".+?\"/i)[0];
+            var htmlPath = componentSource(findProp(componentSetup, "template"));
+            var CSSPath = componentSource(findProp(componentSetup, "styles"));
+            
+            var componentTag = findProp(componentSetup, "tag");
             componentTag = componentTag.match(/\".+?\"/)[0].replace(/\"/g, "");
 
             documentFolder = entryFolder + documentFolder.replace(/\./, "");
@@ -176,12 +195,10 @@ module.exports = function(sourceCode){
                 containerCSS += cssObject.container;
             }
 
-            //Remove this and replace it with the cssloader
-            
-
             var componentOutput = componentSourceCode.replace(componentSetup, "return \""+ html +"\"");
             var executableComponent = "a7.registerComponent(\""+componentTag+"\"," + componentOutput + ");function "+importNameVar+"(a){return a7.createElement(\""+componentTag+"\",a)}";
-            sourceCode = sourceCode.replace(Import, "/* "+Import+" */"+executableComponent);
+            sourceCode = sourceCode.replace(Import, executableComponent);
+            imports += {from:importableModule,as:importNameVar};
         });
     }
 
@@ -201,7 +218,7 @@ module.exports = function(sourceCode){
             }
             var importedModule = `(function(window){` + moduleSourceCode + ` if(typeof (window.` + importNameVar + `) === "undefined"){window.` + importNameVar + `=` + exportDefaultName + `}})(window)`;
             var minifiedModule = minifier(importedModule);
-            sourceCode = sourceCode.replace(Import, "/* " + Import + " */" + minifiedModule);
+            sourceCode = sourceCode.replace(Import, minifiedModule);
             imports += {from:importableModule,as:importNameVar};
         });
     
