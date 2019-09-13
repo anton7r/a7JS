@@ -34,7 +34,7 @@ module.exports = function(settings) {
     }
 
     var mainFile = fs.readFileSync(config.entry, "utf-8");
-    fs.writeFileSync(config.output, importer(mainFile).output);
+    fs.writeFileSync(config.output, importer(mainFile));
     return;
 
     var imports = mainFile.match(/import .+ from \".+\"/g);

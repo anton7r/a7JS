@@ -5,12 +5,9 @@ const self = "a7js";
 const uglifyJS = require("uglify-js");
 const configPath = "./a7.config.json";
 const clicore = require("./cli-core");
-
+const cssMinifier = require("./cli-cssminifier");
 var config;
 
-//we can build the big source maps from these!!
-var sourceMaps = [];
-var sources = [];
 
 if(fs.existsSync(configPath)){
     config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
@@ -19,13 +16,12 @@ if(fs.existsSync(configPath)){
 }
 
 const minifier = function (source){
-    var min = uglifyJS.minify(source, {
-        sourceMap:true
-    });
-    sourceMaps.push(min.map);
+    var min = uglifyJS.minify(source);
+
     if (min.error){
         return clicore.errorLog(min.error);
     }
+    //log(min.code)
     return min.code;
 };
 
@@ -114,11 +110,6 @@ const cssSplitter = function(csssrc, componentTag){
     return {container:parsedContainerStyles,innerStyles:innerStyles};     
 };
 
-function addToSources(modulePath){
-    this.source = modulePath.replace(/(\.\/|\/)(.+?\/)*/g, "");
-    return sources.push(this.source);
-}
-
 module.exports = function(sourceCode){
     var containerCSS = "";
     var imports = [];
@@ -139,7 +130,6 @@ module.exports = function(sourceCode){
         componentImports.forEach(Import => {
             var importNameVar = importName(Import);
             var importableModule = importFrom(Import);
-            addToSources(importableModule);
 
             var documentFolder = importableModule.replace(/(\w|\n)+\.js/g, "");
             var componentSourceCode = fs.readFileSync(entryFolder + importableModule.replace(/(\.|\.\/)/, ""), "utf-8");
@@ -195,7 +185,7 @@ module.exports = function(sourceCode){
             var componentOutput = componentSourceCode.replace(componentSetup, "return \""+ html +"\"");
             componentOutput = minifier(componentOutput);
 
-            var executableComponent = "a7.registerComponent(\""+componentTag+"\"," + componentOutput + ");function "+importNameVar+"(a){return a7.createElement(\""+componentTag+"\",a)}";
+            var executableComponent = "/* " + importNameVar + " */a7.registerComponent(\""+componentTag+"\"," + componentOutput + ");function "+importNameVar+"(a){return a7.createElement(\""+componentTag+"\",a)}";
             sourceCode = sourceCode.replace(Import, executableComponent);
             imports += {from:importableModule,as:importNameVar};
         });
@@ -222,7 +212,7 @@ module.exports = function(sourceCode){
             }
             var importedModule = `(function(p){` + moduleSourceCode + ` if(typeof (window.` + importNameVar + `) === "undefined"){window.` + importNameVar + `=` + exportDefaultName + `}})(window)`;
             var minifiedModule = minifier(importedModule);
-            sourceCode = sourceCode.replace(Import, minifiedModule);
+            sourceCode = sourceCode.replace(Import, "/* " + importNameVar + " */" + minifiedModule);
             imports += {from:importableModule,as:importNameVar};
         });
     
@@ -236,12 +226,14 @@ module.exports = function(sourceCode){
         return clicore.errorLog("Importing only a part of a framework is not yet supported!");
     }
 
+    containerCSS = cssMinifier(containerCSS);
+
     if(containerCSS != ""){
         sourceCode += "a7.loadCSS(\""+ containerCSS + "\")";
     }
+
     //Development helpers
     //log("whole imports:"+wholeImports);
     //log("partial imports:"+partialImports);
-    this.output = sourceCode;
-    return this;
+    return sourceCode;
 };
