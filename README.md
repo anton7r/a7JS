@@ -12,12 +12,26 @@
 
 ✅ Frontend framework only 2,6kb gzipped and minified. 
 
+⚡ Its stupid fast.
+
+⚙️ Supports component design.
+
+😍 Easy to use.
+
+🚀 Provides compression and minification.
+
+👑 Supports ES6 Imports.
+
+# What are the features?
+CLI - Development server and boilerplate for new projects and components
+Router - Fully working 
+
 # Setup
 
 Install it:
 
 ```shell
-npm i a7js
+npm i a7js -g
 ```
 
 Start a new project:
@@ -29,12 +43,14 @@ a7 newproject [projectname]
 Run development server
 
 ```shell
-Coming soon..
+a7 devserver
 ```
 
 # Motivation
 
 Most of the commonly used libraries / frameworks are really large and also packs in features that most of the users will never use.
+
+a7JS focuses on the stuff that would be really hard to make from scratch.
 
 And it has 0 dependencies on the code that runs at the front end and also it is fully es5.
 
