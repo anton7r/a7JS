@@ -185,7 +185,7 @@ module.exports = function(sourceCode){
             innerCSS = cssObject.innerStyles;
 
             cssRules = innerCSS.match(/(\w|\d|\s)+{.+?}/);
-
+            console.log(cssRules);
             cssRules.forEach(function (rule){
                 containerCSS += ".a7-component-container." + componentTag+ " " + rule;
             });
@@ -209,7 +209,7 @@ module.exports = function(sourceCode){
             var importNameVar = importName(Import);
             var importableModule = require.resolve(replaceSelf(importFrom(Import)));
             var moduleSourceCode = fs.readFileSync(importableModule, "utf-8");
-            var modulesImports = moduleSourceCode.match();
+            var modulesImports = moduleSourceCode.match(/(import\s+.+?\s+from\".*?\"|require\(.*?\))/g);
 
             if(modulesImports !== null){
                 clicore.errorLog("Module " + importNameVar +" has its own imports which we cannot right now import with our detections!");
