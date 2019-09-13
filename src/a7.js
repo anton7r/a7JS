@@ -1,4 +1,84 @@
 /* internal methods start */
+//Init will run once
+var init = function () {
+    //a7store[10] is initDone
+    if (a7store[10] === true) {
+        return;
+    }
+
+    var pageContainerEL = document.querySelector("[data-a7-page-container]");
+    if (pageContainerEL === null | pageContainerEL === undefined) {
+        return a7debug("Page Container Could not be found, It has to have the data attribute \"data-a7-page-container\". Your website wont function without that.");
+    }
+    //assignment of a7store[9] aka pageContainer
+    a7store[9] = pageContainerEL;
+    pageContainerEL.setAttribute("a7-page-container", "set");
+    pageContainerEL.removeAttribute("data-a7-page-container");
+    a7store[10] = true;
+
+    //menu init
+    var menuElements = document.querySelectorAll("[data-a7-menu]");
+    if (menuElements) {
+        for (var i = 0; i < menuElements.length; i++) {
+            var elem = menuElements[i],
+                menuname = elem.getAttribute("data-a7-menu"),
+                state = elem.getAttribute("data-a7-default-state");
+            a7store[2][menuname] = elem;
+            if (state === "open") {
+                elem.classList.add("a7-menu-" + menuname + "-open");
+            } else if (state === "closed") {
+                elem.classList.add("a7-menu-" + menuname + "-closed");
+            } else {
+                elem.classList.add("a7-menu-" + menuname + "-closed");
+            }
+        }
+    }
+
+    var menuToggles = document.querySelectorAll("[data-a7-menu-toggle]");
+    if (menuToggles) {
+        for (var x = 0; x < menuToggles.length; x++) {
+            menuToggles[x].addEventListener("mouseup",
+                a7.toggleMenu(menuToggles[x].getAttribute("data-a7-menu-toggle"))
+            );
+        }
+    }
+
+    //links init
+    var linkcollection = document.getElementsByTagName("a");
+
+    for (var y = 0; y < linkcollection.length; y++) {
+        if (linkcollection[y].dataset.a7link !== undefined | linkcollection[y].getAttribute("a7-link") !== null) {
+            a7.linkHandler(linkcollection[y]);
+        }
+    }
+
+    //descriptions
+    var descL = document.getElementsByName("description");
+
+    if (descL.length !== 0) {
+        a7store[6].push(descL[0]);
+        var descContent = descL[0].getAttribute("content");
+
+        if (descContent !== undefined) {
+            a7store[11] = descContent;
+        }
+
+    } else {
+        document.getElementsByTagName("head")[0].innerHTML += "<meta name=\"description\" content=\"\">";
+        a7store[6].push(document.getElementsByName("description")[0]);
+    }
+
+    //conf
+    a7store[12] = document.title;
+
+    //first route and enabling back button
+    a7.router(a7.path());
+
+    window.addEventListener("popstate", function () {
+        a7.router(a7.path());
+    });
+};
+
 var objectToAttributes = function (obj) {
     obj = JSON.stringify(obj);
     var lenght = obj.length,
@@ -121,6 +201,7 @@ a7.ver = function () {
 
 a7.routes = function(routes){
     a7store[14] = routes;
+    init();
     return a7store[14];
 };
 
@@ -336,86 +417,6 @@ a7.onMenuToggle = function (menuName, func) {
     a7store[5][menuName] = func;
 };
 
-//Init will run once
-a7.init = function () {
-    //a7store[10] is initDone
-    if (a7store[10] === true) {
-        return;
-    }
-
-    var pageContainerEL = document.querySelector("[data-a7-page-container]");
-    if (pageContainerEL === null | pageContainerEL === undefined) {
-        return a7debug("Page Container Could not be found, It has to have the data attribute \"data-a7-page-container\". Your website wont function without that.");
-    }
-    //assignment of a7store[9] aka pageContainer
-    a7store[9] = pageContainerEL;
-    pageContainerEL.setAttribute("a7-page-container", "set");
-    pageContainerEL.removeAttribute("data-a7-page-container");
-    a7store[10] = true;
-
-    //menu init
-    var menuElements = document.querySelectorAll("[data-a7-menu]");
-    if (menuElements) {
-        for (var i = 0; i < menuElements.length; i++) {
-            var elem = menuElements[i],
-                menuname = elem.getAttribute("data-a7-menu"),
-                state = elem.getAttribute("data-a7-default-state");
-            a7store[2][menuname] = elem;
-            if (state === "open") {
-                elem.classList.add("a7-menu-" + menuname + "-open");
-            } else if (state === "closed") {
-                elem.classList.add("a7-menu-" + menuname + "-closed");
-            } else {
-                elem.classList.add("a7-menu-" + menuname + "-closed");
-            }
-        }
-    }
-
-    var menuToggles = document.querySelectorAll("[data-a7-menu-toggle]");
-    if (menuToggles) {
-        for (var x = 0; x < menuToggles.length; x++) {
-            menuToggles[x].addEventListener("mouseup",
-                a7.toggleMenu(menuToggles[x].getAttribute("data-a7-menu-toggle"))
-            );
-        }
-    }
-
-    //links init
-    var linkcollection = document.getElementsByTagName("a");
-
-    for (var y = 0; y < linkcollection.length; y++) {
-        if (linkcollection[y].dataset.a7link !== undefined | linkcollection[y].getAttribute("a7-link") !== null) {
-            a7.linkHandler(linkcollection[y]);
-        }
-    }
-
-    //descriptions
-    var descL = document.getElementsByName("description");
-
-    if (descL.length !== 0) {
-        a7store[6].push(descL[0]);
-        var descContent = descL[0].getAttribute("content");
-
-        if (descContent !== undefined) {
-            a7store[11] = descContent;
-        }
-
-    } else {
-        document.getElementsByTagName("head")[0].innerHTML += "<meta name=\"description\" content=\"\">";
-        a7store[6].push(document.getElementsByName("description")[0]);
-    }
-
-    //conf
-    a7store[12] = document.title;
-
-    //first route and enabling back button
-    a7.router(a7.path());
-
-    window.addEventListener("popstate", function () {
-        a7.router(a7.path());
-    });
-};
-
 //if newPath is not defined then it will return the current path
 //Its looking too complex of a function right now.
 a7.path = function (newPath) {
@@ -463,7 +464,7 @@ a7.router = function (newPath) {
     } else {
         return a7debug("we could not find the page which you were looking for");
     }
-    console.log(routes[route]());
+    
     a7.render(routes[route]());
     a7.path(newPath);
     scrollTo(0, pageXOffset);

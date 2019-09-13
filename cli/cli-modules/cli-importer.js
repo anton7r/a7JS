@@ -147,9 +147,8 @@ module.exports = function(sourceCode){
             var componentSourceCode = fs.readFileSync(entryFolder + importableModule.replace(/(\.|\.\/)/, ""), "utf-8");
             componentSourceCode = componentSourceCode.replace(/export default function\s*\(\)/, "function e()");
             componentSourceCode = componentSourceCode.replace("export default function", "function");
-            componentSourceCode = minifier(componentSourceCode);
             
-            var componentSetup = componentSourceCode.match(/return\{.+?\}/)[0];
+            var componentSetup = componentSourceCode.match(/return\s*\(\{(.|\s)*\}\)/)[0];
             var htmlPath = componentSource(findProp(componentSetup, "template"));
             var CSSPath = componentSource(findProp(componentSetup, "styles"));
             
@@ -196,6 +195,8 @@ module.exports = function(sourceCode){
             }
 
             var componentOutput = componentSourceCode.replace(componentSetup, "return \""+ html +"\"");
+            componentOutput = minifier(componentOutput);
+
             var executableComponent = "a7.registerComponent(\""+componentTag+"\"," + componentOutput + ");function "+importNameVar+"(a){return a7.createElement(\""+componentTag+"\",a)}";
             sourceCode = sourceCode.replace(Import, executableComponent);
             imports += {from:importableModule,as:importNameVar};
@@ -216,7 +217,7 @@ module.exports = function(sourceCode){
                 exportDefaultName = moduleSourceCodeMatches[0].replace(/(module.exports\s*=\s*|;)/g, "");
 
             }
-            var importedModule = `(function(window){` + moduleSourceCode + ` if(typeof (window.` + importNameVar + `) === "undefined"){window.` + importNameVar + `=` + exportDefaultName + `}})(window)`;
+            var importedModule = `(function(p){` + moduleSourceCode + ` if(typeof (window.` + importNameVar + `) === "undefined"){window.` + importNameVar + `=` + exportDefaultName + `}})(window)`;
             var minifiedModule = minifier(importedModule);
             sourceCode = sourceCode.replace(Import, minifiedModule);
             imports += {from:importableModule,as:importNameVar};
@@ -233,7 +234,7 @@ module.exports = function(sourceCode){
     }
 
     if(containerCSS != ""){
-        sourceCode += "\n\n/* components css bundled */a7.loadCSS(\""+ containerCSS + "\")";
+        sourceCode += "a7.loadCSS(\""+ containerCSS + "\")";
     }
     //Development helpers
     //log("whole imports:"+wholeImports);
