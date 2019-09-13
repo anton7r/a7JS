@@ -27,7 +27,7 @@ const openInDefaultBrowser = function(url){
         infoLog("We dont have support yet for the OS youre using. Open a new issue, so we can add support!");
     }
 };
-
+var buildN = 0;
 uinput.setEncoding("utf-8");
 
 const resolveFile = function(url){
@@ -72,6 +72,9 @@ module.exports = function(prefport){
 
     clicore.infoLog("Development server is starting at port "+ port);
     clicore.infoLog("in order to stop the server type \"stop\".");
+    
+    log("Build", buildN);
+    buildN++;
 
     uinput.on("data", data => {
         if(data === "stop\r\n"){
@@ -91,20 +94,11 @@ module.exports = function(prefport){
     
     var changes = 0;
 
-    fs.watch("./", {recursive:true, encoding:"utf-8"}, function (event, trigger){
-        if(trigger !== config.output){
-            //build the app
-            // use setTimeout to limit the amount of builds
-            setTimeout(function(){
-                if (changes !== 0){
-                    build({silent:true});
-                    changes = 0;
-                    log("App built. refresh page to see changes!");
-                }
-            }, 2000);
-            changes++;
-        }
-    });
+    setInterval(function(){
+        build({silent:true});
+        log("Build", buildN);
+        buildN++;
+    }, 10000);
 
     openInDefaultBrowser("localhost:" + port);
 };
