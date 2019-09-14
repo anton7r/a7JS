@@ -2,6 +2,7 @@
  *          License MIT
  *          anton7r (C) 2019
  */
+
 /* internal methods start */
 //Init will run once
 var init = function () {
@@ -197,12 +198,12 @@ a7store = [
     "v4-pre", //Version       0
     {}, //ComponentList       1
     {}, //Menus               2
-    [], //ClosableMenus       3
+    [], //Empty               3
     {}, //PageMethods         4
     {}, //onMenuToggleList    5
     [], //descriptionElements 6
     {}, //cacheMatch          7
-    false, //closeMenuOnRout  8
+    false, //Empty            8
     {}, //pageContainer       9
     false, //initDone         10
     "", //description         11
@@ -436,17 +437,12 @@ a7.closeMenu = function (menuName) {
     }
 };
 
-a7.closeMenuOnRout = function (menu) {
-    if (menu === undefined) {
-        new Error("Menu" + menu + "could not be found.");
-    } else {
-        a7store[8] = true;
-        a7store[3].push(menu);
-    }
-};
-
 a7.onMenuToggle = function (menuName, func) {
     a7store[5][menuName] = func;
+};
+
+a7.onRoute = function (componentName, executable) {
+
 };
 
 //if newPath is not defined then it will return the current path
@@ -468,12 +464,6 @@ a7.path = function (newPath) {
 
 //Resolves any path you give
 a7.router = function (newPath) {
-
-    if (a7store[8] === true) {
-        for (var i; i < a7store[3].length; i++) {
-            a7.closeMenu(a7store[3][i]);
-        }
-    }
 
     if (newPath.indexOf("/") === 0) {
         newPath = newPath.replace("/", "");

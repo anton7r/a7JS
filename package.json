@@ -9,6 +9,7 @@
     "cli/cli-modules/cli-build.js",
     "cli/cli-modules/cli-tags.js",
     "cli/cli-modules/cli-importer.js",
+    "cli/cli-modules/cli-subimporter.js",
     "cli/cli-modules/cli-devserver.js",
     "cli/cli-modules/cli-cssminifier.js",
     "scripts/build.js",
@@ -30,7 +31,10 @@
     "js-framework",
     "router",
     "javascript-compiler",
-    "compiler"
+    "compiler",
+    "front-end",
+    "framework",
+    "js-bundler"
   ],
   "author": "anton7r",
   "license": "MIT",
