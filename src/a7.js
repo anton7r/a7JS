@@ -236,7 +236,7 @@ a7.createElement = function (element, attributes) {
     var elclass = attributes.class;
 
     if(component !== undefined){
-        
+
         if(elclass === undefined){
             elclass = "";
         } else {
@@ -247,6 +247,10 @@ a7.createElement = function (element, attributes) {
     }
 
     attributes = objectToAttributes(attributes);
+    
+    if(attributes !== ""){
+        attributes = " " + attributes;
+    }
 
     //If secure mode is enabled
     if (a7store[13] === true) {
@@ -258,10 +262,10 @@ a7.createElement = function (element, attributes) {
     }
 
     //if the element is a component
-    if (a7store[1][element] !== undefined) {
+    if (component !== undefined) {
 
-        finalElement = "<div class=\"a7-component " + element + elclass + "\" " + attributes + ">" + a7store[1][element](props) + "</div>";
-        console.log(finalElement);
+        finalElement = "<div class=\"a7-component " + element + elclass + "\"" + attributes + ">" + component(props) + "</div>";
+        
     } else {
 
         //console.log(attributes);
