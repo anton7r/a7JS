@@ -198,7 +198,8 @@ module.exports = function(sourceCode){
                     }
 
                     parsedProps = JSON.stringify(parsedProps);
-                    html = html.replace(val, "\"+a7.createElement(\""+tagName+"\", " + parsedProps + ")+\"");
+                    htmlReplacer = html.replace(val, "\"+a7.createElement(\""+tagName+"\", " + parsedProps + ")+\"");
+                    html =  htmlReplacer;
                 });
             }
             //replace literals
@@ -227,6 +228,9 @@ module.exports = function(sourceCode){
             }
 
             var componentOutput = componentSourceCode.replace(componentSetup, "return \""+ html +"\"");
+            componentOutput = componentOutput.replace(/((\"\")\s*\+\s*|(\s*\+\s*\"\"))/g, "");
+            
+            console.log(componentOutput);
             componentOutput = minifier(componentOutput);
 
             var executableComponent = "/* " + importNameVar + " */a7.registerComponent(\""+componentTag+"\"," + componentOutput + ");function "+importNameVar+"(a){return a7.createElement(\""+componentTag+"\",a)}";
@@ -254,7 +258,7 @@ module.exports = function(sourceCode){
                 exportDefaultName = moduleSourceCodeMatches[0].replace(/(module.exports\s*=\s*|;)/g, "");
 
             }
-            var importedModule = `imports.` + importNameVar + `;(function(){` + moduleSourceCode + ` if(typeof(imports.` + importNameVar + `)==="undefined"){imports.` + importNameVar + `=` + exportDefaultName + `}})();var ` + importNameVar + `=imports.` + importNameVar + ";";
+            var importedModule = `imports.` + importNameVar + `;(function(){` + moduleSourceCode + ` imports.` + importNameVar + `=` + exportDefaultName + `})();var ` + importNameVar + `=imports.` + importNameVar + ";";
             var minifiedModule = minifier(importedModule);
             sourceCode = sourceCode.replace(Import, "/* " + importNameVar + " */" + minifiedModule);
             imports += {from:importableModule,as:importNameVar};
