@@ -101,6 +101,8 @@ var render = function () {
     a7store[9].innerHTML = final;
 };
 
+
+//REVIEW: Remake it to use RegExp
 var objectToAttributes = function (obj) {
     obj = JSON.stringify(obj);
     var lenght = obj.length,
@@ -199,7 +201,7 @@ a7store = [
     {}, //ComponentList       1
     {}, //Menus               2
     [], //Empty               3
-    {}, //PageMethods         4
+    {}, //Empty               4
     {}, //onMenuToggleList    5
     [], //descriptionElements 6
     {}, //cacheMatch          7
@@ -359,10 +361,13 @@ a7.sanitizer = function (content) {
     return result;
 };
 
+
+//TODO: Deprecate or move out of api
 a7.replaceCharAt = function (str, index, repWith) {
     return str.substring(0, index) + repWith + str.substring(index + 1, str.length);
 };
 
+//TODO: Deprecate or move out of api
 a7.linkHandler = function (link) {
     link.addEventListener("click", function (ev) {
         //console.log(link);
@@ -371,6 +376,8 @@ a7.linkHandler = function (link) {
     });
 };
 
+
+//REVIEW: Embed into router
 a7.renderNewLinks = function () {
     var newLinks = document.querySelectorAll("[data-a7-new-link]"),
         i;
@@ -396,6 +403,10 @@ a7.setTitle = function (newTitle) {
 };
 
 //Menu stuff
+
+//REVIEW: combine toggleMenu and closeMenu
+//make a forceState parameter into toggle menu.
+//since toggleMenu and closeMenu is basicly the same.
 a7.toggleMenu = function (menuName) {
     var elem = a7store[2][menuName],
         classList = elem.classList,
@@ -441,12 +452,13 @@ a7.onMenuToggle = function (menuName, func) {
     a7store[5][menuName] = func;
 };
 
-a7.onRoute = function (componentName, executable) {
+
+//FinishThis TODO:_
+a7.onDomEnter = function (componentName, executable) {
 
 };
 
 //if newPath is not defined then it will return the current path
-//Its looking too complex of a function right now.
 a7.path = function (newPath) {
     if (newPath === undefined) {
         return window.location.pathname.replace("/", "");
