@@ -163,6 +163,7 @@ a7.secureProps = function (mode) {
     }
 };
 
+//REVIEW:
 a7.createElement = function (element, attributes) {
 
     //Replace this
