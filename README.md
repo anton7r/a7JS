@@ -4,13 +4,13 @@
 ![a7JS](./designs/banner.svg)
 
 ![build passing](https://img.shields.io/badge/build-passing-success)
-![latest version](https://img.shields.io/badge/Latest%20version-v3.3.5-blue)
+![latest version](https://img.shields.io/badge/Latest%20version-v4.0.0-alpha.8-blue)
 ![size](https://img.shields.io/badge/Size-3kb-success)
-![v4 status](https://img.shields.io/badge/v4%20status-in%20Development-red)
+![v4 status](https://img.shields.io/badge/v4%20status-in%20Development-yellow)
 
 🔥 A lot of power in a small package.
 
-✅ Frontend framework only 2,6kb gzipped and minified. 
+✅ Frontend framework only 2,6kb gzipped and minified.
 
 ⚡ Its stupid fast.
 
@@ -24,7 +24,7 @@
 
 # What are the features?
 CLI - Development server and boilerplate for new projects and components
-Router - Fully working 
+Router - Fully working
 
 # Setup
 
