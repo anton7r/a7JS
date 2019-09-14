@@ -167,7 +167,7 @@ module.exports = function(sourceCode){
             }
 
             htmlApi2 = html.match(/\<.+?(\s|.)*?\/\s*\>/g);
-            
+
             if(htmlApi2 !== null){
                 htmlApi = htmlApi.concat(htmlApi2);
             }
@@ -276,6 +276,18 @@ module.exports = function(sourceCode){
         sourceCode += "a7.loadCSS(\""+ containerCSS + "\")";
     }
 
+
+    if (config.mode === "production"){
+        sourceCode = "(function(){" + sourceCode + "})()";
+        sourceCode = uglifyJS.minify(sourceCode, {
+            compress:{
+                passes:1
+            },
+            mangle:{
+                toplevel:true
+            }
+        }).code;
+    }
     //Development helpers
     //log("whole imports:"+wholeImports);
     //log("partial imports:"+partialImports);

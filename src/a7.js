@@ -1,3 +1,7 @@
+/*
+ *          License MIT
+ *          anton7r (C) 2019
+ */
 /* internal methods start */
 //Init will run once
 var init = function () {
@@ -228,6 +232,19 @@ a7.createElement = function (element, attributes) {
         props = attributes.props;
         delete attributes.props;
     }
+    var component = a7store[1][element];
+    var elclass = attributes.class;
+
+    if(component !== undefined){
+        
+        if(elclass === undefined){
+            elclass = "";
+        } else {
+            elclass = " " + elclass;
+            delete attributes.class;
+        }
+
+    }
 
     attributes = objectToAttributes(attributes);
 
@@ -242,7 +259,9 @@ a7.createElement = function (element, attributes) {
 
     //if the element is a component
     if (a7store[1][element] !== undefined) {
-        finalElement = "<div class=\"a7-component " + element + "\" " + attributes + ">" + a7store[1][element](props) + "</div>";
+
+        finalElement = "<div class=\"a7-component " + element + elclass + "\" " + attributes + ">" + a7store[1][element](props) + "</div>";
+        console.log(finalElement);
     } else {
 
         //console.log(attributes);
