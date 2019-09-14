@@ -195,7 +195,7 @@ function a7debug(message) {
 
 //we changed a7store object to an array because we tested that arrays are simply about 33% faster than objects
 //which would give us a huge performance increase
-var a7store = Array(16);
+var a7store = Array(15);
 a7store = [
     "v4-pre", //Version       0
     {}, //ComponentList       1
@@ -212,7 +212,6 @@ a7store = [
     "", //title               12
     true, //secureProps mode  13
     {}, //Routes              14
-    [], //eventListenerQueue  15
 ];
 
 /* internal methods end */
@@ -321,14 +320,6 @@ a7.elementCollection = function () {
 
 a7.loadCSS = function(css){
     document.head.insertAdjacentHTML("beforeend", "<style>" + css + "</style>");
-};
-
-a7.EventListener = function(target, event, handler){
-    a7store[15].push({
-        target:target,
-        event:event,
-        handler:handler
-    });
 };
 
 a7.registerComponent = function (compName, compFunc) {
@@ -452,12 +443,6 @@ a7.onMenuToggle = function (menuName, func) {
     a7store[5][menuName] = func;
 };
 
-
-//FinishThis TODO:_
-a7.onDomEnter = function (componentName, executable) {
-
-};
-
 //if newPath is not defined then it will return the current path
 a7.path = function (newPath) {
     if (newPath === undefined) {
@@ -500,15 +485,6 @@ a7.router = function (newPath) {
     }
 
     render(routes[route]());
-
-    var eventListenerQueue = a7store[15];
-    var evListenerLen = eventListenerQueue.length;
-    var y = 0;
-
-    for(y = 0; y<evListenerLen; y++){
-        var obj = eventListenerQueue[y];
-        obj.target.addEventListener(obj.event, obj.handler);
-    }
 
     a7store[15] = [];
     a7.path(newPath);
