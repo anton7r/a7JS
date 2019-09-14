@@ -111,6 +111,7 @@ const cssSplitter = function(csssrc, componentTag){
 };
 
 module.exports = function(sourceCode){
+    sourceCode = "var imports = {};" + sourceCode;
     var containerCSS = "";
     var imports = [];
     var moduleExportEquals = /module.exports\s*=\s*(\w|\d)*;*/g;
@@ -254,7 +255,7 @@ module.exports = function(sourceCode){
                 exportDefaultName = moduleSourceCodeMatches[0].replace(/(module.exports\s*=\s*|;)/g, "");
 
             }
-            var importedModule = `(function(p){` + moduleSourceCode + ` if(typeof (window.` + importNameVar + `) === "undefined"){window.` + importNameVar + `=` + exportDefaultName + `}})(window)`;
+            var importedModule = `imports.` + importNameVar + `;(function(){` + moduleSourceCode + ` if(typeof(imports.` + importNameVar + `)==="undefined"){imports.` + importNameVar + `=` + exportDefaultName + `}})();var ` + importNameVar + `=imports.` + importNameVar + ";";
             var minifiedModule = minifier(importedModule);
             sourceCode = sourceCode.replace(Import, "/* " + importNameVar + " */" + minifiedModule);
             imports += {from:importableModule,as:importNameVar};
