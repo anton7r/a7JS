@@ -198,7 +198,6 @@ module.exports = function(sourceCode){
                     }
 
                     parsedProps = JSON.stringify(parsedProps);
-                    log(parsedProps);
                     html = html.replace(val, "\"+a7.createElement(\""+tagName+"\", " + parsedProps + ")+\"");
                 });
             }
