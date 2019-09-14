@@ -101,84 +101,6 @@ var render = function () {
     a7store[9].innerHTML = final;
 };
 
-
-//REVIEW: Remake it to use RegExp
-var objectToAttributes = function (obj) {
-    obj = JSON.stringify(obj);
-    var lenght = obj.length,
-        quoteLocations = [],
-        equalLocations = [],
-        curVal;
-    for (curVal = 0; curVal < lenght; curVal++) {
-        var curChar = obj.charAt(curVal);
-        if (curChar === "\"") {
-
-            quoteLocations.push(curVal);
-        } else if (curChar === ":") {
-
-            equalLocations.push(curVal);
-        }
-    }
-
-    //checks if ":" is inside a string
-    var eqLen = equalLocations.length;
-
-    for (curVal = 0; curVal < eqLen; curVal++) {
-        var resolv = true,
-            charPosition = equalLocations[curVal],
-            char = obj.charAt(charPosition - 1),
-            nextChar = obj.charAt(charPosition - 2);
-        while (resolv) {
-            //console.log("checkerCharPos:", charPosition - 1);
-
-            if (char === "\"" & nextChar === ":" | char === "\"" & nextChar === "=") {
-                //We dont want to replace this
-                //console.log(":");
-                resolv = false;
-            } else if (char === "\"" & nextChar !== ":") {
-                //Replace char
-                //console.log("=");
-                obj = a7.replaceCharAt(obj, charPosition, "=");
-                resolv = false;
-            }
-            //fail safe for infite loops and check for the first
-            else if (charPosition === 1) {
-                //it appears that this is the first ":" so we want to replace it!
-                //console.log("=");
-                obj = a7.replaceCharAt(obj, charPosition, "=");
-                resolv = false;
-            } else {
-                charPosition -= 1;
-            }
-        }
-    }
-
-    var displacement = 0,
-        quLen = quoteLocations.length;
-    for (curVal = 0; curVal < quLen; curVal++) {
-        var val = quoteLocations[curVal];
-        //console.log(curVal, obj.charAt(val + 1 - displacement));
-        if (obj.charAt(val + 1 - displacement) === "=") {
-            var start = quoteLocations[curVal - 1] + 1 - displacement;
-            var AttrName = obj.slice(start, val - displacement);
-            /*
-            console.log("AttrName:",AttrName);
-            //*/
-            obj = obj.replace("\"" + AttrName + "\"", AttrName);
-            displacement += 2;
-        }
-    }
-
-    obj = obj.replace(/({|})/g, "").replace(/,/g, " ");
-    //console.log(finalAttributes);
-
-    if (obj === "\"\"") {
-        obj = "";
-    }
-
-    return obj;
-};
-
 //very useful 
 if (!"".trim) String.prototype.trim = function () {
     return this.replace(/^[\s﻿]+|[\s﻿]+$/g, '');
@@ -242,8 +164,11 @@ a7.secureProps = function (mode) {
 };
 
 a7.createElement = function (element, attributes) {
-    var finalElement,
-        props;
+
+    //Replace this
+    var props;
+    var component = a7store[1][element];
+    var elclass = attributes.class;
 
     if (attributes === undefined | null | "null") {
         attributes = "";
@@ -251,8 +176,6 @@ a7.createElement = function (element, attributes) {
         props = attributes.props;
         delete attributes.props;
     }
-    var component = a7store[1][element];
-    var elclass = attributes.class;
 
     if(component !== undefined){
 
@@ -263,12 +186,6 @@ a7.createElement = function (element, attributes) {
             delete attributes.class;
         }
 
-    }
-
-    attributes = objectToAttributes(attributes);
-    
-    if(attributes !== ""){
-        attributes = " " + attributes;
     }
 
     //If secure mode is enabled
@@ -282,27 +199,18 @@ a7.createElement = function (element, attributes) {
 
     //if the element is a component
     if (component !== undefined) {
-
-        finalElement = "<div class=\"a7-component " + element + elclass + "\"" + attributes + ">" + component(props) + "</div>";
+        //Its component
 
     } else {
-
-        //console.log(attributes);
-        //Join content
-        var contentArray = [];
+        //Its a regular element
         var curVal;
         var argLen = arguments.length;
 
         for (curVal = 2; curVal < argLen; curVal++) {
-            contentArray.push(arguments[curVal]);
+            //loops through the rest of the arguments
         }
 
-        content = contentArray.join("");
-        //debugger!! comment it when it is not needed
-        /*
-        console.log("Content:",content);
-        */
-        finalElement = "<" + element + " " + attributes + ">" + content + "</" + element + ">";
+        return element;
     }
 
     return finalElement;
