@@ -83,6 +83,23 @@ var init = function () {
     });
 };
 
+var render = function () {
+    var final = "",
+        curVal,
+        argLen = arguments.length;
+
+    for (curVal = 0; curVal < argLen; curVal++) {
+        final += arguments[curVal];
+    }
+
+    if (final.search("onclick=\"") !== -1 | final.search("onerror=\"") !== -1 | final.search("onload=\"") !== -1 | final.search("onhover=\"") !== -1) {
+        return a7debug("a possible security vulnerability found in your application, ERROR: on[event] attributes deprecated.");
+    }
+
+    //a7store[9] is pageContainer
+    a7store[9].innerHTML = final;
+};
+
 var objectToAttributes = function (obj) {
     obj = JSON.stringify(obj);
     var lenght = obj.length,
@@ -265,7 +282,7 @@ a7.createElement = function (element, attributes) {
     if (component !== undefined) {
 
         finalElement = "<div class=\"a7-component " + element + elclass + "\"" + attributes + ">" + component(props) + "</div>";
-        
+
     } else {
 
         //console.log(attributes);
@@ -361,23 +378,6 @@ a7.renderNewLinks = function () {
         newLinks[i].removeAttribute("data-a7-new-link");
         newLinks[i].setAttribute("data-a7-link", "");
     }
-};
-
-a7.render = function () {
-    var final = "",
-        curVal,
-        argLen = arguments.length;
-
-    for (curVal = 0; curVal < argLen; curVal++) {
-        final += arguments[curVal];
-    }
-
-    if (final.search("onclick=\"") !== -1 | final.search("onerror=\"") !== -1 | final.search("onload=\"") !== -1 | final.search("onhover=\"") !== -1) {
-        return a7debug("a possible security vulnerability found in your application, ERROR: on[event] attributes deprecated.");
-    }
-
-    //a7store[9] is pageContainer
-    a7store[9].innerHTML = final;
 };
 
 a7.getDesc = function () {
@@ -497,7 +497,7 @@ a7.router = function (newPath) {
         return a7debug("we could not find the page which you were looking for");
     }
 
-    a7.render(routes[route]());
+    render(routes[route]());
 
     var eventListenerQueue = a7store[15];
     var evListenerLen = eventListenerQueue.length;
