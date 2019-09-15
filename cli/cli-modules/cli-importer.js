@@ -190,7 +190,7 @@ module.exports = function(sourceCode){
             }
 
             var componentOutput = componentSourceCode.replace(componentSetup, "return " + html);
-            componentOutput = componentOutput.replace(/((\"\")\s*\+\s*|(\s*\+\s*\"\"))/g, "");
+            componentOutput = componentOutput.replace(/((\'\')\s*\+\s*|(\s*\+\s*\'\'))/g, "");
             
             console.log(componentOutput);
             componentOutput = minifier(componentOutput);
@@ -221,7 +221,8 @@ module.exports = function(sourceCode){
 
             }
             var importedModule = `;(function(){` + moduleSourceCode + ` a7importBridgeAPI.` + importNameVar + `=` + exportDefaultName + `;})();var ` + importNameVar + `=a7importBridgeAPI.` + importNameVar + ";";
-            var minifiedModule = minifier(importedModule);
+            //var minifiedModule = minifier(importedModule);
+            var minifiedModule = importedModule;
             sourceCode = sourceCode.replace(Import, "/* " + importNameVar + " */" + minifiedModule);
             imports += {from:importableModule,as:importNameVar};
         });

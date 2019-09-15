@@ -111,7 +111,7 @@ var eventListeners = function (elm, attributes){
 };
 
 
-var render = void function (elem) {
+var render = function (elem) {
     
     //a7store[9] is pageContainer
     var appRoot = a7store[9];
@@ -246,24 +246,21 @@ a7.createElement = function (element, attributes) {
 
         for (curVal = 2; curVal < argLen; curVal++) {
             currentArg = arguments[curVal];
-            var textnode;
 
             //loops through the rest of the arguments
-            if(typeof currentArg === "string"){
-                
-                textnode = document.createTextNode(currentArg);
-                return rElement.appendChild(textnode);
+            if(typeof currentArg === "string" && currentArg !== ""){
+                console.log("isString");
+                rElement.innerText += currentArg;
 
             } else if (typeof currentArg === "number"){
                 
                 // instance of number
-                textnode = document.createTextNode(currentArg);
-                return rElement.appendChild(textnode);
+                rElement.innerText += currentArg;
 
             } else if (currentArg instanceof Element){
                 
                 //instance of element
-                return rElement.appendChild(currentArg);
+                rElement.appendChild(currentArg);
 
             } else {
                 //edge case
@@ -271,8 +268,6 @@ a7.createElement = function (element, attributes) {
             }
 
         }
-
-        console.log(rElement);
         return rElement;
     }
 };
@@ -285,7 +280,6 @@ a7.documentFragment = function () {
     for (i = 0; i < length; i++) {
         result.appendChild(arguments[i]);
     }
-
     return result;
 };
 
