@@ -6,6 +6,7 @@ const uglifyJS = require("uglify-js");
 const configPath = "./a7.config.json";
 const clicore = require("./cli-core");
 const cssMinifier = require("./cli-cssminifier");
+const htmlCompiler = require("./cli-htmlcompiler");
 var config;
 
 
@@ -87,12 +88,13 @@ const htmlCompressor = function(htmlsrc){
     return htmlsrc;
 };
 
-//Searches properties from stringified objects
+//Searches properties from objects in sourceCode
 function findProp (findFrom, find){
     var finder = new RegExp(find + "\s*:\s*\".+?\"", "i");
     return findFrom.match(finder)[0];
 }
 
+//splits css into non component container affecting to component container affecting ones
 const cssSplitter = function(csssrc, componentTag){
     //container RegExp
     containerRx = new RegExp(componentTag, "g");
@@ -161,47 +163,7 @@ module.exports = function(sourceCode){
 
             html = htmlCompressor(html);
             html = html.replace(/\"/g, "\'");
-            htmlApi = html.match(/\<.+?(\s|.)*?\>\<\/.+?(\s|.)*?\>/g);
-
-            if(htmlApi === null){
-                htmlApi = [];
-            }
-
-            htmlApi2 = html.match(/\<.+?(\s|.)*?\/\s*\>/g);
-
-            if(htmlApi2 !== null){
-                htmlApi = htmlApi.concat(htmlApi2);
-            }
-
-            if(htmlApi !== null){
-                htmlApi.forEach(function(val){
-                    var tagName = val.match(/[^\<\s]+/);
-                    var props = val.match(/(\@|)(\w|\d|\.)+?\=\'[^']+\'/g);
-                    var parsedProps = {};
-
-                    if(props !== null){
-                        props.forEach(function(pval){
-                            var propName = pval.match(/[^=]+/)[0];
-                            var propValue = pval.match(/[^=]+$/)[0].replace(/\'/g, "");
-
-                            if(propName.charAt(0) === "@"){
-                                propName = propName.replace("@", "");
-                                if(parsedProps.props === undefined){
-                                    parsedProps.props = {};
-                                }
-
-                                parsedProps.props[propName] = propValue;
-                            } else {
-                                parsedProps[propName] = propValue;
-                            }
-                        });
-                    }
-
-                    parsedProps = JSON.stringify(parsedProps);
-                    htmlReplacer = html.replace(val, "\"+a7.createElement(\""+tagName+"\", " + parsedProps + ")+\"");
-                    html =  htmlReplacer;
-                });
-            }
+            html = htmlCompiler(html);
             //replace literals
             templateLiterals = html.match(/{{\s*.+?\s*}}/);
 

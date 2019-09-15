@@ -12,6 +12,7 @@
     "cli/cli-modules/cli-subimporter.js",
     "cli/cli-modules/cli-devserver.js",
     "cli/cli-modules/cli-cssminifier.js",
+    "cli/cli-modules/cli-htmlcompiler.js",
     "scripts/build.js",
     "cli/project-template/defaultconfig.json",
     "cli/project-template/index.js"
