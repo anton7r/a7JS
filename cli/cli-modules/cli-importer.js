@@ -111,7 +111,7 @@ const cssSplitter = function(csssrc, componentTag){
 };
 
 module.exports = function(sourceCode){
-    sourceCode = "var imports = {};" + sourceCode;
+    sourceCode = "var a7importBridgeAPI = {};" + sourceCode;
     var containerCSS = "";
     var imports = [];
     var moduleExportEquals = /module.exports\s*=\s*(\w|\d)*;*/g;
@@ -230,7 +230,7 @@ module.exports = function(sourceCode){
             var componentOutput = componentSourceCode.replace(componentSetup, "return \""+ html +"\"");
             componentOutput = componentOutput.replace(/((\"\")\s*\+\s*|(\s*\+\s*\"\"))/g, "");
             
-            
+
             componentOutput = minifier(componentOutput);
 
             var executableComponent = "/* " + importNameVar + " */a7.registerComponent(\""+componentTag+"\"," + componentOutput + ");function "+importNameVar+"(a){return a7.createElement(\""+componentTag+"\",a)}";
@@ -258,7 +258,7 @@ module.exports = function(sourceCode){
                 exportDefaultName = moduleSourceCodeMatches[0].replace(/(module.exports\s*=\s*|;)/g, "");
 
             }
-            var importedModule = `imports.` + importNameVar + `;(function(){` + moduleSourceCode + ` imports.` + importNameVar + `=` + exportDefaultName + `})();var ` + importNameVar + `=imports.` + importNameVar + ";";
+            var importedModule = `;(function(){` + moduleSourceCode + ` a7importBridgeAPI.` + importNameVar + `=` + exportDefaultName + `;})();var ` + importNameVar + `=a7importBridgeAPI.` + importNameVar + ";";
             var minifiedModule = minifier(importedModule);
             sourceCode = sourceCode.replace(Import, "/* " + importNameVar + " */" + minifiedModule);
             imports += {from:importableModule,as:importNameVar};

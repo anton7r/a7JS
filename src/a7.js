@@ -84,7 +84,34 @@ var init = function () {
     });
 };
 
-var render = function (elem) {
+var eventListeners = function (elm, attributes){
+
+    //basic event listeners
+    if("a7onClick" in attributes){
+        elm.addEventListener("click", attributes.a7onClick(ev));
+    }
+
+    if("a7onHover" in attributes){
+        elm.addEventListener("hover", attributes.a7onHover(ev));
+    }
+
+    if("a7onInit" in attributes){
+        elm.a7onInit(rElement);
+    }
+
+    if("a7onChange" in attributes){
+        elm.addEventListener("change", attributes.a7onChange(ev));
+    }
+
+    if("a7onInput" in attributes){
+        elm.addEventListener("input", attributes.a7onInput(ev));
+    }
+
+    return elm;
+};
+
+
+var render = void function (elem) {
     
     //a7store[9] is pageContainer
     var appRoot = a7store[9];
@@ -166,8 +193,11 @@ a7.createElement = function (element, attributes) {
     var component = a7store[1][element];
 
     if (attributes === undefined | null | "null") {
-        attributes = "";
+        
+        attributes = {};
+
     } else if (attributes.props) {
+        
         props = attributes.props;
         delete attributes.props;
     }
@@ -180,27 +210,35 @@ a7.createElement = function (element, attributes) {
             props[key] = a7.sanitizer(props[key]);
         }
     }
-
+    var attr;
     //if the element is a component
     if (component !== undefined) {
         //It's a component
+        var cElement = document.createElement("div");
+        cElement.className = "a7-component " + element;
+        cElement.appendChild(component(props));
 
+        cElement = eventListeners(cElement, attributes);
+
+        for (attr in attributes){
+
+            cElement.setAttribute(attr, attributes[attr]);
+
+        }
+
+        return cElement;
+    
     } else {
         //It's a regular element
         var rElement = document.createElement(element);
+        
+        rElement = eventListeners(rElement, attributes); 
 
-        if (attributes.class !== undefined){
-            rElement.className = attributes.class;
-            delete attributes.class;
+        for (attr in attributes){
+
+            rElement.setAttribute(attr, attributes[attr]);
+
         }
-
-        if (attributes.id !== undefined){
-            rElement.id = attributes.id;
-            delete attributes.id;
-        }
-
-        //event listeners!!! here
-
 
         //children
         var curVal;
@@ -229,7 +267,7 @@ a7.createElement = function (element, attributes) {
 
             } else {
                 //edge case
-                a7debug("Error cant render "+ currentArg);
+                a7debug("cant recognize type of "+ currentArg);
             }
 
         }
@@ -239,13 +277,15 @@ a7.createElement = function (element, attributes) {
     }
 };
 
-a7.elementCollection = function () {
+a7.documentFragment = function () {
+    
     var length = arguments.length,
         i,
-        result = "";
+        result = document.createDocumentFragment();
     for (i = 0; i < length; i++) {
-        result += arguments[i];
+        result.appendChild(arguments[i]);
     }
+
     return result;
 };
 
@@ -254,11 +294,12 @@ a7.loadCSS = function(css){
 };
 
 a7.registerComponent = function (compName, compFunc) {
-    if (compName === "div" | compName === "p" | compName === "span" | compName === "h1") {
-        return a7debug("please choose a different Component name because the name " + compName + " is a htmltag name.");
-    } else if (a7store[1][compName] === undefined) {
+    if (a7store[1][compName] === undefined) {
+
         a7store[1][compName] = compFunc;
+
     } else {
+        
         a7debug("That component is already registered!");
     }
 };
