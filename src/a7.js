@@ -84,21 +84,16 @@ var init = function () {
     });
 };
 
-var render = function () {
-    var final = "",
-        curVal,
-        argLen = arguments.length;
-
-    for (curVal = 0; curVal < argLen; curVal++) {
-        final += arguments[curVal];
-    }
-
-    if (final.search("onclick=\"") !== -1 | final.search("onerror=\"") !== -1 | final.search("onload=\"") !== -1 | final.search("onhover=\"") !== -1) {
-        return a7debug("a possible security vulnerability found in your application, ERROR: on[event] attributes deprecated.");
-    }
-
+var render = function (elem) {
+    
     //a7store[9] is pageContainer
-    a7store[9].innerHTML = final;
+    var appRoot = a7store[9];
+
+    if(appRoot.children.length !== 0){
+        appRoot.removeChild(appRoot.lastChild);
+    }
+
+    appRoot.appendChild(elem);
 };
 
 //very useful 
@@ -165,11 +160,10 @@ a7.secureProps = function (mode) {
 
 //REVIEW:
 a7.createElement = function (element, attributes) {
-
+    // secure createElement
     //Replace this
     var props;
     var component = a7store[1][element];
-    var elclass = attributes.class;
 
     if (attributes === undefined | null | "null") {
         attributes = "";
@@ -177,18 +171,7 @@ a7.createElement = function (element, attributes) {
         props = attributes.props;
         delete attributes.props;
     }
-
-    if(component !== undefined){
-
-        if(elclass === undefined){
-            elclass = "";
-        } else {
-            elclass = " " + elclass;
-            delete attributes.class;
-        }
-
-    }
-
+    //Secure also attributes
     //If secure mode is enabled
     if (a7store[13] === true) {
         //sanitize props
@@ -200,21 +183,60 @@ a7.createElement = function (element, attributes) {
 
     //if the element is a component
     if (component !== undefined) {
-        //Its component
+        //It's a component
 
     } else {
-        //Its a regular element
+        //It's a regular element
+        var rElement = document.createElement(element);
+
+        if (attributes.class !== undefined){
+            rElement.className = attributes.class;
+            delete attributes.class;
+        }
+
+        if (attributes.id !== undefined){
+            rElement.id = attributes.id;
+            delete attributes.id;
+        }
+
+        //event listeners!!! here
+
+
+        //children
         var curVal;
         var argLen = arguments.length;
 
         for (curVal = 2; curVal < argLen; curVal++) {
+            currentArg = arguments[curVal];
+            var textnode;
+
             //loops through the rest of the arguments
+            if(typeof currentArg === "string"){
+                
+                textnode = document.createTextNode(currentArg);
+                return rElement.appendChild(textnode);
+
+            } else if (typeof currentArg === "number"){
+                
+                // instance of number
+                textnode = document.createTextNode(currentArg);
+                return rElement.appendChild(textnode);
+
+            } else if (currentArg instanceof Element){
+                
+                //instance of element
+                return rElement.appendChild(currentArg);
+
+            } else {
+                //edge case
+                a7debug("Error cant render "+ currentArg);
+            }
+
         }
 
-        return element;
+        console.log(rElement);
+        return rElement;
     }
-
-    return finalElement;
 };
 
 a7.elementCollection = function () {
