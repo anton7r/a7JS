@@ -111,9 +111,19 @@ ElementStarting.forEach(function(val){
     loc++;
 });
 
-if(headElements !== null&& headElements !== undefined){
+if(headElements !== null && headElements !== undefined){
+    var len = headElements.length;
+    var pos = 0;
+    var trail = ",";
     headElements.forEach(function(el){
-        compiledStringifiedArray += el + ",";
+        
+        //no trailing commas
+        if(pos === len - 1){
+            trail = "";
+        }
+
+        compiledStringifiedArray += el + trail;
+        pos++;
     });
 }
 

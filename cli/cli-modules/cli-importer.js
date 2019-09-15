@@ -170,7 +170,7 @@ module.exports = function(sourceCode){
             if(templateLiterals !== null){
                 templateLiterals.forEach(function(literal){
                     var cleanLiteral = literal.replace(/({{|}})/g, "");
-                    html = html.replace(literal, "\"+"+cleanLiteral+"+\"");
+                    html = html.replace(literal, "\'+"+cleanLiteral+"+\'");
                 });
             }
 
@@ -189,10 +189,10 @@ module.exports = function(sourceCode){
                 containerCSS += cssObject.container;
             }
 
-            var componentOutput = componentSourceCode.replace(componentSetup, "return \""+ html +"\"");
+            var componentOutput = componentSourceCode.replace(componentSetup, "return " + html);
             componentOutput = componentOutput.replace(/((\"\")\s*\+\s*|(\s*\+\s*\"\"))/g, "");
             
-
+            console.log(componentOutput);
             componentOutput = minifier(componentOutput);
 
             var executableComponent = "/* " + importNameVar + " */a7.registerComponent(\""+componentTag+"\"," + componentOutput + ");function "+importNameVar+"(a){return a7.createElement(\""+componentTag+"\",a)}";
