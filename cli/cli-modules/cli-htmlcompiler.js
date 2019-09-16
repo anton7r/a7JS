@@ -4,14 +4,36 @@ function getElTag(el){
     return el;
 }
 
-module.exports = function(html){
-console.log(html);
+
+function buildEl(el){
+
+}
+
+function returnHigherThan (arr, higherThan){
+
+    function matcher(matchCase){
+        if (matchCase > higherThan){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    var matching = arr.filter(matcher);
+    
+    return matching;
+}
+
+module.exports = function htmlCompiler(html){
+
 var htmlCopy1 = html;
 var htmlCopy2 = html;
 var htmlCopy3 = html;
 
+//Aka result
 var compiledStringifiedArray = "";
 
+//Only gets every "top level" element and then puts their children running through the compiler so that we can get them compiled efficiently
 var headElements = [];
 
 var ElementStarting = html.match(/\<[^<>/\s]+\s*[^<>]*?(?<=[^/])\>/g);
@@ -19,9 +41,6 @@ var ElementStarting = html.match(/\<[^<>/\s]+\s*[^<>]*?(?<=[^/])\>/g);
 var ElementClosing = html.match(/\<\/(\w|\d)+?\>/g);
 
 var ElementSelfClosing = html.match(/\<(\d|\w)+?(|\s|[^>]*?)\s*?\/\>/g);
-
-console.log(ElementStarting);
-console.log(ElementClosing);
 
 var indexOF = {};
 indexOF.ElementStarting = [];
@@ -89,7 +108,9 @@ if(ElementSelfClosing !== null&& ElementSelfClosing !== undefined){
 //Get topLevel Elements first
 var loc = 0; 
 var oldVAL = 0;
-ElementStarting.forEach(function(val){
+var len =  ElementStarting.length;
+var y;
+for (y = 0; y < len; y++){
     //findClosing
     var start = indexOF.ElementStarting[loc];
     var nextStart = indexOF.ElementStarting[loc + 1];
@@ -100,34 +121,52 @@ ElementStarting.forEach(function(val){
     var i;
 
     for(let x in indexOF.ElementClosing){
+        x = Number(x);
         var valx = indexOF.ElementClosing[x];
 
         //checks if nested the check is working but we dont know how to make it work
-        if(nextStart < valx)
+        if(nextStart < valx && valx > oldVAL){
             //nested TODO:
-            console.log("nested");
+            //console.log("nested");
             nested = true;
 
-        if(valx > start && valx > oldVAL){
+            var allNextStart = returnHigherThan(indexOF.ElementStarting, start);
+            var allNextClose = returnHigherThan(indexOF.ElementClosing, start);
+            var difference = allNextClose.length - allNextStart.length + 1;
+
+            var endTagLoc = indexOF.ElementClosing[x + difference];
+            
+            var innerElements = html.slice(start + ElementStarting[x].length, endTagLoc);
+            y += difference;
+            x += difference;
+            i += difference;
+
+            var ReturnElement = "a7.createElement(\'" + tagOF.ElementStarting[loc] + "\',{}," + htmlCompiler(innerElements).replace(/;$/, "") + ")";
+            headElements.push(ReturnElement);
+            break;
+
+        } else if(valx > start && valx > oldVAL){
             close = valx;
             oldVAL = valx;
             nextClose = indexOF.ElementClosing[i + 1];
             break;
         }
-        console.log(start, valx);
+        //console.log(start, valx);
         i++;
     }
 
-    console.log(indexOF.ElementClosing);
+    //console.log(indexOF.ElementClosing);
 
     var content = "";
     var el;
-
+    var val = ElementStarting[y];
 
     //checks if 
     
     //safe close
-    if(nextStart > close && nextStart !== undefined){
+    if (nextStart < close || nested === true) {
+
+    } else if(nextStart > close && nextStart !== undefined){
         
         content = html.slice(indexOF.ElementStarting[loc] + val.length, indexOF.ElementClosing[loc]);
         el = "a7.createElement(\'"+tagOF.ElementStarting[loc]+"\',{},\'"+content+"\')";    
@@ -146,8 +185,6 @@ ElementStarting.forEach(function(val){
         headElements.push(el);
     
     //nested items
-    } else if (nextStart < close) {
-
     } else {
         console.log("edge case");
     }
@@ -156,16 +193,16 @@ ElementStarting.forEach(function(val){
 
 
     loc++;
-});
+}
 
 if(headElements !== null && headElements !== undefined){
-    var len = headElements.length;
+    var len2 = headElements.length;
     var pos = 0;
     var trail = ",";
     headElements.forEach(function(el){
         
         //no trailing commas
-        if(pos === len - 1){
+        if(pos === len2 - 1){
             trail = "";
         }
 
@@ -174,9 +211,7 @@ if(headElements !== null && headElements !== undefined){
     });
 }
 
-var compiled = "a7.documentFragment("+ compiledStringifiedArray + ")";
-
-console.log(compiled);
-return compiled;
+//console.log(compiledStringifiedArray);
+return compiledStringifiedArray;
 
 };

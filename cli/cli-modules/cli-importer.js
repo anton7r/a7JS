@@ -164,6 +164,8 @@ module.exports = function(sourceCode){
             html = htmlCompressor(html);
             html = html.replace(/\"/g, "\'");
             html = htmlCompiler(html);
+            html = "a7.documentFragment(" + html + ")";
+
             //replace literals
             templateLiterals = html.match(/{{\s*.+?\s*}}/);
 
@@ -191,9 +193,7 @@ module.exports = function(sourceCode){
 
             var componentOutput = componentSourceCode.replace(componentSetup, "return " + html);
             componentOutput = componentOutput.replace(/((\'\')\s*\+\s*|(\s*\+\s*\'\'))/g, "");
-            
             componentOutput = minifier(componentOutput);
-
             var executableComponent = "/* " + importNameVar + " */a7.registerComponent(\""+componentTag+"\"," + componentOutput + ");function "+importNameVar+"(a){return a7.createElement(\""+componentTag+"\",a)}";
             sourceCode = sourceCode.replace(Import, executableComponent);
             imports += {from:importableModule,as:importNameVar};
