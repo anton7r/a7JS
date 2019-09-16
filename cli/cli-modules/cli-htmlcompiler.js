@@ -80,10 +80,6 @@ if(ElementSelfClosing !== null&& ElementSelfClosing !== undefined){
     });
 }
 
-console.log(tagOF.ElementStarting);
-console.log(tagOF.ElementClosing);
-console.log(lastIndexOF.ElementStarting);
-console.log(lastIndexOF.ElementClosing);
 //console.log(ElementStarting);
 //console.log(ElementSelfClosing);
 //console.log(ElementClosing);
@@ -92,17 +88,68 @@ console.log(lastIndexOF.ElementClosing);
 //building algo
 //Get topLevel Elements first
 var loc = 0; 
+var oldVAL = 0;
 ElementStarting.forEach(function(val){
     //findClosing
+    var start = indexOF.ElementStarting[loc];
     var nextStart = indexOF.ElementStarting[loc + 1];
-    var close = indexOF.ElementClosing[loc];
+    //closing needs to be different
+    var close;
+    var nextClose;
+    var nested = false;
+    var i;
+
+    for(let x in indexOF.ElementClosing){
+        var valx = indexOF.ElementClosing[x];
+
+        //checks if nested the check is working but we dont know how to make it work
+        if(nextStart < valx)
+            //nested TODO:
+            console.log("nested");
+            nested = true;
+
+        if(valx > start && valx > oldVAL){
+            close = valx;
+            oldVAL = valx;
+            nextClose = indexOF.ElementClosing[i + 1];
+            break;
+        }
+        console.log(start, valx);
+        i++;
+    }
+
+    console.log(indexOF.ElementClosing);
+
     var content = "";
     var el;
+
+
+    //checks if 
+    
     //safe close
-    if(nextStart > close | nextStart === undefined){
+    if(nextStart > close && nextStart !== undefined){
+        
         content = html.slice(indexOF.ElementStarting[loc] + val.length, indexOF.ElementClosing[loc]);
         el = "a7.createElement(\'"+tagOF.ElementStarting[loc]+"\',{},\'"+content+"\')";    
         headElements.push(el);
+
+    } else if (start < close && nextStart > close){
+
+        content = html.slice(indexOF.ElementStarting[loc] + val.length, indexOF.ElementClosing[loc]);
+        el = "a7.createElement(\'"+tagOF.ElementStarting[loc]+"\',{},\'"+content+"\')";    
+        headElements.push(el);
+    
+    } else if (nextStart === undefined && nextClose === undefined){
+
+        content = html.slice(indexOF.ElementStarting[loc] + val.length, indexOF.ElementClosing[loc]);
+        el = "a7.createElement(\'"+tagOF.ElementStarting[loc]+"\',{},\'"+content+"\')";    
+        headElements.push(el);
+    
+    //nested items
+    } else if (nextStart < close) {
+
+    } else {
+        console.log("edge case");
     }
     
     

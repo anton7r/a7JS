@@ -192,7 +192,6 @@ module.exports = function(sourceCode){
             var componentOutput = componentSourceCode.replace(componentSetup, "return " + html);
             componentOutput = componentOutput.replace(/((\'\')\s*\+\s*|(\s*\+\s*\'\'))/g, "");
             
-            console.log(componentOutput);
             componentOutput = minifier(componentOutput);
 
             var executableComponent = "/* " + importNameVar + " */a7.registerComponent(\""+componentTag+"\"," + componentOutput + ");function "+importNameVar+"(a){return a7.createElement(\""+componentTag+"\",a)}";
