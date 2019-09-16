@@ -88,11 +88,11 @@ var eventListeners = function (elm, attributes){
 
     //basic event listeners
     if("a7onClick" in attributes){
-        elm.addEventListener("click", attributes.a7onClick(ev));
+        elm.addEventListener("click", attributes.a7onClick);
     }
 
     if("a7onHover" in attributes){
-        elm.addEventListener("hover", attributes.a7onHover(ev));
+        elm.addEventListener("hover", attributes.a7onHover);
     }
 
     if("a7onInit" in attributes){
@@ -100,11 +100,11 @@ var eventListeners = function (elm, attributes){
     }
 
     if("a7onChange" in attributes){
-        elm.addEventListener("change", attributes.a7onChange(ev));
+        elm.addEventListener("change", attributes.a7onChange);
     }
 
     if("a7onInput" in attributes){
-        elm.addEventListener("input", attributes.a7onInput(ev));
+        elm.addEventListener("input", attributes.a7onInput);
     }
 
     return elm;

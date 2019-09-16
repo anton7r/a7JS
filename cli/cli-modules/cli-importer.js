@@ -165,7 +165,6 @@ module.exports = function(sourceCode){
             html = html.replace(/\"/g, "\'");
             html = htmlCompiler(html);
             html = "a7.documentFragment(" + html + ")";
-
             //replace literals
             templateLiterals = html.match(/{{\s*.+?\s*}}/);
 

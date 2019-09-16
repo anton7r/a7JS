@@ -5,8 +5,54 @@ function getElTag(el){
 }
 
 
-function buildEl(el){
+function buildEl(tag, src, content){
+    var attributes = {};
+    var srcAttr = src.match(/(\@|)(\w|\d|\.)+?\=\'[^']+\'/g);
+    
+    if(srcAttr !== null){
+        srcAttr.forEach(function(val){
+            var attrName = val.match(/[^=]+/)[0];
+            var attrValue = val.match(/[^=]+$/)[0].replace(/\'/g, "");
+            
+            //is not a property
+            if(attrName.indexOf("@") !== 0){
 
+                if(attrName.indexOf("a7on") === 0){
+                    attrValue = attrValue.replace("()", "");
+                }
+
+                attributes[attrName] = attrValue;
+
+            } else {
+
+                if(attributes.props === undefined){
+                    attributes.props = {};
+                }
+
+                var attrRName = attrName.replace("@", "");
+
+                attributes.props[attrRName] = attrValue;
+
+            }
+
+        });
+    }
+
+    attributes = JSON.stringify(attributes);
+
+    var EvListener = attributes.match(/\"a7on\w*\":\"[\w|\d\_]*\"/i);
+
+    if(EvListener !== null){
+        EvListener.forEach(function(val){
+
+            //attributes = attributes.replace(...)
+        console.log(EvListener);
+       
+        });
+    }
+
+
+    return "a7.createElement(\'"+tag+"\',"+attributes+","+content+")";
 }
 
 function returnHigherThan (arr, higherThan){
@@ -126,22 +172,17 @@ for (y = 0; y < len; y++){
 
         //checks if nested the check is working but we dont know how to make it work
         if(nextStart < valx && valx > oldVAL){
-            //nested TODO:
-            //console.log("nested");
             nested = true;
-
             var allNextStart = returnHigherThan(indexOF.ElementStarting, start);
             var allNextClose = returnHigherThan(indexOF.ElementClosing, start);
             var difference = allNextClose.length - allNextStart.length + 1;
-
             var endTagLoc = indexOF.ElementClosing[x + difference];
-            
             var innerElements = html.slice(start + ElementStarting[x].length, endTagLoc);
             y += difference;
             x += difference;
             i += difference;
 
-            var ReturnElement = "a7.createElement(\'" + tagOF.ElementStarting[loc] + "\',{}," + htmlCompiler(innerElements).replace(/;$/, "") + ")";
+            var ReturnElement = buildEl(tagOF.ElementStarting[loc],ElementStarting[loc],htmlCompiler(innerElements).replace(/;$/, ""));
             headElements.push(ReturnElement);
             break;
 
@@ -169,36 +210,34 @@ for (y = 0; y < len; y++){
     } else if(nextStart > close && nextStart !== undefined){
         
         content = html.slice(indexOF.ElementStarting[loc] + val.length, indexOF.ElementClosing[loc]);
-        el = "a7.createElement(\'"+tagOF.ElementStarting[loc]+"\',{},\'"+content+"\')";    
+        el = buildEl(tagOF.ElementStarting[loc],ElementStarting[loc],"\'" + content + "\'");
         headElements.push(el);
 
     } else if (start < close && nextStart > close){
 
         content = html.slice(indexOF.ElementStarting[loc] + val.length, indexOF.ElementClosing[loc]);
-        el = "a7.createElement(\'"+tagOF.ElementStarting[loc]+"\',{},\'"+content+"\')";    
+        el = buildEl(tagOF.ElementStarting[loc],ElementStarting[loc],"\'" + content + "\'");
         headElements.push(el);
     
     } else if (nextStart === undefined && nextClose === undefined){
 
         content = html.slice(indexOF.ElementStarting[loc] + val.length, indexOF.ElementClosing[loc]);
-        el = "a7.createElement(\'"+tagOF.ElementStarting[loc]+"\',{},\'"+content+"\')";    
+        el = buildEl(tagOF.ElementStarting[loc],ElementStarting[loc],"\'" + content + "\'");
         headElements.push(el);
     
-    //nested items
     } else {
         console.log("edge case");
     }
     
-    
-
-
     loc++;
 }
 
 if(headElements !== null && headElements !== undefined){
+
     var len2 = headElements.length;
     var pos = 0;
     var trail = ",";
+
     headElements.forEach(function(el){
         
         //no trailing commas
@@ -211,7 +250,6 @@ if(headElements !== null && headElements !== undefined){
     });
 }
 
-//console.log(compiledStringifiedArray);
 return compiledStringifiedArray;
 
 };
