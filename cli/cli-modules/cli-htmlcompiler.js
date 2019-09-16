@@ -45,12 +45,13 @@ function buildEl(tag, src, content){
     if(EvListener !== null){
         EvListener.forEach(function(val){
 
-            //attributes = attributes.replace(...)
-        console.log(EvListener);
+            var event = val.match(/\".+?\"/);
+            var listener = val.match(/\:\".+?\"/)[0].replace(/\"/g, "");
+
+            attributes = attributes.replace(val, event + listener);
        
         });
     }
-
 
     return "a7.createElement(\'"+tag+"\',"+attributes+","+content+")";
 }

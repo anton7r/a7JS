@@ -249,7 +249,7 @@ a7.createElement = function (element, attributes) {
 
             //loops through the rest of the arguments
             if(typeof currentArg === "string" && currentArg !== ""){
-                console.log("isString");
+                
                 rElement.innerText += currentArg;
 
             } else if (typeof currentArg === "number"){
@@ -449,9 +449,8 @@ a7.router = function (newPath) {
     } else {
         return a7debug("we could not find the page which you were looking for");
     }
-
+    
     render(routes[route]());
-
     a7store[15] = [];
     a7.path(newPath);
     scrollTo(0, pageXOffset);
