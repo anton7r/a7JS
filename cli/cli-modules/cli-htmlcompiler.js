@@ -177,6 +177,8 @@ for (y = 0; y < len; y++){
             var allNextStart = returnHigherThan(indexOF.ElementStarting, start);
             var allNextClose = returnHigherThan(indexOF.ElementClosing, start);
             var difference = (allNextClose.length - allNextStart.length) + 1;
+
+            //needs rewriting 
             var endTagLoc = indexOF.ElementClosing[x + difference];
 
             if(endTagLoc === undefined){
