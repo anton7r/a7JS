@@ -278,7 +278,17 @@ a7.documentFragment = function () {
         i,
         result = document.createDocumentFragment();
     for (i = 0; i < length; i++) {
-        result.appendChild(arguments[i]);
+        
+        if(typeof arguments[i] === "string"){
+
+            result.appendChild(document.createTextNode(arguments[i]));
+
+        } else {
+
+            result.appendChild(arguments[i]);
+
+        }
+
     }
     return result;
 };

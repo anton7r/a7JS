@@ -176,9 +176,16 @@ for (y = 0; y < len; y++){
             nested = true;
             var allNextStart = returnHigherThan(indexOF.ElementStarting, start);
             var allNextClose = returnHigherThan(indexOF.ElementClosing, start);
-            var difference = allNextClose.length - allNextStart.length + 1;
+            var difference = (allNextClose.length - allNextStart.length) + 1;
             var endTagLoc = indexOF.ElementClosing[x + difference];
+            console.log(endTagLoc);
+
+            if(endTagLoc === undefined){
+                endTagLoc = indexOF.ElementClosing[x] + ElementClosing[x].length;
+            }
+            console.log(endTagLoc);
             var innerElements = html.slice(start + ElementStarting[x].length, endTagLoc);
+            console.log(innerElements);
             y += difference;
             x += difference;
             i += difference;
@@ -229,11 +236,17 @@ for (y = 0; y < len; y++){
         el = buildEl(tagOF.ElementStarting[loc],ElementStarting[loc],"\'" + content + "\'");
         headElements.push(el);
     
+    
+    //at the end
     } else if (nextStart === undefined && nextClose === undefined){
+        var icl = indexOF.ElementClosing[loc];
+        var clEl = ElementClosing[loc].length;
+        var htmlLast = html.length;
 
-        content = html.slice(indexOF.ElementStarting[loc] + val.length, indexOF.ElementClosing[loc]);
+        text = html.slice(icl + clEl, htmlLast);
+        content = html.slice(indexOF.ElementStarting[loc] + val.length, icl);
         el = buildEl(tagOF.ElementStarting[loc],ElementStarting[loc],"\'" + content + "\'");
-        headElements.push(el);
+        headElements.push("\"" + text + "\"", el);
     
     } else {
         console.log("edge case");
