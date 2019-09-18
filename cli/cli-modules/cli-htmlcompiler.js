@@ -198,15 +198,24 @@ for (y = 0; y < len; y++){
     }
 
     //console.log(indexOF.ElementClosing);
-
+    var text = "";
     var content = "";
     var el;
     var val = ElementStarting[y];
+    
+    
+    //does nothing because it is nested
+    if (nextStart < close || nested === true) {
 
     //checks if 
     
     //safe close
-    if (nextStart < close || nested === true) {
+    } else if(indexOF.ElementStarting[loc] !== 0 && loc === 0){
+        
+        text = html.slice(0, indexOF.ElementStarting[loc]);        
+        content = html.slice(indexOF.ElementStarting[loc] + val.length, indexOF.ElementClosing[loc]);
+        el = buildEl(tagOF.ElementStarting[loc],ElementStarting[loc],"\'" + content + "\'");
+        headElements.push("\"" + text + "\"", el);
 
     } else if(nextStart > close && nextStart !== undefined){
         
