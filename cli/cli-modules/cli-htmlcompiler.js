@@ -178,14 +178,13 @@ for (y = 0; y < len; y++){
             var allNextClose = returnHigherThan(indexOF.ElementClosing, start);
             var difference = (allNextClose.length - allNextStart.length) + 1;
             var endTagLoc = indexOF.ElementClosing[x + difference];
-            console.log(endTagLoc);
 
             if(endTagLoc === undefined){
                 endTagLoc = indexOF.ElementClosing[x] + ElementClosing[x].length;
             }
-            console.log(endTagLoc);
+
             var innerElements = html.slice(start + ElementStarting[x].length, endTagLoc);
-            console.log(innerElements);
+
             y += difference;
             x += difference;
             i += difference;
