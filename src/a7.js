@@ -84,99 +84,43 @@ var init = function () {
     });
 };
 
-var render = function () {
-    var final = "",
-        curVal,
-        argLen = arguments.length;
+var eventListeners = function (elm, attributes){
 
-    for (curVal = 0; curVal < argLen; curVal++) {
-        final += arguments[curVal];
+    //basic event listeners
+    if("a7onClick" in attributes){
+        elm.addEventListener("click", attributes.a7onClick);
     }
 
-    if (final.search("onclick=\"") !== -1 | final.search("onerror=\"") !== -1 | final.search("onload=\"") !== -1 | final.search("onhover=\"") !== -1) {
-        return a7debug("a possible security vulnerability found in your application, ERROR: on[event] attributes deprecated.");
+    if("a7onHover" in attributes){
+        elm.addEventListener("hover", attributes.a7onHover);
     }
 
-    //a7store[9] is pageContainer
-    a7store[9].innerHTML = final;
+    if("a7onInit" in attributes){
+        elm.a7onInit(rElement);
+    }
+
+    if("a7onChange" in attributes){
+        elm.addEventListener("change", attributes.a7onChange);
+    }
+
+    if("a7onInput" in attributes){
+        elm.addEventListener("input", attributes.a7onInput);
+    }
+
+    return elm;
 };
 
 
-//REVIEW: Remake it to use RegExp
-var objectToAttributes = function (obj) {
-    obj = JSON.stringify(obj);
-    var lenght = obj.length,
-        quoteLocations = [],
-        equalLocations = [],
-        curVal;
-    for (curVal = 0; curVal < lenght; curVal++) {
-        var curChar = obj.charAt(curVal);
-        if (curChar === "\"") {
+var render = function (elem) {
+    
+    //a7store[9] is pageContainer
+    var appRoot = a7store[9];
 
-            quoteLocations.push(curVal);
-        } else if (curChar === ":") {
-
-            equalLocations.push(curVal);
-        }
+    if(appRoot.children.length !== 0){
+        appRoot.removeChild(appRoot.lastChild);
     }
 
-    //checks if ":" is inside a string
-    var eqLen = equalLocations.length;
-
-    for (curVal = 0; curVal < eqLen; curVal++) {
-        var resolv = true,
-            charPosition = equalLocations[curVal],
-            char = obj.charAt(charPosition - 1),
-            nextChar = obj.charAt(charPosition - 2);
-        while (resolv) {
-            //console.log("checkerCharPos:", charPosition - 1);
-
-            if (char === "\"" & nextChar === ":" | char === "\"" & nextChar === "=") {
-                //We dont want to replace this
-                //console.log(":");
-                resolv = false;
-            } else if (char === "\"" & nextChar !== ":") {
-                //Replace char
-                //console.log("=");
-                obj = a7.replaceCharAt(obj, charPosition, "=");
-                resolv = false;
-            }
-            //fail safe for infite loops and check for the first
-            else if (charPosition === 1) {
-                //it appears that this is the first ":" so we want to replace it!
-                //console.log("=");
-                obj = a7.replaceCharAt(obj, charPosition, "=");
-                resolv = false;
-            } else {
-                charPosition -= 1;
-            }
-        }
-    }
-
-    var displacement = 0,
-        quLen = quoteLocations.length;
-    for (curVal = 0; curVal < quLen; curVal++) {
-        var val = quoteLocations[curVal];
-        //console.log(curVal, obj.charAt(val + 1 - displacement));
-        if (obj.charAt(val + 1 - displacement) === "=") {
-            var start = quoteLocations[curVal - 1] + 1 - displacement;
-            var AttrName = obj.slice(start, val - displacement);
-            /*
-            console.log("AttrName:",AttrName);
-            //*/
-            obj = obj.replace("\"" + AttrName + "\"", AttrName);
-            displacement += 2;
-        }
-    }
-
-    obj = obj.replace(/({|})/g, "").replace(/,/g, " ");
-    //console.log(finalAttributes);
-
-    if (obj === "\"\"") {
-        obj = "";
-    }
-
-    return obj;
+    appRoot.appendChild(elem);
 };
 
 //very useful 
@@ -241,36 +185,23 @@ a7.secureProps = function (mode) {
     }
 };
 
+//REVIEW:
 a7.createElement = function (element, attributes) {
-    var finalElement,
-        props;
+    // secure createElement
+    //Replace this
+    var props;
+    var component = a7store[1][element];
 
     if (attributes === undefined | null | "null") {
-        attributes = "";
+        
+        attributes = {};
+
     } else if (attributes.props) {
+        
         props = attributes.props;
         delete attributes.props;
     }
-    var component = a7store[1][element];
-    var elclass = attributes.class;
-
-    if(component !== undefined){
-
-        if(elclass === undefined){
-            elclass = "";
-        } else {
-            elclass = " " + elclass;
-            delete attributes.class;
-        }
-
-    }
-
-    attributes = objectToAttributes(attributes);
-    
-    if(attributes !== ""){
-        attributes = " " + attributes;
-    }
-
+    //Secure also attributes
     //If secure mode is enabled
     if (a7store[13] === true) {
         //sanitize props
@@ -279,41 +210,85 @@ a7.createElement = function (element, attributes) {
             props[key] = a7.sanitizer(props[key]);
         }
     }
-
+    var attr;
     //if the element is a component
     if (component !== undefined) {
+        //It's a component
+        var cElement = document.createElement("div");
+        cElement.className = "a7-component " + element;
+        cElement.appendChild(component(props));
 
-        finalElement = "<div class=\"a7-component " + element + elclass + "\"" + attributes + ">" + component(props) + "</div>";
+        cElement = eventListeners(cElement, attributes);
 
+        for (attr in attributes){
+
+            cElement.setAttribute(attr, attributes[attr]);
+
+        }
+
+        return cElement;
+    
     } else {
+        //It's a regular element
+        var rElement = document.createElement(element);
+        
+        rElement = eventListeners(rElement, attributes); 
 
-        //console.log(attributes);
-        //Join content
-        var contentArray = [];
+        for (attr in attributes){
+
+            rElement.setAttribute(attr, attributes[attr]);
+
+        }
+
+        //children
         var curVal;
         var argLen = arguments.length;
 
         for (curVal = 2; curVal < argLen; curVal++) {
-            contentArray.push(arguments[curVal]);
+            currentArg = arguments[curVal];
+
+            //loops through the rest of the arguments
+            if(typeof currentArg === "string" && currentArg !== ""){
+                
+                rElement.innerText += currentArg;
+
+            } else if (typeof currentArg === "number"){
+                
+                // instance of number
+                rElement.innerText += currentArg;
+
+            } else if (currentArg instanceof Element){
+                
+                //instance of element
+                rElement.appendChild(currentArg);
+
+            } else {
+                //edge case
+                a7debug("cant recognize type of "+ currentArg);
+            }
+
         }
-
-        content = contentArray.join("");
-        //debugger!! comment it when it is not needed
-        /*
-        console.log("Content:",content);
-        */
-        finalElement = "<" + element + " " + attributes + ">" + content + "</" + element + ">";
+        return rElement;
     }
-
-    return finalElement;
 };
 
-a7.elementCollection = function () {
+a7.documentFragment = function () {
+    
     var length = arguments.length,
         i,
-        result = "";
+        result = document.createDocumentFragment();
     for (i = 0; i < length; i++) {
-        result += arguments[i];
+        
+        if(typeof arguments[i] === "string"){
+
+            result.appendChild(document.createTextNode(arguments[i]));
+
+        } else {
+
+            result.appendChild(arguments[i]);
+
+        }
+
     }
     return result;
 };
@@ -323,11 +298,12 @@ a7.loadCSS = function(css){
 };
 
 a7.registerComponent = function (compName, compFunc) {
-    if (compName === "div" | compName === "p" | compName === "span" | compName === "h1") {
-        return a7debug("please choose a different Component name because the name " + compName + " is a htmltag name.");
-    } else if (a7store[1][compName] === undefined) {
+    if (a7store[1][compName] === undefined) {
+
         a7store[1][compName] = compFunc;
+
     } else {
+        
         a7debug("That component is already registered!");
     }
 };
@@ -483,9 +459,8 @@ a7.router = function (newPath) {
     } else {
         return a7debug("we could not find the page which you were looking for");
     }
-
+    
     render(routes[route]());
-
     a7store[15] = [];
     a7.path(newPath);
     scrollTo(0, pageXOffset);
