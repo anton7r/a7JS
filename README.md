@@ -1,12 +1,12 @@
 
 # a7JS
 
-![a7JS](./designs/banner.svg)
+![a7JS](./designs/banner.png)
 
 ![build passing](https://img.shields.io/badge/build-passing-success)
-![latest version](https://img.shields.io/badge/Latest%20version-v4.0.0alpha.9-green)
+![latest version](https://img.shields.io/badge/Latest%20version-v4.0.0alpha.9-blue)
 ![size](https://img.shields.io/badge/Size-3kb-success)
-![v4 status](https://img.shields.io/badge/v4%20status-in%20Development-yellow)
+![v4 status](https://img.shields.io/badge/v4%20status-in%20Development-green)
 
 🔥 A lot of power in a small package.
 
@@ -53,11 +53,15 @@ Most of the commonly used libraries / frameworks are really large and also packs
 
 a7JS focuses on the stuff that would be really hard to make from scratch.
 
+If there is something that you feel like we could add make an feature request. We aprove those which would benefit us all!
+
 And it has 0 dependencies on the code that runs at the front end and also it is fully es5.
 
 The dependencies that it has are for the cli and other useful tools.
 
 # Code examples and Documentation
+
+Outdated....
 
 For documentation and code examples please visit our [Wiki](https://github.com/anton7r/a7JS/wiki)
 
