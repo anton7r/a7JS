@@ -85,7 +85,9 @@ var init = function () {
 };
 
 var eventListeners = function (elm, attributes){
-
+    if(typeof attributes === "number"){
+        return elm;
+    }
     //basic event listeners
     if("a7onClick" in attributes){
         elm.addEventListener("click", attributes.a7onClick);
@@ -192,7 +194,7 @@ a7.createElement = function (element, attributes) {
     var props;
     var component = a7store[1][element];
 
-    if (attributes === undefined | null | "null") {
+    if (attributes === undefined | null | "null" | 0) {
         
         attributes = {};
 
