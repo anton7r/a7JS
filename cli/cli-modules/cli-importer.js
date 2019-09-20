@@ -211,6 +211,10 @@ module.exports = function(sourceCode){
                 clicore.errorLog("Module " + importNameVar +" has its own imports which we cannot right now import with our detections!");
             }
 
+            if(config.mode === "production"){
+                moduleSourceCode = minifier(moduleSourceCode);
+            }
+
             var exportDefaultName = "";
             var moduleSourceCodeMatches = moduleSourceCode.match(moduleExportEquals);
             if(moduleSourceCodeMatches !== null){
@@ -219,8 +223,14 @@ module.exports = function(sourceCode){
 
             }
             var importedModule = `;(function(){` + moduleSourceCode + ` a7importBridgeAPI.` + importNameVar + `=` + exportDefaultName + `;})();var ` + importNameVar + `=a7importBridgeAPI.` + importNameVar + ";";
-            //var minifiedModule = minifier(importedModule);
-            var minifiedModule = importedModule;
+            var minifiedModule;
+            
+            if(config.mode === "production"){
+                minifiedModule = minifier(importedModule);
+            } else {
+                minifiedModule = importedModule;
+            }
+
             sourceCode = sourceCode.replace(Import, "/* " + importNameVar + " */" + minifiedModule);
             imports += {from:importableModule,as:importNameVar};
         });

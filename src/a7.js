@@ -89,23 +89,23 @@ var eventListeners = function (elm, attributes){
         return elm;
     }
     //basic event listeners
-    if("a7onClick" in attributes){
+    if(attributes.a7onClick){
         elm.addEventListener("click", attributes.a7onClick);
     }
 
-    if("a7onHover" in attributes){
+    if(attributes.a7onHover){
         elm.addEventListener("hover", attributes.a7onHover);
     }
 
-    if("a7onInit" in attributes){
+    if(attributes.a7onInit){
         elm.a7onInit(rElement);
     }
 
-    if("a7onChange" in attributes){
+    if(attributes.a7onChange){
         elm.addEventListener("change", attributes.a7onChange);
     }
 
-    if("a7onInput" in attributes){
+    if(attributes.a7onInput){
         elm.addEventListener("input", attributes.a7onInput);
     }
 
@@ -146,8 +146,8 @@ a7store = [
     "v4-pre", //Version       0
     {}, //ComponentList       1
     {}, //Menus               2
-    [], //Empty               3
-    {}, //Empty               4
+    {}, //Observables         3
+    {}, //Observable liste... 4
     {}, //onMenuToggleList    5
     [], //descriptionElements 6
     {}, //cacheMatch          7
@@ -272,6 +272,70 @@ a7.createElement = function (element, attributes) {
         }
         return rElement;
     }
+};
+
+a7.observable = function (){
+    
+    var listeners = [];
+    
+    var set = function (newValue){
+        this.value = newValue;
+        
+        if(listeners !== undefined){
+            var listLen = listeners.length;
+            
+            for(var i = 0; i < listLen; i++){
+                listeners[i]();
+            }
+        }
+
+        return newValue;
+    };
+
+    var addListener = function (Listener){
+        listeners.push(Listener);
+    };
+
+    this.set = set;
+    this.addListener = addListener;
+    this.listeners = listeners;
+
+    return this;
+};
+
+a7.globalObservable = function (ObservalbeName) {
+    var observable = a7store[3][ObservalbeName];
+    var listeners = a7store[4][ObservalbeName];
+
+    if(observable === undefined){
+        observable = "";
+        a7store[4][ObservalbeName] = [];
+    }
+
+    //methods of observable
+    var __ = {};
+
+    __.set = function(NewValue){
+        a7store[3][ObservalbeName] = NewValue;
+        if(listeners !== undefined){
+            for(var i = 0; i < listeners.length; i++){
+                listeners[i]();
+            }
+
+        }
+        return NewValue;
+    };
+
+    __.addListener = function(Listener){
+        a7store[4][ObservalbeName].push(Listener);
+
+    };
+
+    __.listeners = listeners;
+
+    __.value = observable;
+
+    return __;
 };
 
 a7.documentFragment = function () {
@@ -461,7 +525,6 @@ a7.router = function (newPath) {
     } else {
         return a7debug("we could not find the page which you were looking for");
     }
-    
     render(routes[route]());
     a7store[15] = [];
     a7.path(newPath);
