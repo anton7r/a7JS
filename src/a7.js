@@ -523,7 +523,6 @@ a7.router = function (newPath) {
         for (i = 0; i < links.length; i++) {
 
             if(links[i].getAttribute("a7link") === ""){
-                console.log(links);
                 linkHandler(links[i]);
             }
         }
