@@ -52,8 +52,8 @@ var init = function () {
     var linkcollection = document.getElementsByTagName("a");
 
     for (var y = 0; y < linkcollection.length; y++) {
-        if (linkcollection[y].dataset.a7link !== undefined | linkcollection[y].getAttribute("a7-link") !== null) {
-            a7.linkHandler(linkcollection[y]);
+        if (linkcollection[y].dataset.a7link !== undefined | linkcollection[y].getAttribute("a7link") !== null) {
+            linkHandler(linkcollection[y]);
         }
     }
 
@@ -81,6 +81,15 @@ var init = function () {
 
     window.addEventListener("popstate", function () {
         a7.router(a7.path());
+    });
+};
+
+var linkHandler = function (link) {
+    console.log(link);
+    link.addEventListener("click", function (ev) {
+        //console.log(link);
+        ev.preventDefault();
+        a7.router(link.getAttribute("href"));
     });
 };
 
@@ -400,27 +409,6 @@ a7.replaceCharAt = function (str, index, repWith) {
     return str.substring(0, index) + repWith + str.substring(index + 1, str.length);
 };
 
-//TODO: Deprecate or move out of api
-a7.linkHandler = function (link) {
-    link.addEventListener("click", function (ev) {
-        //console.log(link);
-        ev.preventDefault();
-        a7.router(link.getAttribute("href"));
-    });
-};
-
-
-//REVIEW: Embed into router
-a7.renderNewLinks = function () {
-    var newLinks = document.querySelectorAll("[data-a7-new-link]"),
-        i;
-    for (i = 0; i < newLinks.length; i++) {
-        a7.linkHandler(newLinks[i]);
-        newLinks[i].removeAttribute("data-a7-new-link");
-        newLinks[i].setAttribute("data-a7-link", "");
-    }
-};
-
 a7.getDesc = function () {
     return a7store[6][0];
 };
@@ -525,9 +513,26 @@ a7.router = function (newPath) {
     } else {
         return a7debug("we could not find the page which you were looking for");
     }
-    render(routes[route]());
+
+    var renderable = routes[route]();
+
+    var i;
+    var links = renderable.getElementsByTagName("a");
+    
+    if(links !== null){
+        for (i = 0; i < links.length; i++) {
+
+            if(links[i].getAttribute("a7link") === ""){
+                console.log(links);
+                linkHandler(links[i]);
+            }
+        }
+    }
+
+    render(renderable);
     a7store[15] = [];
     a7.path(newPath);
+
     scrollTo(0, pageXOffset);
 };
 /* outfacing api end */

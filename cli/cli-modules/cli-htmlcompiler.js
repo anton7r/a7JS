@@ -38,6 +38,11 @@ function buildEl(tag, src, content){
         }
     
     }
+
+    if (src.match("a7link") !== undefined){
+        attributes.a7link = "";
+    }
+
     attributes = JSON.stringify(attributes);
 
     var EvListener = attributes.match(/\"a7on\w*\":\"[\w|\d\_]*\"/i);
