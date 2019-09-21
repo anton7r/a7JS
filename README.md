@@ -4,7 +4,7 @@
 ![a7JS](./designs/banner.png)
 
 ![build passing](https://img.shields.io/badge/build-passing-success)
-![latest version](https://img.shields.io/badge/Latest%20version-v4.0.0beta.2-blue)
+![latest version](https://img.shields.io/badge/Latest%20version-v4.0.0beta.3-blue)
 ![size](https://img.shields.io/badge/Size-3kb-success)
 ![v4 status](https://img.shields.io/badge/v4%20status-in%20Development-green)
 
