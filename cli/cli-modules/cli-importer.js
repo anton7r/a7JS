@@ -7,6 +7,7 @@ const configPath = "./a7.config.json";
 const clicore = require("./cli-core");
 const cssMinifier = require("./cli-cssminifier");
 const htmlCompiler = require("./cli-htmlcompiler");
+const csso = require("csso");
 var config;
 
 
@@ -120,7 +121,12 @@ module.exports = function(sourceCode){
         var cssFile = config.css.file;
 
         if(fs.existsSync(cssFile) === true){
-            CSSBundle += fs.readFileSync(cssFile, "utf-8");
+            var mainCSS = fs.readFileSync(cssFile, "utf-8");
+            mainCSS = csso.minify(mainCSS, {
+                filename:cssFile
+            });
+
+            CSSBundle += mainCSS;
             
         }
     }
