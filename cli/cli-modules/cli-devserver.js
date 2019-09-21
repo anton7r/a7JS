@@ -5,6 +5,7 @@ const log = console.log;
 const fs = require("fs");
 const clicore = require("./cli-core.js");
 const uinput = process.stdin;
+const zlib = require("zlib");
 
 const configPath = "./a7.config.json";
 var config;

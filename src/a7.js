@@ -403,12 +403,6 @@ a7.sanitizer = function (content) {
     return result;
 };
 
-
-//TODO: Deprecate or move out of api
-a7.replaceCharAt = function (str, index, repWith) {
-    return str.substring(0, index) + repWith + str.substring(index + 1, str.length);
-};
-
 a7.getDesc = function () {
     return a7store[6][0];
 };
