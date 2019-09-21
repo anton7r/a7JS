@@ -16,6 +16,35 @@ if(fs.existsSync(configPath)){
     config = {entry:"./app/index.js", output:"./appbuild.js"};
 }
 
+const isFile = function(path){
+    
+    if(fs.existsSync(path) === false){
+
+        return false;
+
+    }
+
+
+    var stats = fs.statSync(path);
+
+    if(stats){
+
+        if(stats.isFile() === true){
+
+            return true;
+
+        } else {
+
+            return false;
+            
+        }
+
+    } else{
+
+        return false;
+    }
+};
+
 const build = require("./cli-build");
 
 const os = require("os").type();
@@ -37,11 +66,13 @@ const resolveFile = function(url){
         url.replace("/", "");
     }
 
+    console.log(isFile("./"+url));
+
     if(url === "/"){
 
         return {code: fs.readFileSync("./index.html", "utf-8"), type: "text/html"};
 
-    } else if (fs.existsSync("./"+url) === true){
+    } else if (isFile("./"+url) === true){
 
         var file = fs.readFileSync("./"+url, "utf-8");
         var rawType = url.match(/\..+/g)[0];
@@ -54,7 +85,7 @@ const resolveFile = function(url){
         } else {
             type = "text/plain";
         }
-        
+
         return {code: file, type: type};
     } else {
         return {code: fs.readFileSync("./index.html", "utf-8"), type: "text/html"};
