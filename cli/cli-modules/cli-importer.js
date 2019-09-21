@@ -114,7 +114,17 @@ const cssSplitter = function(csssrc, componentTag){
 
 module.exports = function(sourceCode){
     sourceCode = "var a7importBridgeAPI = {};" + sourceCode;
-    var containerCSS = "";
+    var CSSBundle = "";
+
+    if(config.css.bundle === true && config.css.file !== undefined){
+        var cssFile = config.css.file;
+
+        if(fs.existsSync(cssFile) === true){
+            CSSBundle += fs.readFileSync(cssFile, "utf-8");
+            
+        }
+    }
+
     var imports = [];
     var moduleExportEquals = /module.exports\s*=\s*(\w|\d)*;*/g;
 
@@ -182,12 +192,12 @@ module.exports = function(sourceCode){
 
             if(cssRules !== null){
                 cssRules.forEach(function (rule){
-                    containerCSS += ".a7-component." + componentTag+ " " + rule;
+                    CSSBundle += ".a7-component." + componentTag+ " " + rule;
                 });
             }
 
             if (cssObject.container != ""){
-                containerCSS += cssObject.container;
+                CSSBundle += cssObject.container;
             }
 
             var componentOutput = componentSourceCode.replace(componentSetup, "return " + html);
@@ -245,10 +255,10 @@ module.exports = function(sourceCode){
         return clicore.errorLog("Importing only a part of a framework is not yet supported!");
     }
 
-    containerCSS = cssMinifier(containerCSS);
+    CSSBundle = cssMinifier(CSSBundle);
 
-    if(containerCSS != ""){
-        sourceCode += "a7.loadCSS(\""+ containerCSS + "\")";
+    if(CSSBundle != ""){
+        sourceCode += "a7.loadCSS(\""+ CSSBundle + "\")";
     }
 
 

@@ -36,7 +36,7 @@ const isFile = function(path){
         } else {
 
             return false;
-            
+
         }
 
     } else{
@@ -118,10 +118,20 @@ module.exports = function(prefport){
     });
 
     var server = http.createServer(function (req, res){
+
+        var headers = req.headers;
+
+        console.log(headers.accept);
+
         var file = resolveFile(req.url);
-        res.writeHead(200, {'Content-Type': file.type});
-        res.write(file.code);
-        res.end();
+        res.writeHead(200, {'Content-Type': file.type, 'Content-Encoding': "gzip"});
+
+        var fileBuffer = new Buffer(file.code, "utf-8");
+        zlib.gzip(fileBuffer, function(_, result){
+            res.write(result);
+            res.end();
+        });
+
     }).listen(port);
     
     var changes = 0;
@@ -131,7 +141,7 @@ module.exports = function(prefport){
         build({silent:true});
         log("Build", buildN);
         buildN++;
-    }, 10000);
+    }, 3000);
 
     openInDefaultBrowser("localhost:" + port);
 };
