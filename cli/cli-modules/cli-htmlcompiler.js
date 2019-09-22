@@ -39,7 +39,7 @@ function buildEl(tag, src, content){
     
     }
 
-    if (src.match("a7link") !== undefined){
+    if (src.match("a7link") !== null){
         attributes.a7link = "";
     }
 
@@ -66,7 +66,7 @@ function buildEl(tag, src, content){
 
 
 
-    return "a7.createElement(\'"+tag+"\',"+attributes+","+content+")";
+    return "a7.createElement(\'"+tag+"\',"+attributes+","+content+"),";
 }
 
 function __ChildNodes(nodes){
@@ -85,7 +85,8 @@ function __ChildNodes(nodes){
         }
     });
 
-    compiled = compiled.replace(/,$/, "");
+    compiled = compiled.replace(/,\)/, ")");
+    compiled = compiled.replace(/\',\)/, "')");
 
     return compiled;
 }
@@ -106,12 +107,14 @@ module.exports = function htmlCompiler(html){
 
 
         var attributes = currentNode.rawAttrs;
-        compiled += buildEl(tag, attributes, inner) + ",";
+        compiled += buildEl(tag, attributes, inner);
         
     }
     compiled = compiled.replace(/\,\)/g, ")");
     compiled = compiled.replace(/\,\"\"/g, "");
     compiled = compiled.replace(/\)\,$/g, ")");
+    compiled = compiled.replace(/\',\)/g, "')");
+    compiled = compiled.replace(/\),\)/g, "))");
 
     return compiled;
 };

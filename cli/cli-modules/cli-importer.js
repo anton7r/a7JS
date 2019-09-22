@@ -194,7 +194,7 @@ module.exports = function(sourceCode){
                     html = html.replace(literal, "\'+"+cleanLiteral+"+\'");
                 });
             }
-
+            log(html);
             cssObject = cssSplitter(css, componentTag);
             innerCSS = cssObject.innerStyles;
 
