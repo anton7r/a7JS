@@ -61,12 +61,32 @@ var buildN = 0;
 uinput.setEncoding("utf-8");
 
 const resolveFile = function(url){
+    var type ="";
 
-    if(url.charAt(0) === "/"){
-        url.replace("/", "");
+    if(isFile("./"+url) === true){
+
+        if(url.charAt(0) === "/"){
+            url.replace("/", "");
+        }
+        var rawType = url.match(/\..+/g)[0];
+    
+        if (rawType === ".js"){
+        
+            type = "application/javascript";
+        
+        } else if (rawType === ".png"){
+        
+            type = "image/png";
+        
+        } else if (rawType === ".css"){
+        
+            type = "text/css";
+        } else {
+        
+            type = "text/plain";
+        }
+    
     }
-
-    console.log(isFile("./"+url));
 
     if(url === "/"){
 
@@ -74,17 +94,7 @@ const resolveFile = function(url){
 
     } else if (isFile("./"+url) === true){
 
-        var file = fs.readFileSync("./"+url, "utf-8");
-        var rawType = url.match(/\..+/g)[0];
-        var type ="";
-
-        if (rawType === ".js"){
-            type = "application/javascript";
-        } else if (rawType === ".css"){
-            type = "text/css";
-        } else {
-            type = "text/plain";
-        }
+        var file = fs.readFileSync("./"+url);
 
         return {code: file, type: type};
     } else {
@@ -124,13 +134,22 @@ module.exports = function(prefport){
         console.log(headers.accept);
 
         var file = resolveFile(req.url);
-        res.writeHead(200, {'Content-Type': file.type, 'Content-Encoding': "gzip"});
 
-        var fileBuffer = new Buffer(file.code, "utf-8");
-        zlib.gzip(fileBuffer, function(_, result){
-            res.write(result);
-            res.end();
-        });
+        if(file.type !== "png/image"){
+
+            res.writeHead(200, {'Content-Type': file.type, 'Content-Encoding': "gzip"});
+            var fileBuffer = new Buffer(file.code, "utf-8");
+            zlib.gzip(fileBuffer, function(_, result){
+                res.end(result);
+            });
+
+        } else {
+
+            res.writeHead(200, {'Content-Type': file.type});
+            res.end(file.code);
+            
+        }
+
 
     }).listen(port);
     

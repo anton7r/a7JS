@@ -195,10 +195,10 @@ module.exports = function(sourceCode){
                 });
             }
             
-            cssObject = cssSplitter(css, componentTag);
-            innerCSS = cssObject.innerStyles;
+            var cssObject = cssSplitter(css, componentTag);
+            var innerCSS = cssObject.innerStyles;
 
-            cssRules = innerCSS.match(/.+?\s*?\{.+?\}/);
+            var cssRules = innerCSS.match(/.+?\s*?\{.+?\}/g);
 
             if(cssRules !== null){
                 cssRules.forEach(function (rule){
