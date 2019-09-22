@@ -85,7 +85,6 @@ var init = function () {
 };
 
 var linkHandler = function (link) {
-    console.log(link);
     link.addEventListener("click", function (ev) {
         //console.log(link);
         ev.preventDefault();

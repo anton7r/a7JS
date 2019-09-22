@@ -279,6 +279,9 @@ module.exports = function(sourceCode){
             }
         }).code;
     }
+
+    clicore.successLog("app was built.");
+
     //Development helpers
     //log("whole imports:"+wholeImports);
     //log("partial imports:"+partialImports);
