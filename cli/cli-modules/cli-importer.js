@@ -116,19 +116,23 @@ const cssSplitter = function(csssrc, componentTag){
 module.exports = function(sourceCode){
     sourceCode = "var a7importBridgeAPI = {};" + sourceCode;
     var CSSBundle = "";
+    
+    if(config.css !== undefined){
 
-    if(config.css.bundle === true && config.css.file !== undefined){
-        var cssFile = config.css.file;
-
-        if(fs.existsSync(cssFile) === true){
-            var mainCSS = fs.readFileSync(cssFile, "utf-8");
-            mainCSS = csso.minify(mainCSS, {
-                filename:cssFile
-            });
-
-            CSSBundle += mainCSS;
-            
+        if(config.css.bundle === true && config.css.file !== undefined){
+            var cssFile = config.css.file;
+    
+            if(fs.existsSync(cssFile) === true){
+                var mainCSS = fs.readFileSync(cssFile, "utf-8");
+                mainCSS = csso.minify(mainCSS, {
+                    filename:cssFile
+                });
+    
+                CSSBundle += mainCSS;
+                
+            }
         }
+
     }
 
     var imports = [];
