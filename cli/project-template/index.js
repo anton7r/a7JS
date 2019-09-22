@@ -1,9 +1,6 @@
-import a7 from "@a7JS";
+import a7 from "a7js";
 
-a7.routes = {
-    "/*": mainPage
-};
 
-var mainPage = function(){
-
-};
+a7.routes({
+    "/*":""
+});
