@@ -4,9 +4,9 @@
 ![a7JS](./designs/banner.png)
 
 ![build passing](https://img.shields.io/badge/build-passing-success)
-![latest version](https://img.shields.io/badge/Latest%20version-v4.0.0beta.3-blue)
+![Version](https://img.shields.io/npm/v/a7js)
 ![size](https://img.shields.io/badge/Size-3kb-success)
-![v4 status](https://img.shields.io/badge/v4%20status-in%20Development-green)
+![downloads](https://img.shields.io/npm/dy/a7js)
 
 🔥 A lot of power in a small package.
 
