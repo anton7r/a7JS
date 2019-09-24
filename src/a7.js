@@ -255,7 +255,7 @@ a7.createElement = function (element, attributes) {
         var argLen = arguments.length;
 
         for (curVal = 2; curVal < argLen; curVal++) {
-            currentArg = arguments[curVal];
+            var currentArg = arguments[curVal];
 
             //loops through the rest of the arguments
             if(typeof currentArg === "string" && currentArg !== ""){
