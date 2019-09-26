@@ -3,6 +3,11 @@
  *          anton7r (C) 2019
  */
 
+//debugging function which should not be public facing
+function a7debug(message) {
+    console.warn("A7JS: " + message);
+}
+
 /* internal methods start */
 //Init will run once
 var init = function () {
@@ -11,14 +16,28 @@ var init = function () {
         return;
     }
 
-    var pageContainerEL = document.querySelector("[data-a7-page-container]");
-    if (pageContainerEL === null | pageContainerEL === undefined) {
-        return a7debug("Page Container Could not be found, It has to have the data attribute \"data-a7-page-container\". Your website wont function without that.");
+    var deprecated = document.querySelector("[data-a7-page-container]");
+    var deprecated2 = document.querySelector("[a7-page-container]");
+
+    if(deprecated !== null){
+        a7debug("Replace \"data-a7-page-container\" with \"a7app\" and then your app should work fine");
+        return;
+    
+    } else if (deprecated2 !== null){
+        a7debug("Replace \"a7-page-container\" with \"a7app\" and then your app should work fine");
+        return;
     }
+
+    var pageContainerEL = document.querySelector("[a7app]");
+
+    if (pageContainerEL === null) {
+        a7debug("Page Container Could not be found, It has to have the attribute \"a7app\". Your website won't function without that.");
+        return;
+    
+    }
+
     //assignment of a7store[9] aka pageContainer
     a7store[9] = pageContainerEL;
-    pageContainerEL.setAttribute("a7-page-container", "set");
-    pageContainerEL.removeAttribute("data-a7-page-container");
     a7store[10] = true;
 
     //menu init
@@ -137,15 +156,6 @@ var render = function (elem) {
 if (!"".trim) String.prototype.trim = function () {
     return this.replace(/^[\s﻿]+|[\s﻿]+$/g, '');
 };
-
-//debugging function which should not be public facing
-function a7debug(message) {
-    message = "%c" + "a7.js: " + message;
-    return console.warn(
-        message,
-        ""
-    );
-}
 
 //we changed a7store object to an array because we tested that arrays are simply about 33% faster than objects
 //which would give us a huge performance increase

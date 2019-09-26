@@ -21,7 +21,7 @@ const createHtmlDoc = function (name) {
     <link href="/css/style.css" rel="stylesheet">
 </head>
 <body>
-    <div a7-page-container></div>
+    <div a7app></div>
     <script type="module" src="/appbuild.js"></script>
 </body>
 </html>`].join("");
