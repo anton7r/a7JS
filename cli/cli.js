@@ -18,7 +18,7 @@ const createHtmlDoc = function (name) {
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>`, name, `</title>
     <meta name="description" content="`, name, `"></meta>
-    <link href="/css/style.css" rel="stylesheet">
+    <link href="/app/style.css" rel="stylesheet">
 </head>
 <body>
     <div a7app></div>
@@ -87,19 +87,12 @@ const a7newproject = function (name) {
         }
     });
 
-    fs.mkdir(name + "/css", {
-        recursive: true
-    }, function (err) {
-        if (err) {
-            return clicore.errorLog("css folder could not be created.");
-        }
-    });
-
-    fs.writeFile(name + "/css/style.css", cssDoc, function (err) {
+    fs.writeFile(name + "/app/style.css", cssDoc, function (err) {
         if (err) {
             return clicore.errorLog("css file could not be created.");
         }
     });
+    
     var conf = fs.readFileSync(require.resolve("./project-template/defaultconfig.json"));
     fs.writeFile(name + "/a7.config.json", conf, function (err) {
         if (err) {
