@@ -51,7 +51,7 @@ const componentSource = function (string){
 //Since the cli is inside the a7JS node cannot find the module a7js for some reason.
 const replaceSelf = function(Module){
     if(Module === self){
-        return pathToA7JS;
+        return require.resolve(pathToA7JS);
     } else {
         return Module;
     }
@@ -223,7 +223,14 @@ module.exports = function(sourceCode){
         this.imports += wholeImports.length;
         wholeImports.forEach(Import => {
             var importNameVar = importName(Import);
-            var importableModule = require.resolve(replaceSelf(importFrom(Import)));
+            var importableModule = replaceSelf(importFrom(Import));
+
+            if(importableModule.charAt(0) === "."){
+                importableModule = importableModule.replace(".", "./app");
+            } else {
+                importableModule = require.resolve(importableModule);
+            }
+
             var moduleSourceCode = fs.readFileSync(importableModule, "utf-8");
             var modulesImports = moduleSourceCode.match(/(import\s+.+?\s+from\".*?\"|require\(.*?\))/g);
 

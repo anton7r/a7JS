@@ -4,6 +4,12 @@
  */
 
 //debugging function which should not be public facing
+var isMobile = false;
+
+if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+    isMobile = true;
+}
+
 function a7debug(message) {
     console.warn("A7JS: " + message);
 }
@@ -289,6 +295,22 @@ a7.createElement = function (element, attributes) {
 
         }
         return rElement;
+    }
+};
+
+a7.app = function () {
+    return a7store[9];
+};
+
+a7.onMobile = function(func){
+    if(isMobile === true){
+        func();
+    }
+};
+
+a7.onDesktop = function(func){
+    if(isMobile === false){
+        func();
     }
 };
 
