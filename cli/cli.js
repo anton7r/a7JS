@@ -115,11 +115,24 @@ const a7createComponent = function(name) {
     var cssFileName = path + name + "/" + name + ".css";
     var htmlFileName = path + name + "/" + name + ".html";
     
+    var _imports = clicore.getImports();
+    var last = _imports.imports[_imports.imports.length - 1];
+    
+    var source = _imports.source.replace(last, last + ";\nimport "+name+" from \"./components/"+name+"/"+name+".js\";").replace(";;", ";");
+
     if(clicore.htmlTags.indexOf(name) !== -1){
         return clicore.errorLog(name + " is a html tag, please choose a different tag name");
     } else if (fs.existsSync(path + name) === true){
         return clicore.errorLog(name+" is already defined as a component.");
     }
+
+    fs.writeFile(clicore.config.entry, source, function(err){
+        if (err) {
+            clicore.errorLog("An error happened while trying to add import to component" + name);
+        } else {
+            clicore.successLog("Component " + name + " was successfully added to imports");
+        }
+    });
 
     fs.mkdirSync(path + name);
     fs.writeFileSync(jsFileName, "export default function(){\n\nreturn({\n    tag:\""+name+"\",\n    template:\"./"+name+".html\",\n    styles:\"./"+name+".css\"\n});\n}");

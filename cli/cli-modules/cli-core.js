@@ -5,6 +5,19 @@ const chalk = require("chalk");
 const clicore = {};
 const log = console.log;
 
+const confFile = "./a7.config.json";
+let config;
+
+if(fs.existsSync(confFile) === true){
+    
+    config = JSON.parse(
+        fs.readFileSync(confFile, "utf-8")
+    );
+
+} else {
+    config = {};
+}
+
 clicore.pathToA7JS = require.resolve("../../src/a7.js");
 
 clicore.componentSource = function (string){
@@ -23,6 +36,16 @@ clicore.isRelativePath = function (url){
         return false;
     }
 };
+
+clicore.config = config;
+
+clicore.getImports = function(){
+    var source = fs.readFileSync(config.entry, "utf-8");
+    var imports = source.match(/import\s+(\d|\w|\_)+\s+from\s*\".+\";*/gi);
+    return {imports:imports,source:source};
+};
+
+clicore.getEntryFolder = config.entry.replace(/[^\/]+\.js/, "");
 
 //TODO:
 clicore.successLog = function (msg){
