@@ -29,16 +29,22 @@ Router - Fully working
 
 # Setup
 
-Install it:
+Install it
 
 ```shell
 npm i a7js -g
 ```
 
-Start a new project:
+Start a new project
 
 ```shell
 a7 newproject [projectname]
+```
+
+Cd into the new project
+
+```shell
+cd [newproject]
 ```
 
 Run development server
