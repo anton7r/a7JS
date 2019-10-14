@@ -25,7 +25,10 @@
 # What are the features?
 
 CLI - Development server and boilerplate for new projects and components
-Router - Fully working
+
+Router - Fully working frontend routing system.
+
+Component Design - helps you with splitting your code into components.
 
 # Setup
 
