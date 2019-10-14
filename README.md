@@ -67,12 +67,18 @@ The dependencies that it has are for the cli and other useful tools.
 
 # Code examples and Documentation
 
-Outdated....
+Working on v4 up to date documentation
 
 For documentation and code examples please visit our [Wiki](https://github.com/anton7r/a7JS/wiki)
-
-v4 Documentation coming soon...
 
 # License
 
 License is MIT see [license](https://github.com/anton7r/a7JS/blob/master/LICENSE)
+
+# Changes
+
+## 4.0.0-beta.10
+
+Fixed a bug in the development server.
+
+Added a feature that adds component automatically to your main javascript file when creating it using the `a7 newcomponent ...` command.
