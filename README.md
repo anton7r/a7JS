@@ -25,20 +25,29 @@
 # What are the features?
 
 CLI - Development server and boilerplate for new projects and components
-Router - Fully working
+
+Router - Fully working frontend routing system.
+
+Component Design - helps you with splitting your code into components.
 
 # Setup
 
-Install it:
+Install it
 
 ```shell
 npm i a7js -g
 ```
 
-Start a new project:
+Start a new project
 
 ```shell
 a7 newproject [projectname]
+```
+
+Cd into the new project
+
+```shell
+cd [newproject]
 ```
 
 Run development server
@@ -61,12 +70,18 @@ The dependencies that it has are for the cli and other useful tools.
 
 # Code examples and Documentation
 
-Outdated....
+Working on v4 up to date documentation
 
 For documentation and code examples please visit our [Wiki](https://github.com/anton7r/a7JS/wiki)
-
-v4 Documentation coming soon...
 
 # License
 
 License is MIT see [license](https://github.com/anton7r/a7JS/blob/master/LICENSE)
+
+# Changes
+
+## 4.0.0-beta.10
+
+Fixed a bug in the development server.
+
+Added a feature that adds component automatically to your main javascript file when creating it using the `a7 newcomponent ...` command.
