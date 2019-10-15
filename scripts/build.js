@@ -1,3 +1,4 @@
+/*
 const fs = require("fs");
 const uglifyJS = require("uglify-js");
 var path = require.resolve("../src/a7.js");
@@ -8,3 +9,4 @@ if(fs.existsSync("./build") !== true){
     fs.mkdirSync("./build");
 }
 fs.writeFileSync(output, minified.code);
+*/

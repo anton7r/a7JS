@@ -45,7 +45,18 @@ clicore.getImports = function(){
     return {imports:imports,source:source};
 };
 
-clicore.getEntryFolder = config.entry.replace(/[^\/]+\.js/, "");
+clicore.getEntryFolder = function(){
+    if(config.entry !== undefined){
+        return config.entry.replace(/[^\/]+\.js/, "");
+    } else {
+        return;
+    }
+};
+
+clicore.getVersion = function(){
+    var a7pack = JSON.parse(fs.readFileSync(require.resolve("../../package.json"), "utf-8"));
+    return a7pack.version;
+};
 
 //TODO:
 clicore.successLog = function (msg){

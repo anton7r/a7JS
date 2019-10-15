@@ -10,28 +10,28 @@ const [, , ...args] = process.argv;
 const endbar = "======================================";
 
 const createHtmlDoc = function (name) {
-    return [`<!DOCTYPE html>
+    return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>`, name, `</title>
-    <meta name="description" content="`, name, `"></meta>
+    <title>${name}</title>
+    <meta name="description" content="${name}"></meta>
     <link href="/app/style.css" rel="stylesheet">
 </head>
 <body>
     <div a7app></div>
     <script type="module" src="/appbuild.js"></script>
 </body>
-</html>`].join("");
+</html>`;
 };
 const cssDoc = `:root{\n    --main-color:black;\n    --bg-color:white;\n}\n\n* {\n    margin:0px;\n    padding:0px;\n}\n\nbody {\n    font-family:"FONT HERE";\n}`;
 
 const a7greet = function () {
     log();
     log("================", chalk.blue("a7JS"), "================");
-    log("installed version:", chalk.green("v4-pre"));
+    log("installed version:", chalk.green(clicore.getVersion()));
     log();
 };
 
@@ -69,7 +69,7 @@ const a7newproject = function (name) {
         }
     });
 
-    fs.writeFile(name + "/package.json", "{\n   \"name\":\"" + name + "\"\n    }", function (err) {
+    fs.writeFile(name + "/package.json", "{\n  \"name\":\"" + name + "\",\n  \"dependencies\": {\n    \"a7js\": \"^"+clicore.getVersion()+"\"\n  },\n  \"main\" :\"app/index.js\"\n}", function (err) {
         if (err) {
             log(chalk.red("ERROR:"), "package.json could not be created.");
         } else {
