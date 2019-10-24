@@ -1,3 +1,6 @@
+/* jshint -W104 */
+/* jshint -W119 */
+
 //Start a dev server
 const chalk = require("chalk");
 const http = require("http");

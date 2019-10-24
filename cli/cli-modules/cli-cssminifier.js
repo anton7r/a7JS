@@ -1,3 +1,6 @@
+/* jshint -W104 */
+/* jshint -W119 */
+
 const clicore = require("./cli-core");
 const csso = require("csso");
 

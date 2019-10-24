@@ -1,4 +1,5 @@
 /* jshint -W104 */
+/* jshint -W119 */
 const fs = require("fs");
 const chalk = require("chalk");
 const log = console.log;

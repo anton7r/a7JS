@@ -1,3 +1,6 @@
+/* jshint -W104 */
+/* jshint -W119 */
+/* jshint -W049 */
 const fs = require("fs");
 const log = console.log;
 const pathToA7JS = require.resolve("../../src/a7.js");
@@ -293,8 +296,5 @@ module.exports = function(sourceCode){
 
     clicore.successLog("app was built.");
 
-    //Development helpers
-    //log("whole imports:"+wholeImports);
-    //log("partial imports:"+partialImports);
     return sourceCode;
 };

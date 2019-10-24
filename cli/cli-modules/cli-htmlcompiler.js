@@ -1,3 +1,6 @@
+/* jshint -W104 */
+/* jshint -W119 */
+
 //This file is used to compile html to our javascript equivelant code.
 const HTMLParser = require("node-html-parser");
 
