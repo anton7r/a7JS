@@ -21,13 +21,14 @@ if(fs.existsSync(configPath)){
 }
 
 const minifier = function (source){
-    var min = uglifyJS.minify(source);
-
-    if (min.error){
-        return clicore.errorLog(min.error);
+    var min; 
+    try {
+        min = uglifyJS.minify(source);
+        return min.code;
+    } catch (e){
+        clicore.errorLog("An error happened while trying to minify a script");
+        return source;
     }
-    //log(min.code)
-    return min.code;
 };
 
 const existsRead = function(path){
@@ -252,7 +253,7 @@ module.exports = function(sourceCode){
                 exportDefaultName = moduleSourceCodeMatches[0].replace(/(module.exports\s*=\s*|;)/g, "");
 
             }
-            var importedModule = `;(function(){` + moduleSourceCode + ` a7importBridgeAPI.` + importNameVar + `=` + exportDefaultName + `;})();var ` + importNameVar + `=a7importBridgeAPI.` + importNameVar + ";";
+            var importedModule = `;(function(){${moduleSourceCode} a7importBridgeAPI.${importNameVar}=${exportDefaultName};})();var ${importNameVar}=a7importBridgeAPI.${importNameVar};`;
             var minifiedModule;
             
             if(config.mode === "production"){
@@ -262,7 +263,11 @@ module.exports = function(sourceCode){
             }
 
             sourceCode = sourceCode.replace(Import, "/* " + importNameVar + " */" + minifiedModule);
-            imports += {from:importableModule,as:importNameVar};
+            
+            imports += {
+                from:importableModule,
+                as:importNameVar
+            };
         });
     
     }
