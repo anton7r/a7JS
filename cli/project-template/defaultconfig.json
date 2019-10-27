@@ -1,9 +1,12 @@
 {
-    "mode":"development",
-    "entry":"./app/index.js",
-    "output":"./appbuild.js",
-    "css":{
-        "bundle":false,
-        "file":""
+    "mode": "development",
+    "entry": "./app/index.js",
+    "output": "./appbuild.js",
+    "css": {
+        "bundle": false,
+        "file": ""
+    },
+    "devserver": {
+        "buildmode": "manual"
     }
 }

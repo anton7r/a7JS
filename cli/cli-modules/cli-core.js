@@ -15,7 +15,7 @@ if(fs.existsSync(confFile) === true){
     );
 
 } else {
-    config = {};
+    config = {entry:"./app/index.js", output:"./appbuild.js"};
 }
 
 clicore.pathToA7JS = require.resolve("../../src/a7.js");
@@ -56,6 +56,10 @@ clicore.getEntryFolder = function(){
 clicore.getVersion = function(){
     var a7pack = JSON.parse(fs.readFileSync(require.resolve("../../package.json"), "utf-8"));
     return a7pack.version;
+};
+
+clicore.atFileLog = function (file){
+    log(chalk.red("At file:"), file);
 };
 
 //TODO:

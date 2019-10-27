@@ -7,16 +7,16 @@ const http = require("http");
 const log = console.log;
 const fs = require("fs");
 const clicore = require("./cli-core.js");
-const uinput = process.stdin;
 const zlib = require("zlib");
+const build = require("./cli-build");
+const os = require("os").type();
 
-const configPath = "./a7.config.json";
-var config;
+var buildMode;
 
-if(fs.existsSync(configPath)){
-    config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+if(clicore.config.devserver.buildmode !== undefined){
+    buildMode = clicore.config.devserver.buildmode;
 } else {
-    config = {entry:"./app/index.js", output:"./appbuild.js"};
+    buildMode = "manual";
 }
 
 const isFile = function(path){
@@ -48,9 +48,6 @@ const isFile = function(path){
     }
 };
 
-const build = require("./cli-build");
-
-const os = require("os").type();
 
 const openInDefaultBrowser = function(url){
     if(os === "Windows_NT"){
@@ -61,6 +58,7 @@ const openInDefaultBrowser = function(url){
     }
 };
 
+const uinput = process.stdin;
 uinput.setEncoding("utf-8");
 
 const resolveFile = function(url){
@@ -117,7 +115,16 @@ module.exports = function(prefport){
 
     clicore.infoLog("Development server is starting at port "+ port);
     clicore.infoLog("in order to stop the server type \"stop\".");
-    clicore.infoLog("in order to build your code type \"build\".");
+
+    if(buildMode === "manual"){
+        clicore.infoLog("in order to build your code type \"build\".");
+    } else if (buildMode === "auto") {
+        clicore.infoLog("buildmode auto is enabled");
+    } else {
+        clicore.errorLog("no config.devserver.buildmode specified.");
+        clicore.atFileLog("a7.config.json");
+        process.exit();
+    }
 
     uinput.on("data", data => {
         if(data === "stop\r\n"){
