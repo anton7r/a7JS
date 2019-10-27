@@ -60,13 +60,13 @@ const openInDefaultBrowser = function(url){
         infoLog("We dont have support yet for the OS youre using. Open a new issue, so we can add support!");
     }
 };
-var buildN = 0;
+
 uinput.setEncoding("utf-8");
 
 const resolveFile = function(url){
     var type ="";
 
-    if(isFile("./"+url) === true){
+    if(isFile("./"+url)){
 
         if(url.charAt(0) === "/"){
             url.replace("/", "");
@@ -92,14 +92,14 @@ const resolveFile = function(url){
     }
 
     if(url === "/"){
-
-        return {code: fs.readFileSync("./index.html", "utf-8"), type: "text/html"};
+        if (isFile("./index.html")) {
+            return {code: fs.readFileSync("./index.html", "utf-8"), type: "text/html"};
+        } else {
+            return {code: "Could not find index.html file from directory", type:"text/html"};
+        }
 
     } else if (isFile("./"+url) === true){
-
-        var file = fs.readFileSync("./"+url);
-
-        return {code: file, type: type};
+        return {code: fs.readFileSync("./"+url), type: type};
     } else {
         return {code: fs.readFileSync("./index.html", "utf-8"), type: "text/html"};
     }
@@ -117,24 +117,21 @@ module.exports = function(prefport){
 
     clicore.infoLog("Development server is starting at port "+ port);
     clicore.infoLog("in order to stop the server type \"stop\".");
-    
-    log("Build", buildN);
-    buildN++;
+    clicore.infoLog("in order to build your code type \"build\".");
 
     uinput.on("data", data => {
         if(data === "stop\r\n"){
             clicore.infoLog("Development server stopped.");
             process.exit();
+        } else if (data === "build\r\n") {
+            clicore.infoLog("App was built");
+            build({silent:true});
         } else {
             clicore.infoLog("cant understand " + data);
         }
     });
 
     var server = http.createServer(function (req, res){
-
-        var headers = req.headers;
-
-        console.log(headers.accept);
 
         var file = resolveFile(req.url);
 
@@ -153,17 +150,7 @@ module.exports = function(prefport){
             
         }
 
-
     }).listen(port);
-    
-    var changes = 0;
-
-    setInterval(function(){
-        console.clear();
-        build({silent:true});
-        log("Build", buildN);
-        buildN++;
-    }, 3000);
 
     openInDefaultBrowser("localhost:" + port);
 };
