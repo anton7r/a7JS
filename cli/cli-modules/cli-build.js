@@ -4,7 +4,7 @@ const fs = require("fs");
 const chalk = require("chalk");
 const log = console.log;
 const UglifyJS = require("uglify-js");
-const clicore = require("./cli-core.js");
+const core = require("./cli-core.js");
 const importer = require("./cli-importer");
 
 module.exports = function(settings) {
@@ -24,13 +24,13 @@ module.exports = function(settings) {
 
     if (config.entry === undefined){
         if(silent === false){
-            clicore.errorLog("You have not defined the entrypoint of your app.");
+            core.errorLog("You have not defined the entrypoint of your app.");
         }
         return;
     } 
     else {
         if(silent === false){
-            clicore.infoLog("config was successfully loaded.");
+            core.infoLog("config was successfully loaded.");
         }
     }
 
@@ -47,7 +47,7 @@ module.exports = function(settings) {
             var documentPath;
 
             pathToComponent[0] = pathToComponent[0].replace(/\"/g, "");
-            if(clicore.isRelativePath(pathToComponent[0])){
+            if(core.isRelativePath(pathToComponent[0])){
                 documentPath = "./app" + pathToComponent[0].replace(/\./, "");
                 document = fs.readFileSync(documentPath, "utf-8");
             } else {
@@ -58,18 +58,18 @@ module.exports = function(settings) {
 
 
             //FIXME: So many variable declarations, could be simplified
-            var templateRawUrl = clicore.componentSource(document.match(/template(|\s+):(|\s+)\".+\"/i)[0]);
-            var stylesRawUrl = clicore.componentSource(document.match(/styles(|\s+):(|\s+)\".+\"/i)[0]);
+            var templateRawUrl = core.componentSource(document.match(/template(|\s+):(|\s+)\".+\"/i)[0]);
+            var stylesRawUrl = core.componentSource(document.match(/styles(|\s+):(|\s+)\".+\"/i)[0]);
             var templateUrl;
             var stylesUrl;
             var componentTag = document.match(/tag(|\s+):(|\s+)\".+\"/i)[0].match(/\".+\"/)[0].replace(/\"/g, "");
-            if(clicore.isRelativePath(templateRawUrl)){
+            if(core.isRelativePath(templateRawUrl)){
                 templateUrl = documentFolder + templateRawUrl.replace(/\.\//, "");
             } else {
                 templateUrl = templateRawUrl;
             }
 
-            if(clicore.isRelativePath(stylesRawUrl)){
+            if(core.isRelativePath(stylesRawUrl)){
                 stylesUrl = documentFolder + stylesRawUrl.replace(/\.\//, "");
             } else {
                 stylesUrl = stylesRawUrl;
@@ -125,19 +125,19 @@ module.exports = function(settings) {
             mainFile = mainFile.replace(val, importComment + "a7.registerComponent(\"" + componentTag + "\", function(props){return \"<style>"+childrenStyles+"</style>"+templateOut+"\"}); function "+ importerName +"(props){return a7.createElement(\""+ componentTag + "\", {props:props})}");
         });
     } else {
-        clicore.infoLog("no component imports detected.");
+        core.infoLog("no component imports detected.");
     }
 
     if(config.mode === "development"){
         fs.writeFileSync(config.output, mainFile);
-        clicore.successLog("App was successfully buit. (in development mode)");
+        core.successLog("App was successfully buit. (in development mode)");
 
     } else if (config.mode === "production"){
         var minify = UglifyJS.minify(mainFile);
         if(minify.error){
             log(chalk.red("ERROR:"), minify.error.message, minify.error.line + ":" + minify.error.col);
         } else {
-            clicore.successLog("App was successfully built.");
+            core.successLog("App was successfully built.");
         }
     
         fs.writeFileSync(config.output, minify.code);
@@ -148,6 +148,6 @@ module.exports = function(settings) {
         } else {
             additionalMessage = "is undefined";
         }
-        clicore.errorLog("could not build app since mode " + additionalMessage);
+        core.errorLog("could not build app since mode " + additionalMessage);
     }
 };

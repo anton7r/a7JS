@@ -14,6 +14,7 @@
     "cli/cli-modules/cli-cssminifier.js",
     "cli/cli-modules/cli-htmlcompiler.js",
     "cli/project-template/defaultconfig.json",
+    "cli/project-template/defaultindex.html",
     "cli/project-template/index.js",
     "scripts/build.js"
   ],

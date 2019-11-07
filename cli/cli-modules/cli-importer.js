@@ -7,7 +7,7 @@ const pathToA7JS = require.resolve("../../src/a7.js");
 const self = "a7js";
 const uglifyJS = require("uglify-js");
 const configPath = "./a7.config.json";
-const clicore = require("./cli-core");
+const core = require("./cli-core");
 const cssMinifier = require("./cli-cssminifier");
 const htmlCompiler = require("./cli-htmlcompiler");
 const csso = require("csso");
@@ -26,7 +26,7 @@ const minifier = function (source){
         min = uglifyJS.minify(source);
         return min.code;
     } catch (e){
-        clicore.errorLog("An error happened while trying to minify a script");
+        core.errorLog("An error happened while trying to minify a script");
         return source;
     }
 };
@@ -35,7 +35,7 @@ const existsRead = function(path){
     if(fs.existsSync(path)){
         return fs.readFileSync(path, "utf-8");
     } else {
-        clicore.errorLog("File could not be located. "+ path);
+        core.errorLog("File could not be located. "+ path);
         return process.exit(); 
     }
 };
@@ -239,7 +239,7 @@ module.exports = function(sourceCode){
             var modulesImports = moduleSourceCode.match(/(import\s+.+?\s+from\".*?\"|require\(.*?\))/g);
 
             if(modulesImports !== null){
-                clicore.errorLog("Module " + importNameVar +" has its own imports which we cannot right now import with our detections!");
+                core.errorLog("Module " + importNameVar +" has its own imports which we cannot right now import with our detections!");
             }
 
             if(config.mode === "production"){
@@ -277,7 +277,7 @@ module.exports = function(sourceCode){
         partialImports.forEach(Import =>{
             var importFromVar = importFrom(Import);
         });
-        return clicore.errorLog("Importing only a part of a framework is not yet supported!");
+        return core.errorLog("Importing only a part of a framework is not yet supported!");
     }
 
     CSSBundle = cssMinifier(CSSBundle);
@@ -299,7 +299,7 @@ module.exports = function(sourceCode){
         }).code;
     }
 
-    clicore.successLog("app was built.");
+    core.successLog("app was built.");
 
     return sourceCode;
 };

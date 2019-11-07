@@ -6,16 +6,20 @@ const chalk = require("chalk");
 const http = require("http");
 const log = console.log;
 const fs = require("fs");
-const clicore = require("./cli-core.js");
+const core = require("./cli-core.js");
 const zlib = require("zlib");
 const build = require("./cli-build");
 const os = require("os").type();
 
 var buildMode;
 
-if(clicore.config.devserver.buildmode !== undefined){
-    buildMode = clicore.config.devserver.buildmode;
-} else {
+if(core.config.devserver !== undefined){
+    if(core.config.devserver.buildmode !== undefined){
+        buildMode = core.config.devserver.buildmode;
+    } else {
+        buildMode = "manual";
+    }
+}  else {
     buildMode = "manual";
 }
 
@@ -113,28 +117,28 @@ module.exports = function(prefport){
         port = prefport;
     } 
 
-    clicore.infoLog("Development server is starting at port "+ port);
-    clicore.infoLog("in order to stop the server type \"stop\".");
+    core.infoLog("Development server is starting at port "+ port);
+    core.infoLog("in order to stop the server type \"stop\".");
 
     if(buildMode === "manual"){
-        clicore.infoLog("in order to build your code type \"build\".");
+        core.infoLog("in order to build your code type \"build\".");
     } else if (buildMode === "auto") {
-        clicore.infoLog("buildmode auto is enabled");
+        core.infoLog("buildmode auto is enabled");
     } else {
-        clicore.errorLog("no config.devserver.buildmode specified.");
-        clicore.atFileLog("a7.config.json");
+        core.errorLog("no config.devserver.buildmode specified.");
+        core.atFileLog("a7.config.json");
         process.exit();
     }
 
     uinput.on("data", data => {
         if(data === "stop\r\n"){
-            clicore.infoLog("Development server stopped.");
+            core.infoLog("Development server stopped.");
             process.exit();
         } else if (data === "build\r\n") {
-            clicore.infoLog("App was built");
+            core.infoLog("App was built");
             build({silent:true});
         } else {
-            clicore.infoLog("cant understand " + data);
+            core.infoLog("cant understand " + data);
         }
     });
 

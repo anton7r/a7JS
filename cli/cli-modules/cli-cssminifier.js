@@ -1,7 +1,7 @@
 /* jshint -W104 */
 /* jshint -W119 */
 
-const clicore = require("./cli-core");
+const core = require("./cli-core");
 const csso = require("csso");
 
 module.exports = function minifier(css){
@@ -13,7 +13,7 @@ module.exports = function minifier(css){
     }
     
     catch(e){
-        clicore.errorLog("Could not minify css.");
+        core.errorLog("Could not minify css.");
         return css.replace(/\n\r/g, "");
     }
 

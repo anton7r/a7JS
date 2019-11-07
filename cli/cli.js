@@ -5,59 +5,48 @@ const log = console.log;
 const fs = require("fs");
 const chalk = require("chalk");
 const a7build = require("./cli-modules/cli-build.js");
-const clicore = require("./cli-modules/cli-core.js");
+const core = require("./cli-modules/cli-core.js");
 const [, , ...args] = process.argv;
 const endbar = "======================================";
 
 const createHtmlDoc = function (name) {
-    return `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>${name}</title>
-    <meta name="description" content="${name}"></meta>
-    <link href="/app/style.css" rel="stylesheet">
-</head>
-<body>
-    <div a7app></div>
-    <script type="module" src="/appbuild.js"></script>
-</body>
-</html>`;
+    return fs.readFileSync(require.resolve("./project-template/defaultindex.html"), "utf-8", function(err){
+        core.errorLog("an error happened while trying to generate html index file.");
+    }).replace(/\$/g, name);
 };
+
 const cssDoc = `:root{\n    --main-color:black;\n    --bg-color:white;\n}\n\n* {\n    margin:0px;\n    padding:0px;\n}\n\nbody {\n    font-family:"FONT HERE";\n}`;
 
 const a7greet = function () {
     log();
     log("================", chalk.blue("a7JS"), "================");
-    log("installed version:", chalk.green(clicore.getVersion()));
+    log("installed version:", chalk.green(core.getVersion()));
     log();
 };
 
 const a7helper = function () {
         log("=============", chalk.blue("a7JS Help"), "==============");
-        clicore.helperLog("newproject", "create a new project with a7.");
-        clicore.syntaxLog("a7 newproject [projectname]");
-        clicore.syntaxLog("a7 np [projectname]");
-        clicore.helperLog("newcomponent", "create a new component into the current project.");
-        clicore.syntaxLog("a7 newcomponent [componentname]");
-        clicore.syntaxLog("a7 nc [componentname]");
-        clicore.helperLog("build", "build the a7 project.");
-        clicore.syntaxLog("a7 build");
-        clicore.helperLog("devserver", "start a development server [beta]");
-        clicore.syntaxLog("a7 devserver [port(optional)]");
+        core.helperLog("newproject", "create a new project with a7.");
+        core.syntaxLog("a7 newproject [projectname]");
+        core.syntaxLog("a7 np [projectname]");
+        core.helperLog("newcomponent", "create a new component into the current project.");
+        core.syntaxLog("a7 newcomponent [componentname]");
+        core.syntaxLog("a7 nc [componentname]");
+        core.helperLog("build", "build the a7 project.");
+        core.syntaxLog("a7 build");
+        core.helperLog("devserver", "start a development server [beta]");
+        core.syntaxLog("a7 devserver [port(optional)]");
         log(endbar);
 };
 
 const a7newproject = function (name) {
     if (name === undefined) {
-        return clicore.errorLog("You have not defined a name for your project.");
+        return core.errorLog("You have not defined a name for your project.");
     } else if (fs.existsSync(name) !== false) {
-        return clicore.errorLog(name + " folder already exists in this directory.");
+        return core.errorLog(name + " folder already exists in this directory.");
     }
 
-    clicore.infoLog("creating a new project in " + name);
+    core.infoLog("creating a new project in " + name);
 
     fs.mkdir(name, {
         recursive: true
@@ -69,7 +58,7 @@ const a7newproject = function (name) {
         }
     });
 
-    fs.writeFile(name + "/package.json", "{\n  \"name\":\"" + name + "\",\n  \"dependencies\": {\n    \"a7js\": \"^"+clicore.getVersion()+"\"\n  },\n  \"main\" :\"app/index.js\"\n}", function (err) {
+    fs.writeFile(name + "/package.json", "{\n  \"name\":\"" + name + "\",\n  \"dependencies\": {\n    \"a7js\": \"^"+core.getVersion()+"\"\n  },\n  \"main\" :\"app/index.js\"\n}", function (err) {
         if (err) {
             log(chalk.red("ERROR:"), "package.json could not be created.");
         } else {
@@ -89,25 +78,26 @@ const a7newproject = function (name) {
 
     fs.writeFile(name + "/app/style.css", cssDoc, function (err) {
         if (err) {
-            return clicore.errorLog("css file could not be created.");
+            return core.errorLog("css file could not be created.");
         }
     });
     
     var conf = fs.readFileSync(require.resolve("./project-template/defaultconfig.json"));
     fs.writeFile(name + "/a7.config.json", conf, function (err) {
         if (err) {
-            return clicore.errorLog("config could not be created.");
+            return core.errorLog("config could not be created.");
         }
     });
 
     fs.writeFile(name + "/app/index.js", fs.readFileSync(require.resolve("./project-template/index.js")), function (err) {
         if (err) {
-            return clicore.errorLog("app/index.js could not be created.");
+            return core.errorLog("app/index.js could not be created.");
         }
     });
 
-    log(chalk.green("SUCCESS:"), "The Project was created without any errors!");
+    core.successLog("The Project was created without any errors!");
 };
+
 //TODO:
 const a7createComponent = function(name) {
     var path = "./app/components/";
@@ -115,22 +105,22 @@ const a7createComponent = function(name) {
     var cssFileName = path + name + "/" + name + ".css";
     var htmlFileName = path + name + "/" + name + ".html";
     
-    var _imports = clicore.getImports();
+    var _imports = core.getImports();
     var last = _imports.imports[_imports.imports.length - 1];
     
     var source = _imports.source.replace(last, last + ";\nimport "+name+" from \"./components/"+name+"/"+name+".js\";").replace(";;", ";");
 
-    if(clicore.htmlTags.indexOf(name) !== -1){
-        return clicore.errorLog(name + " is a html tag, please choose a different tag name");
+    if(core.htmlTags.indexOf(name) !== -1){
+        return core.errorLog(name + " is a html tag, please choose a different tag name");
     } else if (fs.existsSync(path + name) === true){
-        return clicore.errorLog(name+" is already defined as a component.");
+        return core.errorLog(name+" is already defined as a component.");
     }
 
-    fs.writeFile(clicore.config.entry, source, function(err){
+    fs.writeFile(core.config.entry, source, function(err){
         if (err) {
-            clicore.errorLog("An error happened while trying to add import to component" + name);
+            core.errorLog("An error happened while trying to add import to component" + name);
         } else {
-            clicore.successLog("Component " + name + " was successfully added to imports");
+            core.successLog("Component " + name + " was successfully added to imports");
         }
     });
 
@@ -138,11 +128,11 @@ const a7createComponent = function(name) {
     fs.writeFileSync(jsFileName, "export default function(){\n\nreturn({\n    tag:\""+name+"\",\n    template:\"./"+name+".html\",\n    styles:\"./"+name+".css\"\n});\n}");
     fs.writeFileSync(htmlFileName, "");
     fs.writeFileSync(cssFileName, "");
-    clicore.successLog("Component" + name + " was successfully created.");
+    core.successLog("Component" + name + " was successfully created.");
 };
 
 const a7unknownArg = function () {
-    clicore.errorLog(chalk.cyan(args.join(" ")) + " is not a valid argument.");
+    core.errorLog(chalk.cyan(args.join(" ")) + " is not a valid argument.");
 };
 
 const a7devServer = require("./cli-modules/cli-devserver.js"); 
