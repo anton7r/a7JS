@@ -24,34 +24,23 @@ if(core.config.devserver !== undefined){
 }
 
 const isFile = function(path){
-    
     if(fs.existsSync(path) === false){
-
         return false;
-
     }
-
 
     var stats = fs.statSync(path);
 
     if(stats){
-
         if(stats.isFile() === true){
-
             return true;
-
         } else {
-
             return false;
-
         }
 
     } else{
-
         return false;
     }
 };
-
 
 const openInDefaultBrowser = function(url){
     if(os === "Windows_NT"){

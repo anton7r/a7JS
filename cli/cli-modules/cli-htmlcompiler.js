@@ -88,10 +88,8 @@ function __ChildNodes(nodes){
         }
     });
 
-    compiled = compiled.replace(/,\)/, ")");
-    compiled = compiled.replace(/\',\)/, "')");
+    return compiled.replace(/,\)/, ")").replace(/\',\)/, "')");
 
-    return compiled;
 }
 
 module.exports = function htmlCompiler(html){
@@ -113,11 +111,6 @@ module.exports = function htmlCompiler(html){
         compiled += buildEl(tag, attributes, inner);
         
     }
-    compiled = compiled.replace(/\,\)/g, ")");
-    compiled = compiled.replace(/\,\"\"/g, "");
-    compiled = compiled.replace(/\)\,$/g, ")");
-    compiled = compiled.replace(/\',\)/g, "')");
-    compiled = compiled.replace(/\),\)/g, "))");
+    return compiled.replace(/\,\)/g, ")").replace(/\,\"\"/g, "").replace(/\)\,$/g, ")").replace(/\',\)/g, "')").replace(/\),\)/g, "))");
 
-    return compiled;
 };

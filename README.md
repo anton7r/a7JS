@@ -20,9 +20,9 @@
 
 🚀 Provides compression and minification.
 
-👑 Supports ES6 Imports.
+👑 Supports ES6 Imports, while using ES5.
 
-# What are the features?
+# Main features of A7JS
 
 CLI - Development server and boilerplate for new projects and components
 
@@ -79,6 +79,14 @@ For documentation and code examples please visit our [Wiki](https://github.com/a
 License is MIT see [license](https://github.com/anton7r/a7JS/blob/master/LICENSE)
 
 # Changes
+
+## 4.0.0-rc.1.2
+
+Speed improvements and removed legacy code.
+
+## 4.0.0-rc.1.1
+
+Bug Fixes.
 
 ## 4.0.0-rc.1
 

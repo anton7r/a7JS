@@ -41,7 +41,7 @@ const a7helper = function () {
 
 const a7newproject = function (name) {
     if (name === undefined) {
-        return core.errorLog("You have not defined a name for your project.");
+        return core.errorLog("you have not defined a name for your project.");
     } else if (fs.existsSync(name) !== false) {
         return core.errorLog(name + " folder already exists in this directory.");
     }
@@ -67,9 +67,7 @@ const a7newproject = function (name) {
     });
 
     fs.mkdirSync(name +"/app");
-
     fs.mkdirSync(name +"/app/components");
-
     fs.writeFile(name + "/index.html", createHtmlDoc(name), function (err) {
         if (err) {
             log(chalk.red("ERROR:"), "index.html could not be created.");
@@ -95,15 +93,16 @@ const a7newproject = function (name) {
         }
     });
 
-    core.successLog("The Project was created without any errors!");
+    core.successLog("the project was created without any errors!");
 };
 
 //TODO:
 const a7createComponent = function(name) {
     var path = "./app/components/";
-    var jsFileName = path + name + "/" + name + ".js";
-    var cssFileName = path + name + "/" + name + ".css";
-    var htmlFileName = path + name + "/" + name + ".html";
+    var _file = path + name + "/" + name;
+    var jsFileName = _file + ".js";
+    var cssFileName = _file + ".css";
+    var htmlFileName = _file + ".html";
     
     var _imports = core.getImports();
     var last = _imports.imports[_imports.imports.length - 1];
@@ -125,10 +124,25 @@ const a7createComponent = function(name) {
     });
 
     fs.mkdirSync(path + name);
-    fs.writeFileSync(jsFileName, "export default function(){\n\nreturn({\n    tag:\""+name+"\",\n    template:\"./"+name+".html\",\n    styles:\"./"+name+".css\"\n});\n}");
-    fs.writeFileSync(htmlFileName, "");
-    fs.writeFileSync(cssFileName, "");
-    core.successLog("Component" + name + " was successfully created.");
+    fs.writeFile(jsFileName, "export default function(){\n\nreturn({\n    tag:\""+name+"\",\n    template:\"./"+name+".html\",\n    styles:\"./"+name+".css\"\n});\n}",function(err){
+        if(err){
+            core.errorLog("There was an error while generating the js file for " + name + ".");
+        } else {
+            core.successLog("Component " + name + " was successfully created.");
+        }
+    });
+    var ermsg = ". This is not an big issue but this means that you would have to make the file yourself";
+    fs.writeFile(htmlFileName, "", function(err){
+        if(err){
+            core.errorLog("Couldn't create ./app/" + name + "/" + name + ".html"+ermsg);
+        }
+    });
+    fs.writeFile(cssFileName, "", function(err){
+        if(err){
+            core.errorLog("Couldn't create ./app/" + name + "/" + name + ".css"+ermsg);
+        }
+
+    });
 };
 
 const a7unknownArg = function () {
