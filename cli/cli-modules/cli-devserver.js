@@ -38,28 +38,6 @@ const isFile = function(path){
         return false;
     }
 };
-var conf = core.config;
-var packaged;
-function pack(){
-    packaged = build(fs.readFileSync(conf.entry, "utf-8"));
-    core.infoLog("App was built");
-}
-pack();
-const uinput = process.stdin;
-uinput.setEncoding("utf-8");
-uinput.on("data", data => {
-    if(data === "stop\r\n"){
-        core.infoLog("Saving built file.");
-        fs.writeFileSync(conf.output, packaged);
-        core.infoLog("Development server stopped.");
-        process.exit();
-    } else if (data === "build\r\n") {
-        pack();
-    } else {
-        core.infoLog("cant understand " + data);
-    }
-});
-
 
 const resolveFile = function(url){
     if(isFile("./"+url)){
@@ -84,6 +62,28 @@ const resolveFile = function(url){
 };
 
 module.exports = function(prefport){
+    var conf = core.config;
+    var packaged;
+    function pack(){
+        packaged = build(fs.readFileSync(conf.entry, "utf-8"));
+        core.infoLog("App was built");
+    }
+    pack();
+    const uinput = process.stdin;
+    uinput.setEncoding("utf-8");
+    uinput.on("data", data => {
+        if(data === "stop\r\n"){
+            core.infoLog("Saving built file.");
+            fs.writeFileSync(conf.output, packaged);
+            core.infoLog("Development server stopped.");
+            process.exit();
+        } else if (data === "build\r\n") {
+            pack();
+        } else {
+            core.infoLog("cant understand " + data);
+        }
+    });
+    
     //set host port number
     var port;
 
