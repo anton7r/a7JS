@@ -2,17 +2,14 @@
 /* jshint -W119 */
 
 //Start a dev server
-const chalk = require("chalk");
 const http = require("http");
 const log = console.log;
 const fs = require("fs");
 const core = require("./cli-core.js");
 const zlib = require("zlib");
-const build = require("./cli-build");
-const os = require("os").type();
+const build = require("./cli-importer");
 
 var buildMode;
-
 if(core.config.devserver !== undefined){
     if(core.config.devserver.buildmode !== undefined){
         buildMode = core.config.devserver.buildmode;
@@ -41,58 +38,48 @@ const isFile = function(path){
         return false;
     }
 };
-
-const openInDefaultBrowser = function(url){
-    if(os === "Windows_NT"){
-        //The os is windows
-        require('child_process').spawn('explorer', ["http://"+url]);
-    } else {
-        infoLog("We dont have support yet for the OS youre using. Open a new issue, so we can add support!");
-    }
-};
-
+var conf = core.config;
+var packaged;
+function pack(){
+    packaged = build(fs.readFileSync(conf.entry, "utf-8"));
+    core.infoLog("App was built");
+}
+pack();
 const uinput = process.stdin;
 uinput.setEncoding("utf-8");
+uinput.on("data", data => {
+    if(data === "stop\r\n"){
+        core.infoLog("Saving built file.");
+        fs.writeFileSync(conf.output, packaged);
+        core.infoLog("Development server stopped.");
+        process.exit();
+    } else if (data === "build\r\n") {
+        pack();
+    } else {
+        core.infoLog("cant understand " + data);
+    }
+});
+
 
 const resolveFile = function(url){
-    var type ="";
-
     if(isFile("./"+url)){
-
         if(url.charAt(0) === "/"){
             url.replace("/", "");
         }
-        var rawType = url.match(/\..+/g)[0];
-    
-        if (rawType === ".js"){
-        
-            type = "application/javascript";
-        
-        } else if (rawType === ".png"){
-        
-            type = "image/png";
-        
-        } else if (rawType === ".css"){
-        
-            type = "text/css";
-        } else {
-        
-            type = "text/plain";
-        }
-    
     }
-
-    if(url === "/"){
+    if(url === conf.output){
+        return packaged;
+    } else if(url === "/"){
         if (isFile("./index.html")) {
-            return {code: fs.readFileSync("./index.html", "utf-8"), type: "text/html"};
+            return fs.readFileSync("./index.html", "utf-8");
         } else {
-            return {code: "Could not find index.html file from directory", type:"text/html"};
+            return "Could not find index.html file from directory";
         }
 
     } else if (isFile("./"+url) === true){
-        return {code: fs.readFileSync("./"+url), type: type};
+        return fs.readFileSync("./"+url);
     } else {
-        return {code: fs.readFileSync("./index.html", "utf-8"), type: "text/html"};
+        return fs.readFileSync("./index.html", "utf-8");
     }
 };
 
@@ -119,38 +106,31 @@ module.exports = function(prefport){
         process.exit();
     }
 
-    uinput.on("data", data => {
-        if(data === "stop\r\n"){
-            core.infoLog("Development server stopped.");
-            process.exit();
-        } else if (data === "build\r\n") {
-            core.infoLog("App was built");
-            build({silent:true});
-        } else {
-            core.infoLog("cant understand " + data);
-        }
-    });
-
     var server = http.createServer(function (req, res){
+        var types = req.headers.accept;//.split(",")
+        var type;
+        if (types.indexOf("," > 0)){
+            var t = types.split(",");
+            for(var i = 0; i<t.length; i++){
+                if(t[i] !== "*/*"){
+                    type = t[i];
+                    break;
+                } else if (t[i] === "*/*"){
+                    type = "application/javascript";
+                    break;
+                }
+            }
+        }
 
         var file = resolveFile(req.url);
-
-        if(file.type !== "png/image"){
-
-            res.writeHead(200, {'Content-Type': file.type, 'Content-Encoding': "gzip"});
-            var fileBuffer = new Buffer(file.code, "utf-8");
-            zlib.gzip(fileBuffer, function(_, result){
+        if(type !== "png/image"){
+            res.writeHead(200, {'Content-Type': type, 'Content-Encoding': "gzip"});
+            zlib.gzip(new Buffer.alloc(file.length, file, "utf-8"), function(_, result){
                 res.end(result);
             });
-
         } else {
-
-            res.writeHead(200, {'Content-Type': file.type});
-            res.end(file.code);
-            
+            res.writeHead(200, {'Content-Type': type});
+            res.end(file);
         }
-
     }).listen(port);
-
-    openInDefaultBrowser("localhost:" + port);
 };
