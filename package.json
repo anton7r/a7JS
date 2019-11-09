@@ -18,10 +18,9 @@
     "cli/project-template/index.js",
     "scripts/build.js"
   ],
-  "main": "build/a7.js",
+  "main": "src/a7.js",
   "scripts": {
-    "test": "node ./test/a7.test",
-    "postinstall": "node ./scripts/build"
+    "test": "node ./test/a7.test"
   },
   "repository": {
     "type": "git",
