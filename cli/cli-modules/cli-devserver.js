@@ -1,18 +1,16 @@
 /* jshint -W104 */
 /* jshint -W119 */
-
-//Start a dev server
 const http = require("http");
-const log = console.log;
 const fs = require("fs");
 const core = require("./cli-core.js");
 const zlib = require("zlib");
 const build = require("./cli-importer");
+var conf = core.config;
 
 var buildMode;
-if(core.config.devserver !== undefined){
-    if(core.config.devserver.buildmode !== undefined){
-        buildMode = core.config.devserver.buildmode;
+if(conf.devserver !== undefined){
+    if(conf.devserver.buildmode !== undefined){
+        buildMode = conf.devserver.buildmode;
     } else {
         buildMode = "manual";
     }
@@ -20,27 +18,8 @@ if(core.config.devserver !== undefined){
     buildMode = "manual";
 }
 
-const isFile = function(path){
-    if(fs.existsSync(path) === false){
-        return false;
-    }
-
-    var stats = fs.statSync(path);
-
-    if(stats){
-        if(stats.isFile() === true){
-            return true;
-        } else {
-            return false;
-        }
-
-    } else{
-        return false;
-    }
-};
-
 const resolveFile = function(url){
-    if(isFile("./"+url)){
+    if(fs.existsSync("./"+url)){
         if(url.charAt(0) === "/"){
             url.replace("/", "");
         }
@@ -48,13 +27,13 @@ const resolveFile = function(url){
     if(url === conf.output){
         return packaged;
     } else if(url === "/"){
-        if (isFile("./index.html")) {
+        if (fs.existsSync("./index.html")) {
             return fs.readFileSync("./index.html", "utf-8");
         } else {
             return "Could not find index.html file from directory";
         }
 
-    } else if (isFile("./"+url) === true){
+    } else if (fs.existsSync("./"+url) === true){
         return fs.readFileSync("./"+url);
     } else {
         return fs.readFileSync("./index.html", "utf-8");
@@ -62,7 +41,6 @@ const resolveFile = function(url){
 };
 
 module.exports = function(prefport){
-    var conf = core.config;
     var packaged;
     function pack(){
         packaged = build(fs.readFileSync(conf.entry, "utf-8"));

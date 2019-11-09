@@ -10,7 +10,7 @@
 
 🔥 A lot of power in a small package.
 
-✅ Frontend framework only 2,6kb gzipped and minified.
+✅ Frontend framework only 3kb gzipped and minified.
 
 ⚡ Its stupid fast.
 
@@ -79,6 +79,11 @@ For documentation and code examples please visit our [Wiki](https://github.com/a
 License is MIT see [license](https://github.com/anton7r/a7JS/blob/master/LICENSE)
 
 # Changes
+
+## 4.0.0-rc.1.3
+
+Updated Development server to run faster,
+and fixed bugs that were introduced in the last update.
 
 ## 4.0.0-rc.1.2
 
