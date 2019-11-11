@@ -7,10 +7,9 @@ const chalk = require("chalk");
 const a7build = require("./cli-modules/cli-build.js");
 const core = require("./cli-modules/cli-core.js");
 const [, , ...args] = process.argv;
-const endbar = "======================================";
 
 const createHtmlDoc = function (name) {
-    return fs.readFileSync(require.resolve("./project-template/defaultindex.html"), "utf-8", function(err){
+    return fs.readFileSync(require.resolve("./defaults/index.html"), "utf-8", function(err){
         core.errorLog("an error happened while trying to generate html index file.");
     }).replace(/\$/g, name);
 };
@@ -36,7 +35,7 @@ const a7helper = function () {
         core.syntaxLog("a7 build");
         core.helperLog("devserver", "start a development server [beta]");
         core.syntaxLog("a7 devserver [port(optional)]");
-        log(endbar);
+        log("======================================");
 };
 
 const a7newproject = function (name) {
@@ -80,14 +79,14 @@ const a7newproject = function (name) {
         }
     });
     
-    var conf = fs.readFileSync(require.resolve("./project-template/defaultconfig.json"));
+    var conf = fs.readFileSync(require.resolve("./defaults/config.json"));
     fs.writeFile(name + "/a7.config.json", conf, function (err) {
         if (err) {
             return core.errorLog("config could not be created.");
         }
     });
 
-    fs.writeFile(name + "/app/index.js", fs.readFileSync(require.resolve("./project-template/index.js")), function (err) {
+    fs.writeFile(name + "/app/index.js", fs.readFileSync(require.resolve("./defaults/index.js")), function (err) {
         if (err) {
             return core.errorLog("app/index.js could not be created.");
         }
@@ -97,8 +96,13 @@ const a7newproject = function (name) {
 };
 
 //TODO:
-const a7createComponent = function(name) {
-    var path = "./app/components/";
+const a7createComponent = function(name, absolutePath) {
+    var path = "app/components/";
+    if(absolutePath !== undefined){
+        path = absolutePath + path;
+    } else {
+        path = "./"+path
+    }
     var _file = path + name + "/" + name;
     var jsFileName = _file + ".js";
     var cssFileName = _file + ".css";
@@ -144,6 +148,47 @@ const a7createComponent = function(name) {
 
     });
 };
+//TODO: FIXME: Move it also to another dir
+const http = require("http");
+const a7test = function(){
+    core.infoLog("starting an automatic a7 tester");
+    core.infoLog("this is the tool to find to the most critical bugs in the code.");
+    var a7testFolder =  module.filename.replace(/cli(\/|\\)cli\.js/, "tests/");
+    var errors = "";
+    if(fs.existsSync(a7testFolder)){
+    } else {
+        fs.mkdirSync(a7testFolder);
+        log("folder " + a7testFolder + " was not found. So we added it");
+    }
+    core.infoLog("the whole log is available in the ./tests/ folder")
+    try{
+        a7newproject(a7testFolder + "x");
+    } catch(err){
+        core.errorLog("the project couldn't be created.");
+        errors += err+"\n";
+    }
+    try{
+        a7createComponent("test", a7testFolder+ "x/");
+    } catch(err){
+        core.errorLog("there was an error while trying to create new component.");
+        errors += err+"\n";
+    }
+    try{
+        a7devServer("8698", dir);
+        http.get("localhost:8698");
+    } catch(err){
+        core.errorLog("");
+        errors += err+"\n";
+    }
+
+    //Results
+    fs.writeFile(a7testFolder + "errorlog.txt", errors, function(err){
+        if(err){
+            core.errorLog("could not store error log so here is the log");
+            log(errors);
+        }
+    })
+}
 
 const a7unknownArg = function () {
     core.errorLog(chalk.cyan(args.join(" ")) + " is not a valid argument.");
@@ -172,6 +217,9 @@ switch (args[0]) {
         break;
     case "devserver":
         a7devServer(args[1]);
+        break;
+    case "test":
+        a7test();
         break;
     default:
         a7unknownArg();

@@ -3,7 +3,6 @@
 
 ![a7JS](./designs/banner.png)
 
-![build passing](https://img.shields.io/badge/build-passing-success)
 ![Version](https://img.shields.io/npm/v/a7js)
 ![size](https://img.shields.io/badge/Size-3kb-success)
 ![downloads](https://img.shields.io/npm/dy/a7js)
@@ -79,6 +78,10 @@ For documentation and code examples please visit our [Wiki](https://github.com/a
 License is MIT see [license](https://github.com/anton7r/a7JS/blob/master/LICENSE)
 
 # Changes
+
+## 4.0.0-rc.1.4
+
+Code abstraction and improved performance.
 
 ## 4.0.0-rc.1.3
 

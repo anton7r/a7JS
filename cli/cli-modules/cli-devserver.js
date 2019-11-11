@@ -6,45 +6,43 @@ const core = require("./cli-core.js");
 const zlib = require("zlib");
 const build = require("./cli-importer");
 var conf = core.config;
-
-var buildMode;
-if(conf.devserver !== undefined){
-    if(conf.devserver.buildmode !== undefined){
-        buildMode = conf.devserver.buildmode;
-    } else {
-        buildMode = "manual";
-    }
-}  else {
-    buildMode = "manual";
-}
+var rootDir;
+var buildMode = conf.devserver.buildmode;
 
 const resolveFile = function(url){
-    if(fs.existsSync("./"+url)){
+    //CHECK:FIXME: abstraction needed
+    if(fs.existsSync(rootDir+url)){
         if(url.charAt(0) === "/"){
             url.replace("/", "");
         }
     }
+    // UP
     if(url === conf.output){
         return packaged;
     } else if(url === "/"){
-        if (fs.existsSync("./index.html")) {
-            return fs.readFileSync("./index.html", "utf-8");
+        if (fs.existsSync(rootDir + "index.html")) {
+            return fs.readFileSync(rootDir + "index.html", "utf-8");
         } else {
             return "Could not find index.html file from directory";
         }
 
-    } else if (fs.existsSync("./"+url) === true){
-        return fs.readFileSync("./"+url);
+    } else if (fs.existsSync(rootDir+url) === true){
+        return fs.readFileSync(rootDir+url);
     } else {
-        return fs.readFileSync("./index.html", "utf-8");
+        return fs.readFileSync(rootDir + "index.html", "utf-8");
     }
 };
 
-module.exports = function(prefport){
+module.exports = function(port, dir){
+    if(dir !== undefined){
+        rootDir = dir;
+    } else {
+        rootDir = "./"
+    }
     var packaged;
     function pack(){
         packaged = build(fs.readFileSync(conf.entry, "utf-8"));
-        core.infoLog("App was built");
+        core.infoLog("app was built");
     }
     pack();
     const uinput = process.stdin;
@@ -61,17 +59,10 @@ module.exports = function(prefport){
             core.infoLog("cant understand " + data);
         }
     });
-    
-    //set host port number
-    var port;
-
-    if(prefport === undefined){
+    if(port === undefined){
         port = 2550;
-    } else {
-        port = prefport;
-    } 
-
-    core.infoLog("Development server is starting at port "+ port);
+    }
+    core.infoLog("Development server is starting at localhost:"+ port);
     core.infoLog("in order to stop the server type \"stop\".");
 
     if(buildMode === "manual"){

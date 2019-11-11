@@ -13,29 +13,29 @@ const htmlCompiler = require("./cli-htmlcompiler");
 const csso = require("csso");
 var config;
 
-
+//FIXME: unneccessary junk in code because the config is loaded to the core.
 if(fs.existsSync(configPath)){
     config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
 } else {
     config = {entry:"noEntry"};
 }
-
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 const minifier = function (source){
     var min; 
     try {
         min = uglifyJS.minify(source);
         return min.code;
     } catch (e){
-        core.errorLog("An error happened while trying to minify a script");
+        core.errorLog("an error happened while trying to minify a script");
         return source;
     }
 };
 
-const existsRead = function(path){
+const existsRead = function (path){
     if(fs.existsSync(path)){
         return fs.readFileSync(path, "utf-8");
     } else {
-        core.errorLog("File could not be located. "+ path);
+        core.errorLog("file could not be located. "+ path);
         return process.exit(); 
     }
 };
@@ -86,11 +86,7 @@ const eliminateComponents = function(val){
 };
 
 const htmlCompressor = function(htmlsrc){
-    htmlsrc = htmlsrc.replace(/\s+/g, " ");
-    htmlsrc = htmlsrc.replace(/\r\n/g, "");
-    htmlsrc = htmlsrc.replace(/\>\s/g, ">");
-    htmlsrc = htmlsrc.replace(/\s\</g, "<");
-    return htmlsrc;
+    return htmlsrc.replace(/\s+/g, " ").replace(/\r\n/g, "").replace(/\>\s/g, ">").replace(/\s\</g, "<");
 };
 
 //Searches properties from objects in sourceCode
@@ -113,30 +109,22 @@ const cssSplitter = function(csssrc, componentTag){
         });
     }
     parsedContainerStyles = parsedContainerStyles.replace(containerRx, ".a7-component." + componentTag);
-    innerStyles = csssrc.replace(containerStylesRx, "");
-    return {container:parsedContainerStyles,innerStyles:innerStyles};     
+    return {container:parsedContainerStyles,innerStyles:csssrc.replace(containerStylesRx, "")};     
 };
 
 module.exports = function(sourceCode){
     sourceCode = "var a7importBridgeAPI = {};" + sourceCode;
     var CSSBundle = "";
     
-    if(config.css !== undefined){
-
-        if(config.css.bundle === true && config.css.file !== undefined){
+    if(config.css !== null){
+        if(config.css.bundle === true && config.css.file !== null){
             var cssFile = config.css.file;
-    
             if(fs.existsSync(cssFile) === true){
-                var mainCSS = fs.readFileSync(cssFile, "utf-8");
-                mainCSS = csso.minify(mainCSS, {
+                CSSBundle += csso.minify(fs.readFileSync(cssFile, "utf-8"), {
                     filename:cssFile
                 });
-    
-                CSSBundle += mainCSS;
-                
             }
         }
-
     }
 
     var imports = [];
@@ -159,9 +147,11 @@ module.exports = function(sourceCode){
             var importableModule = importFrom(Import);
 
             var documentFolder = importableModule.replace(/(\w|\n)+\.js/g, "");
+            //FIXME::::::::::::::: Abstraction
             var componentSourceCode = fs.readFileSync(entryFolder + importableModule.replace(/(\.|\.\/)/, ""), "utf-8");
             componentSourceCode = componentSourceCode.replace(/export default function\s*\(/, "function e(");
             componentSourceCode = componentSourceCode.replace(/export default function/, "function");
+            //::::::::::::::::::::
             
             var componentSetup = componentSourceCode.match(/return\s*\(\{(.|\s)*\}\)/)[0];
             var htmlPath = componentSource(findProp(componentSetup, "template"));
@@ -180,13 +170,10 @@ module.exports = function(sourceCode){
                 CSSPath = documentFolder + CSSPath.replace(/\.\//, "");
             }
 
-            var css = existsRead(CSSPath);
+            var css = existsRead(CSSPath).replace(/\s+/g, " ");
             var html = existsRead(htmlPath);
 
-            css = css.replace(/\s+/g, " ");
-
-            html = htmlCompressor(html);
-            html = html.replace(/\"/g, "\'");
+            html = htmlCompressor(html).replace(/\"/g, "\'");
             html = htmlCompiler(html);
             html = "a7.documentFragment(" + html + ")";
             //replace literals
@@ -200,9 +187,7 @@ module.exports = function(sourceCode){
             }
             
             var cssObject = cssSplitter(css, componentTag);
-            var innerCSS = cssObject.innerStyles;
-
-            var cssRules = innerCSS.match(/.+?\s*?\{.+?\}/g);
+            var cssRules = cssObject.innerStyles.match(/.+?\s*?\{.+?\}/g);
 
             if(cssRules !== null){
                 cssRules.forEach(function (rule){
@@ -213,10 +198,11 @@ module.exports = function(sourceCode){
             if (cssObject.container != ""){
                 CSSBundle += cssObject.container;
             }
-
+            //FIXME:::::::::::::::::::::
             var componentOutput = componentSourceCode.replace(componentSetup, "return " + html);
             componentOutput = componentOutput.replace(/((\'\')\s*\+\s*|(\s*\+\s*\'\'))/g, "");
             componentOutput = minifier(componentOutput);
+            //::::::::::::::::::::::::::
             var executableComponent = "/* " + importNameVar + " */a7.registerComponent(\""+componentTag+"\"," + componentOutput + ");function "+importNameVar+"(a){return a7.createElement(\""+componentTag+"\",a)}";
             sourceCode = sourceCode.replace(Import, executableComponent);
             imports += {from:importableModule,as:importNameVar};
@@ -246,30 +232,26 @@ module.exports = function(sourceCode){
                 moduleSourceCode = minifier(moduleSourceCode);
             }
 
-            var exportDefaultName = "";
-            var moduleSourceCodeMatches = moduleSourceCode.match(moduleExportEquals);
-            if(moduleSourceCodeMatches !== null){
-                moduleSourceCode = moduleSourceCode.replace(moduleSourceCodeMatches[0], "");
-                exportDefaultName = moduleSourceCodeMatches[0].replace(/(module.exports\s*=\s*|;)/g, "");
+            var exportName = "";
+            var moduleExport = moduleSourceCode.match(moduleExportEquals);
+            if(moduleExport !== null){
+                moduleSourceCode = moduleSourceCode.replace(moduleExport[0], "");
+                exportName = moduleExport[0].replace(/(module.exports\s*=\s*|;)/g, "");
 
             }
-            var importedModule = `;(function(){${moduleSourceCode} a7importBridgeAPI.${importNameVar}=${exportDefaultName};})();var ${importNameVar}=a7importBridgeAPI.${importNameVar};`;
-            var minifiedModule;
-            
+            var importedModule = `;(function(){${moduleSourceCode} a7importBridgeAPI.${importNameVar}=${exportName};})();var ${importNameVar}=a7importBridgeAPI.${importNameVar};`;
+
             if(config.mode === "production"){
-                minifiedModule = minifier(importedModule);
-            } else {
-                minifiedModule = importedModule;
+                importedModule = minifier(importedModule);
             }
-
-            sourceCode = sourceCode.replace(Import, "/* " + importNameVar + " */" + minifiedModule);
+            //replacing the import on the sourcecode with the modules contens
+            sourceCode = sourceCode.replace(Import, "/* " + importNameVar + " */" + importedModule);
             
             imports += {
                 from:importableModule,
                 as:importNameVar
             };
         });
-    
     }
 
     if (partialImports !== null){
@@ -280,26 +262,17 @@ module.exports = function(sourceCode){
         return core.errorLog("Importing only a part of a framework is not yet supported!");
     }
 
-    CSSBundle = cssMinifier(CSSBundle);
-
-    if(CSSBundle != ""){
+    if (CSSBundle != ""){
+        CSSBundle = cssMinifier(CSSBundle);
         sourceCode += "a7.loadCSS(\""+ CSSBundle + "\")";
     }
 
-
     if (config.mode === "production"){
-        sourceCode = "(function(){" + sourceCode + "})()";
-        sourceCode = uglifyJS.minify(sourceCode, {
-            compress:{
-                passes:1
-            },
-            mangle:{
-                toplevel:true
-            }
+        sourceCode = uglifyJS.minify("(function(){" + sourceCode + "})()", {
+            compress:{passes:1},
+            mangle:{toplevel:true}
         }).code;
     }
-
     core.successLog("app was built.");
-
     return sourceCode;
 };

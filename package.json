@@ -13,9 +13,9 @@
     "cli/cli-modules/cli-devserver.js",
     "cli/cli-modules/cli-cssminifier.js",
     "cli/cli-modules/cli-htmlcompiler.js",
-    "cli/project-template/defaultconfig.json",
-    "cli/project-template/defaultindex.html",
-    "cli/project-template/index.js"
+    "cli/defaults/config.json",
+    "cli/defaults/index.html",
+    "cli/defaults/index.js"
   ],
   "main": "src/a7.js",
   "scripts": {
@@ -49,7 +49,7 @@
     "chalk": "^2.4.2",
     "csso": "^3.5.1",
     "node-html-parser": "^1.1.16",
-    "uglify-js": "^3.6.0"
+    "uglify-js": "^3.6.8"
   },
   "types": "src/a7.d.ts"
 }

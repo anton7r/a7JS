@@ -7,21 +7,19 @@ const importer = require("./cli-importer");
 module.exports = function(settings) {
     var silent;
 
-    //loads passed in settings
+    //loads passed in settings a.k.a parameters
     if (settings !== undefined) {
         if (settings.silent === true){
             silent = true;
         }
-
     } else {
         silent = false;
     }
-
-    var config = JSON.parse(fs.readFileSync("./a7.config.json", "utf-8"));
+    
+    var config = core.config;
 
     if (config.entry === undefined){
-        core.errorLog("You have not defined the entrypoint of your app.");
-        return;
+        return core.errorLog("You have not defined the entrypoint of your app.");
     } 
     else {
         if(silent === false){
