@@ -42,7 +42,6 @@ module.exports = function(port, dir){
     var packaged;
     function pack(){
         packaged = build(fs.readFileSync(conf.entry, "utf-8"));
-        core.infoLog("app was built");
     }
     pack();
     const uinput = process.stdin;
@@ -69,6 +68,7 @@ module.exports = function(port, dir){
         core.infoLog("in order to build your code type \"build\".");
     } else if (buildMode === "auto") {
         core.infoLog("buildmode auto is enabled");
+        setInterval(pack, 1000);
     } else {
         core.errorLog("no config.devserver.buildmode specified.");
         core.atFileLog("a7.config.json");

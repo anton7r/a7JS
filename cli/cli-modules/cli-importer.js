@@ -3,23 +3,13 @@
 /* jshint -W049 */
 const fs = require("fs");
 const log = console.log;
-const pathToA7JS = require.resolve("../../src/a7.js");
-const self = "a7js";
 const uglifyJS = require("uglify-js");
-const configPath = "./a7.config.json";
 const core = require("./cli-core");
 const cssMinifier = require("./cli-cssminifier");
 const htmlCompiler = require("./cli-htmlcompiler");
 const csso = require("csso");
-var config;
+var config = core.config;
 
-//FIXME: unneccessary junk in code because the config is loaded to the core.
-if(fs.existsSync(configPath)){
-    config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
-} else {
-    config = {entry:"noEntry"};
-}
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 const minifier = function (source){
     var min; 
     try {
@@ -52,15 +42,6 @@ const componentSource = function (string){
     return string.match(/\".+\"/g)[0].replace(/\"/g, "");
 };
 
-//Since the cli is inside the a7JS node cannot find the module a7js for some reason.
-const replaceSelf = function(Module){
-    if(Module === self){
-        return require.resolve(pathToA7JS);
-    } else {
-        return Module;
-    }
-};
-
 const getEntryFolder = function(){
     if(config.entry !== "noEntry"){
         return config.entry.replace(/(\w|\d)+\.js/i, "");
@@ -69,12 +50,18 @@ const getEntryFolder = function(){
 
 const entryFolder = getEntryFolder();
 
-const importFrom = function(ImportStatement){
-    return ImportStatement.match(/(\"|\').+(\"|\')/i)[0].replace(/\"/g, "");
-};
+//purePath is our innovative technology to "relational pairing" from file paths to make them work on any given file system.
+//for example if you have ../ or ./ in the path purePath will happily remove it.
+const purePath = (path) => {
+    return path.replace(/(\/\.\/|\/.*\/\.\.\/)/g, "/")
+}
 
-const importName = function(ImportStatement){
-    return ImportStatement.replace(/import\s*/, "").replace(/\s*from\s*\".+?\";*/, "");
+const importHandler = function(imp){
+    return {
+        path: imp.match(/(\"|\').+(\"|\')/i)[0].replace(/\"/g, ""),
+        name: imp.replace(/import\s*/, "").replace(/\s*from\s*\".+?\";*/, ""),
+        sourceCode: "no value"
+    }
 };
 
 const eliminateComponents = function(val){
@@ -84,15 +71,9 @@ const eliminateComponents = function(val){
         return true;
     }
 };
-
-const htmlCompressor = function(htmlsrc){
-    return htmlsrc.replace(/\s+/g, " ").replace(/\r\n/g, "").replace(/\>\s/g, ">").replace(/\s\</g, "<");
-};
-
 //Searches properties from objects in sourceCode
 function findProp (findFrom, find){
-    var finder = new RegExp(find + "\s*:\s*\".+?\"", "i");
-    return findFrom.match(finder)[0];
+    return findFrom.match(new RegExp(find + "\s*:\s*\".+?\"", "i"))[0];
 }
 
 //splits css into non component container affecting to component container affecting ones
@@ -116,14 +97,12 @@ module.exports = function(sourceCode){
     sourceCode = "var a7importBridgeAPI = {};" + sourceCode;
     var CSSBundle = "";
     
-    if(config.css !== null){
-        if(config.css.bundle === true && config.css.file !== null){
-            var cssFile = config.css.file;
-            if(fs.existsSync(cssFile) === true){
-                CSSBundle += csso.minify(fs.readFileSync(cssFile, "utf-8"), {
-                    filename:cssFile
-                });
-            }
+    if(config.css.bundle === true && config.css.file !== null){
+        var cssFile = config.css.file;
+        if(fs.existsSync(cssFile) === true){
+            CSSBundle += csso.minify(fs.readFileSync(cssFile, "utf-8"), {
+                filename:cssFile
+            });
         }
     }
 
@@ -143,12 +122,12 @@ module.exports = function(sourceCode){
     if (componentImports !== null){
         this.imports += componentImports.length;
         componentImports.forEach(Import => {
-            var importNameVar = importName(Import);
-            var importableModule = importFrom(Import);
+            //imp means the imported object
+            var imp = importHandler(Import);
 
-            var documentFolder = importableModule.replace(/(\w|\n)+\.js/g, "");
-            //FIXME::::::::::::::: Abstraction
-            var componentSourceCode = fs.readFileSync(entryFolder + importableModule.replace(/(\.|\.\/)/, ""), "utf-8");
+            var documentFolder = imp.path.replace(/(\w|\n)+\.js/g, "");
+            //FIXME::::::::::::::: Abstraction move into import object
+            var componentSourceCode = fs.readFileSync(entryFolder + imp.path.replace(/(\.|\.\/)/, ""), "utf-8");
             componentSourceCode = componentSourceCode.replace(/export default function\s*\(/, "function e(");
             componentSourceCode = componentSourceCode.replace(/export default function/, "function");
             //::::::::::::::::::::
@@ -156,10 +135,8 @@ module.exports = function(sourceCode){
             var componentSetup = componentSourceCode.match(/return\s*\(\{(.|\s)*\}\)/)[0];
             var htmlPath = componentSource(findProp(componentSetup, "template"));
             var CSSPath = componentSource(findProp(componentSetup, "styles"));
-            
             var componentTag = findProp(componentSetup, "tag");
             componentTag = componentTag.match(/\".+?\"/)[0].replace(/\"/g, "");
-
             documentFolder = entryFolder + documentFolder.replace(/\./, "");
             
             if(isRelativePath(htmlPath)){
@@ -171,11 +148,7 @@ module.exports = function(sourceCode){
             }
 
             var css = existsRead(CSSPath).replace(/\s+/g, " ");
-            var html = existsRead(htmlPath);
-
-            html = htmlCompressor(html).replace(/\"/g, "\'");
-            html = htmlCompiler(html);
-            html = "a7.documentFragment(" + html + ")";
+            var html = "a7.documentFragment(" + htmlCompiler(existsRead(htmlPath)) + ")";
             //replace literals
             templateLiterals = html.match(/{{\s*.+?\s*}}/);
 
@@ -185,10 +158,8 @@ module.exports = function(sourceCode){
                     html = html.replace(literal, "\'+"+cleanLiteral+"+\'");
                 });
             }
-            
             var cssObject = cssSplitter(css, componentTag);
             var cssRules = cssObject.innerStyles.match(/.+?\s*?\{.+?\}/g);
-
             if(cssRules !== null){
                 cssRules.forEach(function (rule){
                     CSSBundle += ".a7-component." + componentTag+ " " + rule;
@@ -203,29 +174,32 @@ module.exports = function(sourceCode){
             componentOutput = componentOutput.replace(/((\'\')\s*\+\s*|(\s*\+\s*\'\'))/g, "");
             componentOutput = minifier(componentOutput);
             //::::::::::::::::::::::::::
-            var executableComponent = "/* " + importNameVar + " */a7.registerComponent(\""+componentTag+"\"," + componentOutput + ");function "+importNameVar+"(a){return a7.createElement(\""+componentTag+"\",a)}";
+            var executableComponent = "/* " + imp.name + " */a7.registerComponent(\""+componentTag+"\"," + componentOutput + ");function "+imp.name+"(a){return a7.createElement(\""+componentTag+"\",a)}";
             sourceCode = sourceCode.replace(Import, executableComponent);
-            imports += {from:importableModule,as:importNameVar};
+            imports += {from:imp.path,as:imp.name};
         });
     }
 
     if (wholeImports !== null){
         this.imports += wholeImports.length;
         wholeImports.forEach(Import => {
-            var importNameVar = importName(Import);
-            var importableModule = replaceSelf(importFrom(Import));
-
-            if(importableModule.charAt(0) === "."){
-                importableModule = importableModule.replace(".", "./app");
+            var imp = importHandler(Import);
+            console.log(imp);
+            
+            //if the package is a7js, it will go searching for it 
+            if(imp.path === "a7js"){
+                imp.path = require.resolve("../../src/a7.js");
+            } else if(imp.path.charAt(0) === "."){
+                imp.path = imp.path.replace(".", "./app");
             } else {
-                importableModule = require.resolve(importableModule);
+                imp.path = require.resolve(imp.path);
             }
 
-            var moduleSourceCode = fs.readFileSync(importableModule, "utf-8");
+            var moduleSourceCode = fs.readFileSync(imp.path, "utf-8");
             var modulesImports = moduleSourceCode.match(/(import\s+.+?\s+from\".*?\"|require\(.*?\))/g);
 
             if(modulesImports !== null){
-                core.errorLog("Module " + importNameVar +" has its own imports which we cannot right now import with our detections!");
+                core.errorLog("Module " + imp.name +" has its own imports which we cannot right now import with our detections!");
             }
 
             if(config.mode === "production"){
@@ -239,17 +213,17 @@ module.exports = function(sourceCode){
                 exportName = moduleExport[0].replace(/(module.exports\s*=\s*|;)/g, "");
 
             }
-            var importedModule = `;(function(){${moduleSourceCode} a7importBridgeAPI.${importNameVar}=${exportName};})();var ${importNameVar}=a7importBridgeAPI.${importNameVar};`;
+            var importedModule = `;(function(){${moduleSourceCode} a7importBridgeAPI.${imp.name}=${exportName};})();var ${imp.name}=a7importBridgeAPI.${imp.name};`;
 
             if(config.mode === "production"){
                 importedModule = minifier(importedModule);
             }
             //replacing the import on the sourcecode with the modules contens
-            sourceCode = sourceCode.replace(Import, "/* " + importNameVar + " */" + importedModule);
+            sourceCode = sourceCode.replace(Import, "/* " + imp.name + " */" + importedModule);
             
             imports += {
-                from:importableModule,
-                as:importNameVar
+                from:imp.path,
+                as:imp.name
             };
         });
     }
@@ -257,14 +231,13 @@ module.exports = function(sourceCode){
     if (partialImports !== null){
         this.imports += partialImports.length;
         partialImports.forEach(Import =>{
-            var importFromVar = importFrom(Import);
+            var imp = importHandler(Import);
         });
-        return core.errorLog("Importing only a part of a framework is not yet supported!");
+        return core.errorLog("Importing only a part of a framework or a library is not yet supported!");
     }
 
     if (CSSBundle != ""){
-        CSSBundle = cssMinifier(CSSBundle);
-        sourceCode += "a7.loadCSS(\""+ CSSBundle + "\")";
+        sourceCode += "a7.loadCSS(\""+ cssMinifier(CSSBundle) + "\")";
     }
 
     if (config.mode === "production"){

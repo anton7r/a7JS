@@ -6,68 +6,46 @@ const HTMLParser = require("node-html-parser");
 
 function buildEl(tag, src, content){
     var attributes = {};
-
     if(src !== undefined){
-
         var srcAttr = src.match(/(\@|)(\w|\d|\.)+?\=\'[^']+\'/g);
-    
         if(srcAttr !== null){
             srcAttr.forEach(function(val){
                 var attrName = val.match(/[^=]+/)[0];
                 var attrValue = val.match(/[^=]+$/)[0].replace(/\'/g, "");
-                
                 //is not a property
                 if(attrName.indexOf("@") !== 0){
-    
                     if(attrName.indexOf("a7on") === 0){
                         attrValue = attrValue.replace("()", "");
                     }
-    
                     attributes[attrName] = attrValue;
-    
                 } else {
-    
                     if(attributes.props === undefined){
                         attributes.props = {};
                     }
-    
                     var attrRName = attrName.replace("@", "");
-    
                     attributes.props[attrRName] = attrValue;
-    
                 }
-    
             });
         }
-    
     }
 
     if (src.match("a7link") !== null){
         attributes.a7link = "";
     }
-
     attributes = JSON.stringify(attributes);
-
     var EvListener = attributes.match(/\"a7on\w*\":\"[\w|\d\_]*\"/i);
-
     if(EvListener !== null){
         EvListener.forEach(function(val){
-
             var event = val.match(/\".+?\"/);
             var listener = val.match(/\:\".+?\"/)[0].replace(/\"/g, "");
-
             attributes = attributes.replace(val, event + listener);
-       
         });
     }
-
     if(attributes === "{}"){
         attributes = 0;
     } else {
         attributes = attributes.replace(/\"/g, "'");
     }
-
-
 
     return "a7.createElement(\'"+tag+"\',"+attributes+","+content+"),";
 }
@@ -87,29 +65,22 @@ function __ChildNodes(nodes){
             compiled += "\'" + _node.rawText + "\',";
         }
     });
-
     return compiled.replace(/,\)/, ")").replace(/\',\)/, "')");
-
 }
 
 module.exports = function htmlCompiler(html){
+    html = html.replace(/\s+/g, " ").replace(/\r\n/g, "").replace(/\>\s/g, ">").replace(/\s\</g, "<").replace(/\"/g, "\'");
     var compiled = "";
-    var vDOM = HTMLParser.parse(html);
-    var Nodes = vDOM.childNodes;
+    //parses html
+    var Nodes = HTMLParser.parse(html).childNodes;
     var NodeCount = Nodes.length;
 
     for(var i = 0; i < NodeCount; i++){
-
         var currentNode = Nodes[i];
-        //console.log(currentNode);
-
         var tag = currentNode.tagName;
         var inner = __ChildNodes(currentNode.childNodes);
-
-
         var attributes = currentNode.rawAttrs;
         compiled += buildEl(tag, attributes, inner);
-        
     }
     return compiled.replace(/\,\)/g, ")").replace(/\,\"\"/g, "").replace(/\)\,$/g, ")").replace(/\',\)/g, "')").replace(/\),\)/g, "))");
 
