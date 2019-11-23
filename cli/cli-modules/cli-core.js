@@ -38,7 +38,7 @@ module.exports = {
     },
 
     getImports: function(){
-        var source = fs.readFileSync(config.entry, "utf-8");
+        var source = fs.readFileSync(this.config.entry, "utf-8");
         var imports = source.match(/import\s+(\d|\w|\_)+\s+from\s*\".+\";*/gi);
         return {imports:imports,source:source};
     },

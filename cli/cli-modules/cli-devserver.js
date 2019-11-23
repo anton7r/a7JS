@@ -57,9 +57,11 @@ module.exports = function(port, dir){
             core.infoLog("cant understand " + data);
         }
     });
+
     if(port === undefined){
         port = 2550;
     }
+    
     core.infoLog("Development server is starting at localhost:"+ port);
     core.infoLog("in order to stop the server type \"stop\".");
 
@@ -74,7 +76,7 @@ module.exports = function(port, dir){
         process.exit();
     }
 
-    var server = http.createServer(function (req, res){
+    http.createServer(function (req, res){
         var types = req.headers.accept;//.split(",")
         var type;
         if (types.indexOf("," > 0)){
@@ -92,7 +94,7 @@ module.exports = function(port, dir){
 
         var file = resolveFile(req.url);
         
-        if(type !== "png/image"){
+        if(type !== "png/image") {
             res.writeHead(200, {'Content-Type': type, 'Content-Encoding': "gzip"});
             zlib.gzip(new Buffer.alloc(file.length, file, "utf-8"), function(_, result){
                 res.end(result);
