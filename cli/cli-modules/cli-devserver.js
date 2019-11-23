@@ -8,7 +8,7 @@ const build = require("./cli-importer");
 var conf = core.config;
 var rootDir;
 var buildMode = conf.devserver.buildmode;
-var packaged;
+var packaged = "";
 const resolveFile = function(url){
     //CHECK:FIXME: abstraction needed
     if(fs.existsSync(rootDir+url)){
@@ -17,7 +17,8 @@ const resolveFile = function(url){
         }
     }
     // UP
-    if(url === conf.output){
+
+    if("."+url === conf.output){
         return packaged;
     } else if(url === "/"){
         if (fs.existsSync(rootDir + "index.html")) {
@@ -39,9 +40,11 @@ module.exports = function(port, dir){
     } else {
         rootDir = "./"
     }
+
     function pack(){
         packaged = build(fs.readFileSync(conf.entry, "utf-8"));
     }
+
     pack();
     const uinput = process.stdin;
     uinput.setEncoding("utf-8");
@@ -79,7 +82,10 @@ module.exports = function(port, dir){
     http.createServer(function (req, res){
         var types = req.headers.accept;//.split(",")
         var type;
-        if (types.indexOf("," > 0)){
+
+        if (types === "" || types === undefined){
+            type = "";
+        } else if (types.indexOf("," > 0)){
             var t = types.split(",");
             for(var i = 0; i<t.length; i++){
                 if(t[i] !== "*/*"){
@@ -93,10 +99,10 @@ module.exports = function(port, dir){
         }
 
         var file = resolveFile(req.url);
-        
-        if(type !== "png/image") {
+
+        if(type !== "png/image" || type !== "") {
             res.writeHead(200, {'Content-Type': type, 'Content-Encoding': "gzip"});
-            zlib.gzip(new Buffer.alloc(file.length, file, "utf-8"), function(_, result){
+            zlib.gzip(new Buffer.from(file, "utf-8"), function(_, result){
                 res.end(result);
             });
         } else {

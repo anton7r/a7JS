@@ -184,7 +184,6 @@ module.exports = function(sourceCode){
         this.imports += wholeImports.length;
         wholeImports.forEach(Import => {
             var imp = importHandler(Import);
-            console.log(imp);
             
             //if the package is a7js, it will go searching for it 
             if(imp.path === "a7js"){
