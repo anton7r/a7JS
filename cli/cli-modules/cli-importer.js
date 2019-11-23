@@ -213,6 +213,7 @@ module.exports = function(sourceCode){
                 exportName = moduleExport[0].replace(/(module.exports\s*=\s*|;)/g, "");
 
             }
+
             var importedModule = `;(function(){${moduleSourceCode} a7importBridgeAPI.${imp.name}=${exportName};})();var ${imp.name}=a7importBridgeAPI.${imp.name};`;
 
             if(config.mode === "production"){
@@ -220,7 +221,6 @@ module.exports = function(sourceCode){
             }
             //replacing the import on the sourcecode with the modules contens
             sourceCode = sourceCode.replace(Import, "/* " + imp.name + " */" + importedModule);
-            
             imports += {
                 from:imp.path,
                 as:imp.name

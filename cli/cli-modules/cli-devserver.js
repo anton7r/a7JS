@@ -8,7 +8,7 @@ const build = require("./cli-importer");
 var conf = core.config;
 var rootDir;
 var buildMode = conf.devserver.buildmode;
-
+var packaged;
 const resolveFile = function(url){
     //CHECK:FIXME: abstraction needed
     if(fs.existsSync(rootDir+url)){
@@ -39,7 +39,6 @@ module.exports = function(port, dir){
     } else {
         rootDir = "./"
     }
-    var packaged;
     function pack(){
         packaged = build(fs.readFileSync(conf.entry, "utf-8"));
     }
@@ -92,6 +91,7 @@ module.exports = function(port, dir){
         }
 
         var file = resolveFile(req.url);
+        
         if(type !== "png/image"){
             res.writeHead(200, {'Content-Type': type, 'Content-Encoding': "gzip"});
             zlib.gzip(new Buffer.alloc(file.length, file, "utf-8"), function(_, result){
@@ -101,5 +101,6 @@ module.exports = function(port, dir){
             res.writeHead(200, {'Content-Type': type});
             res.end(file);
         }
+
     }).listen(port);
 };
