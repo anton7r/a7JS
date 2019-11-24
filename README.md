@@ -79,6 +79,10 @@ License is MIT see [license](https://github.com/anton7r/a7JS/blob/master/LICENSE
 
 # Changes
 
+## 4.0.0-rc.1.5
+
+Bug fixes all the way!
+
 ## 4.0.0-rc.1.4
 
 Code abstraction and improved performance.
