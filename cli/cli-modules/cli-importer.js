@@ -96,7 +96,7 @@ const cssSplitter = function(csssrc, componentTag){
 };
 
 module.exports = function(sourceCode){
-    sourceCode = "var a7importBridgeAPI = {};\n" + sourceCode;
+    sourceCode = "var a7_i = {};\n" + sourceCode;
     var CSSBundle = "";
     
     if(config.css.bundle === true && config.css.file !== null){
@@ -166,10 +166,13 @@ module.exports = function(sourceCode){
             if (cssObject.container != ""){
                 CSSBundle += cssObject.container;
             }
-            var out = componentSrc.replace(componentSetup, "return " + html);
-            out = out.replace(/((\'\')\s*\+\s*|(\s*\+\s*\'\'))/g, "");
-            out = minifier(out);
-            var exec = "/* " + imp.name + " */a7.registerComponent(\""+tag+"\"," + out + ");function "+imp.name+"(a){return a7.createElement(\""+tag+"\",a)}";
+
+            var out = minifier(multiReplace(componentSrc,
+                [componentSetup, "return " + html],
+                [/((\'\')\s*\+\s*|(\s*\+\s*\'\'))/g, ""]
+            ));
+
+            var exec = "a7.registerComponent(\""+tag+"\"," + out + ");function "+imp.name+"(a){return a7.createElement(\""+tag+"\",a)}";
             sourceCode = sourceCode.replace(Import, exec);
             imports += {from:imp.path,as:imp.name};
         });
@@ -207,7 +210,7 @@ module.exports = function(sourceCode){
                 exportName = modExp[0].replace(/(module.exports\s*=\s*|;)/g, "");
             }
 
-            var mod = `;(function(){${modSrc} a7importBridgeAPI.${imp.name}=${exportName};})();var ${imp.name}=a7importBridgeAPI.${imp.name};`;
+            var mod = `;(function(){${modSrc} a7_i.${imp.name}=${exportName};})();var ${imp.name}=a7_i.${imp.name};`;
 
             if(config.mode === "production"){
                 mod = minifier(mod);
@@ -230,7 +233,7 @@ module.exports = function(sourceCode){
     }
 
     if (CSSBundle != ""){
-        sourceCode += "a7.loadCSS(\""+ cssMinifier(CSSBundle) + "\")";
+        sourceCode += "a7.loadCSS(\""+cssMinifier(CSSBundle)+"\")";
     }
 
     if (config.mode === "production"){
