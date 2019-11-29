@@ -41,14 +41,6 @@ const existsRead = function (path){
     }
 };
 
-const isRelativePath = function (url){
-    if (url[0].charAt(0) === "."){
-        return true;
-    } else {
-        return false;
-    }
-};
-
 const componentSource = function (string){
     return string.match(/\".+\"/g)[0].replace(/\"/g, "");
 };
@@ -68,11 +60,9 @@ const purePath = (path) => {
 }
 
 const importHandler = function(imp){
-    return {
-        path: imp.match(/(\"|\').+(\"|\')/i)[0].replace(/\"/g, ""),
-        name: imp.replace(/import\s*/, "").replace(/\s*from\s*\".+?\";*/, ""),
-        sourceCode: "no value"
-    }
+    this.path = imp.match(/(\"|\').+(\"|\')/i)[0].replace(/\"/g, "");
+    this.name = imp.replace(/import\s*/, "").replace(/\s*from\s*\".+?\";*/, "");
+    return this;
 };
 
 const eliminateComponents = function(val){
@@ -136,13 +126,11 @@ module.exports = function(sourceCode){
             //imp means the imported object
             var imp = importHandler(Import);
             var documentFolder = imp.path.replace(/(\w|\n)+\.js/g, "");
-            
             var componentSourceCode = multiReplace(
                 fs.readFileSync(entryFolder + imp.path.replace(/(\.|\.\/)/, ""), "utf-8"),
                 [/export default function\s*\(/, "function e("],
                 [/export default function/, "function"]
             );
-            
             var componentSetup = componentSourceCode.match(/return\s*\(\{(.|\s)*\}\)/)[0];
             var htmlPath = componentSource(findProp(componentSetup, "template"));
             var CSSPath = componentSource(findProp(componentSetup, "styles"));
@@ -150,13 +138,8 @@ module.exports = function(sourceCode){
             componentTag = componentTag.match(/\".+?\"/)[0].replace(/\"/g, "");
             documentFolder = entryFolder + documentFolder.replace(/\./, "");
             
-            if(isRelativePath(htmlPath)){
-                htmlPath = documentFolder + htmlPath.replace(/\.\//, "");
-            }
-
-            if(isRelativePath(CSSPath)){
-                CSSPath = documentFolder + CSSPath.replace(/\.\//, "");
-            }
+            htmlPath = purePath(documentFolder + htmlPath);
+            CSSPath = purePath(documentFolder + CSSPath);
 
             var css = existsRead(CSSPath).replace(/\s+/g, " ");
             var html = "a7.documentFragment(" + htmlCompiler(existsRead(htmlPath)) + ")";
@@ -179,11 +162,9 @@ module.exports = function(sourceCode){
             if (cssObject.container != ""){
                 CSSBundle += cssObject.container;
             }
-            //FIXME:::::::::::::::::::::
             var componentOutput = componentSourceCode.replace(componentSetup, "return " + html);
             componentOutput = componentOutput.replace(/((\'\')\s*\+\s*|(\s*\+\s*\'\'))/g, "");
             componentOutput = minifier(componentOutput);
-            //::::::::::::::::::::::::::
             var executableComponent = "/* " + imp.name + " */a7.registerComponent(\""+componentTag+"\"," + componentOutput + ");function "+imp.name+"(a){return a7.createElement(\""+componentTag+"\",a)}";
             sourceCode = sourceCode.replace(Import, executableComponent);
             imports += {from:imp.path,as:imp.name};
@@ -199,7 +180,7 @@ module.exports = function(sourceCode){
             if(imp.path === "a7js"){
                 imp.path = require.resolve("../../src/a7.js");
             } else if(imp.path.charAt(0) === "."){
-                imp.path = imp.path.replace(".", "./app");
+                imp.path = purePath("./app/" + imp.path)
             } else {
                 imp.path = require.resolve(imp.path);
             }
