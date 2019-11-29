@@ -11,6 +11,7 @@ const csso = require("csso");
 var config = core.config;
 
 const minifier = function (source){
+    source = purePath(source);
     try {
         var min = uglifyJS.minify(source);
         if(min.code === undefined){
@@ -125,21 +126,24 @@ module.exports = function(sourceCode){
         componentImports.forEach(Import => {
             //imp means the imported object
             var imp = importHandler(Import);
-            var documentFolder = imp.path.replace(/(\w|\n)+\.js/g, "");
-            var componentSourceCode = multiReplace(
-                fs.readFileSync(entryFolder + imp.path.replace(/(\.|\.\/)/, ""), "utf-8"),
+            //path to component folder
+            var folder = purePath(entryFolder +imp.path.replace(/(\w|\n)+\.js/g, ""));
+            
+            //Component sourcecode
+            var componentSrc = multiReplace(
+                existsRead(entryFolder + imp.path),
                 [/export default function\s*\(/, "function e("],
                 [/export default function/, "function"]
             );
-            var componentSetup = componentSourceCode.match(/return\s*\(\{(.|\s)*\}\)/)[0];
+
+            var componentSetup = componentSrc.match(/return\s*\(\{(.|\s)*\}\)/)[0];
             var htmlPath = componentSource(findProp(componentSetup, "template"));
             var CSSPath = componentSource(findProp(componentSetup, "styles"));
-            var componentTag = findProp(componentSetup, "tag");
-            componentTag = componentTag.match(/\".+?\"/)[0].replace(/\"/g, "");
-            documentFolder = entryFolder + documentFolder.replace(/\./, "");
+            var tag = findProp(componentSetup, "tag");
+            tag = tag.match(/\".+?\"/)[0].replace(/\"/g, "");
             
-            htmlPath = purePath(documentFolder + htmlPath);
-            CSSPath = purePath(documentFolder + CSSPath);
+            htmlPath = purePath(folder + htmlPath);
+            CSSPath = purePath(folder + CSSPath);
 
             var css = existsRead(CSSPath).replace(/\s+/g, " ");
             var html = "a7.documentFragment(" + htmlCompiler(existsRead(htmlPath)) + ")";
@@ -151,22 +155,22 @@ module.exports = function(sourceCode){
                     html = html.replace(literal, "\'+"+cleanLiteral+"+\'");
                 });
             }
-            var cssObject = cssSplitter(css, componentTag);
+            var cssObject = cssSplitter(css, tag);
             var cssRules = cssObject.innerStyles.match(/.+?\s*?\{.+?\}/g);
             if(cssRules !== null){
                 cssRules.forEach(function (rule){
-                    CSSBundle += ".a7-component." + componentTag+ " " + rule;
+                    CSSBundle += ".a7-component." + tag+ " " + rule;
                 });
             }
 
             if (cssObject.container != ""){
                 CSSBundle += cssObject.container;
             }
-            var componentOutput = componentSourceCode.replace(componentSetup, "return " + html);
-            componentOutput = componentOutput.replace(/((\'\')\s*\+\s*|(\s*\+\s*\'\'))/g, "");
-            componentOutput = minifier(componentOutput);
-            var executableComponent = "/* " + imp.name + " */a7.registerComponent(\""+componentTag+"\"," + componentOutput + ");function "+imp.name+"(a){return a7.createElement(\""+componentTag+"\",a)}";
-            sourceCode = sourceCode.replace(Import, executableComponent);
+            var out = componentSrc.replace(componentSetup, "return " + html);
+            out = out.replace(/((\'\')\s*\+\s*|(\s*\+\s*\'\'))/g, "");
+            out = minifier(out);
+            var exec = "/* " + imp.name + " */a7.registerComponent(\""+tag+"\"," + out + ");function "+imp.name+"(a){return a7.createElement(\""+tag+"\",a)}";
+            sourceCode = sourceCode.replace(Import, exec);
             imports += {from:imp.path,as:imp.name};
         });
     }
@@ -184,33 +188,32 @@ module.exports = function(sourceCode){
             } else {
                 imp.path = require.resolve(imp.path);
             }
+            //modSrc is moduleSourceCode
+            var modSrc = fs.readFileSync(imp.path, "utf-8");
+            //modImp finds modules imports
+            var modImp = modSrc.match(/(import\s+.+?\s+from\".*?\"|require\(.*?\))/g);
 
-            var moduleSourceCode = fs.readFileSync(imp.path, "utf-8");
-            var modulesImports = moduleSourceCode.match(/(import\s+.+?\s+from\".*?\"|require\(.*?\))/g);
-
-            if(modulesImports !== null){
+            if(modImp !== null){
                 core.errorLog("Module " + imp.name +" has its own imports which we cannot right now import with our detections!");
-            }
-
-            if(config.mode === "production"){
-                moduleSourceCode = minifier(moduleSourceCode);
+                return;
+            } else if(config.mode === "production"){
+                modSrc = minifier(modSrc);
             }
 
             var exportName = "";
-            var moduleExport = moduleSourceCode.match(moduleExportEquals);
-            if(moduleExport !== null){
-                moduleSourceCode = moduleSourceCode.replace(moduleExport[0], "");
-                exportName = moduleExport[0].replace(/(module.exports\s*=\s*|;)/g, "");
-
+            var modExp = modSrc.match(moduleExportEquals);
+            if(modExp !== null){
+                modSrc = modSrc.replace(modExp[0],"");
+                exportName = modExp[0].replace(/(module.exports\s*=\s*|;)/g, "");
             }
 
-            var importedModule = `;(function(){${moduleSourceCode} a7importBridgeAPI.${imp.name}=${exportName};})();var ${imp.name}=a7importBridgeAPI.${imp.name};`;
+            var mod = `;(function(){${modSrc} a7importBridgeAPI.${imp.name}=${exportName};})();var ${imp.name}=a7importBridgeAPI.${imp.name};`;
 
             if(config.mode === "production"){
-                importedModule = minifier(importedModule);
+                mod = minifier(mod);
             }
             //replacing the import on the sourcecode with the modules contens
-            sourceCode = sourceCode.replace(Import, "/* " + imp.name + " */" + importedModule);
+            sourceCode = sourceCode.replace(Import, "/* " + imp.name + " */" + mod);
             imports += {
                 from:imp.path,
                 as:imp.name
