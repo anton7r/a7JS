@@ -103,7 +103,7 @@ const cssSplitter = function(csssrc, componentTag){
 };
 
 module.exports = function(sourceCode){
-    sourceCode = "var a7importBridgeAPI = {};" + sourceCode;
+    sourceCode = "var a7importBridgeAPI = {};\n" + sourceCode;
     var CSSBundle = "";
     
     if(config.css.bundle === true && config.css.file !== null){
@@ -141,8 +141,6 @@ module.exports = function(sourceCode){
                 [/export default function\s*\(/, "function e("],
                 [/export default function/, "function"]
             );
-            
-            console.log(componentSourceCode);
             
             var componentSetup = componentSourceCode.match(/return\s*\(\{(.|\s)*\}\)/)[0];
             var htmlPath = componentSource(findProp(componentSetup, "template"));
