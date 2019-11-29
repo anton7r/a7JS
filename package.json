@@ -1,7 +1,7 @@
 {
   "name": "a7js",
   "version": "4.0.0-rc1.6",
-  "description": "a7JS is a spa framework",
+  "description": "a7JS is a frontend spa framework which is very modular",
   "files": [
     "src/a7.js",
     "cli/cli.js",
@@ -31,10 +31,8 @@
     "js-framework",
     "router",
     "javascript-compiler",
-    "compiler",
     "front-end",
-    "framework",
-    "js-bundler"
+    "framework"
   ],
   "author": "anton7r",
   "license": "MIT",
@@ -49,7 +47,7 @@
     "chalk": "^2.4.2",
     "csso": "^3.5.1",
     "node-html-parser": "^1.1.16",
-    "uglify-js": "^3.6.8"
+    "uglify-js": "^3.7.0"
   },
   "types": "src/a7.d.ts"
 }
