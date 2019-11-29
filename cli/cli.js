@@ -6,7 +6,7 @@ const fs = require("fs");
 const chalk = require("chalk");
 const a7build = require("./cli-modules/cli-build.js");
 const core = require("./cli-modules/cli-core.js");
-const [, , ...args] = process.argv;
+const [,,...args] = process.argv;
 
 const createHtmlDoc = function (name) {
     return fs.readFileSync(require.resolve("./defaults/index.html"), "utf-8", function(err){
@@ -14,17 +14,14 @@ const createHtmlDoc = function (name) {
     }).replace(/\$/g, name);
 };
 
-const cssDoc = `:root{\n    --main-color:black;\n    --bg-color:white;\n}\n\n* {\n    margin:0px;\n    padding:0px;\n}\n\nbody {\n    font-family:"FONT HERE";\n}`;
+const cssDoc = `:root{}\n\n* {\n    margin:0px;\n    padding:0px;\n}\n\nbody {\n    font-family:"FONT HERE";\n}`;
 
 const a7greet = function () {
-    log();
-    log("================", chalk.blue("a7JS"), "================");
-    log("installed version:", chalk.green(core.getVersion()));
-    log();
+    log(chalk.blue("A7JS")+chalk.gray("@"+core.getVersion()), "\n");
 };
 
 const a7helper = function () {
-        log("=============", chalk.blue("a7JS Help"), "==============");
+        log(chalk.blue("A7JS help\n"));
         core.helperLog("newproject", "create a new project with a7.");
         core.syntaxLog("a7 newproject [projectname]");
         core.syntaxLog("a7 np [projectname]");
@@ -35,7 +32,6 @@ const a7helper = function () {
         core.syntaxLog("a7 build");
         core.helperLog("devserver", "start a development server [beta]");
         core.syntaxLog("a7 devserver [port(optional)]");
-        log("======================================");
 };
 
 const a7newproject = function (name) {
@@ -107,10 +103,8 @@ const a7createComponent = function(name, absolutePath) {
     var jsFileName = _file + ".js";
     var cssFileName = _file + ".css";
     var htmlFileName = _file + ".html";
-    
     var _imports = core.getImports();
     var last = _imports.imports[_imports.imports.length - 1];
-    
     var source = _imports.source.replace(last, last + ";\nimport "+name+" from \"./components/"+name+"/"+name+".js\";").replace(";;", ";");
 
     if(core.htmlTags.indexOf(name) !== -1){

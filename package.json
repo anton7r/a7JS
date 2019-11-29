@@ -7,7 +7,7 @@
     "cli/cli.js",
     "cli/cli-modules/cli-core.js",
     "cli/cli-modules/cli-build.js",
-    "cli/cli-modules/cli-tags.js",
+    "cli/htmltags.txt",
     "cli/cli-modules/cli-importer.js",
     "cli/cli-modules/cli-subimporter.js",
     "cli/cli-modules/cli-devserver.js",

@@ -3,13 +3,13 @@
  *          anton7r (C) 2019
  */
 
-//debugging function which should not be public facing
 var isMobile = false;
 
 if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
     isMobile = true;
 }
 
+//debugging function which should not be public facing
 function a7debug(message) {
     console.warn("A7JS: " + message);
 }
@@ -26,20 +26,16 @@ var init = function () {
     var deprecated2 = document.querySelector("[a7-page-container]");
 
     if(deprecated !== null){
-        a7debug("Replace \"data-a7-page-container\" with \"a7app\" and then your app should work fine");
+        a7debug("Replace \"data-a7-page-container\" with \"a7app\" in the index.html file and then your app should work fine, this error message is going to be removed when a7js v4 full release comes around");
         return;
-    
     } else if (deprecated2 !== null){
-        a7debug("Replace \"a7-page-container\" with \"a7app\" and then your app should work fine");
+        a7debug("Replace \"a7-page-container\" with \"a7app\" in the index.html file and then your app should work fine, this error message is going to be removed when a7js v4 full release comes around");
         return;
     }
-
     var pageContainerEL = document.querySelector("[a7app]");
-
     if (pageContainerEL === null) {
         a7debug("Page Container Could not be found, It has to have the attribute \"a7app\". Your website won't function without that.");
         return;
-    
     }
 
     //assignment of a7store[9] aka pageContainer
@@ -72,27 +68,21 @@ var init = function () {
             );
         }
     }
-
     //links init
     var linkcollection = document.getElementsByTagName("a");
-
     for (var y = 0; y < linkcollection.length; y++) {
         if (linkcollection[y].dataset.a7link !== undefined | linkcollection[y].getAttribute("a7link") !== null) {
             linkHandler(linkcollection[y]);
         }
     }
-
     //descriptions
     var descL = document.getElementsByName("description");
-
     if (descL.length !== 0) {
         a7store[6].push(descL[0]);
         var descContent = descL[0].getAttribute("content");
-
         if (descContent !== undefined) {
             a7store[11] = descContent;
         }
-
     } else {
         document.getElementsByTagName("head")[0].innerHTML += "<meta name=\"description\" content=\"\">";
         a7store[6].push(document.getElementsByName("description")[0]);
@@ -145,17 +135,13 @@ var eventListeners = function (elm, attributes){
     return elm;
 };
 
-
 var render = function (elem) {
-    
     //a7store[9] is pageContainer
-    var appRoot = a7store[9];
-
-    if(appRoot.children.length !== 0){
-        appRoot.removeChild(appRoot.lastChild);
+    if(a7store[9].children.length !== 0){
+        a7store[9].removeChild(a7store[9].lastChild);
     }
 
-    appRoot.appendChild(elem);
+    a7store[9].appendChild(elem);
 };
 
 //very useful 
@@ -163,8 +149,8 @@ if (!"".trim) String.prototype.trim = function () {
     return this.replace(/^[\s﻿]+|[\s﻿]+$/g, '');
 };
 
-//we changed a7store object to an array because we tested that arrays are simply about 33% faster than objects
-//which would give us a huge performance increase
+//arrays are simply about 33% faster than objects
+//which gives us a huge performance increase
 var a7store = Array(15);
 a7store = [
     "v4-pre", //Version       0
@@ -183,10 +169,8 @@ a7store = [
     true, //secureProps mode  13
     {}, //Routes              14
 ];
-
 /* internal methods end */
 
-/* outfacing api start */
 var a7 = {};
 
 a7.ver = function () {
@@ -205,7 +189,6 @@ a7.secureProps = function (mode) {
     } else {
         a7debug("The parameter 1 (mode) only accepts booleans.");
     }
-
     if (mode === false) {
         a7debug("BEWARE: Props are secure by default and setting them unsecure means that your app can potentially have an xss vulnerability.");
     }
@@ -219,11 +202,8 @@ a7.createElement = function (element, attributes) {
     var component = a7store[1][element];
 
     if (attributes === undefined | null | "null" | 0) {
-        
         attributes = {};
-
     } else if (attributes.props) {
-        
         props = attributes.props;
         delete attributes.props;
     }
@@ -243,27 +223,18 @@ a7.createElement = function (element, attributes) {
         var cElement = document.createElement("div");
         cElement.className = "a7-component " + element;
         cElement.appendChild(component(props));
-
         cElement = eventListeners(cElement, attributes);
-
+        //FIXME: for in loops not recommended
         for (attr in attributes){
-
             cElement.setAttribute(attr, attributes[attr]);
-
         }
-
         return cElement;
-    
     } else {
         //It's a regular element
         var rElement = document.createElement(element);
-        
         rElement = eventListeners(rElement, attributes); 
-
         for (attr in attributes){
-
             rElement.setAttribute(attr, attributes[attr]);
-
         }
 
         //children
@@ -272,27 +243,19 @@ a7.createElement = function (element, attributes) {
 
         for (curVal = 2; curVal < argLen; curVal++) {
             var currentArg = arguments[curVal];
-
             //loops through the rest of the arguments
             if(typeof currentArg === "string" && currentArg !== ""){
-                
                 rElement.innerText += currentArg;
-
             } else if (typeof currentArg === "number"){
-                
                 // instance of number
                 rElement.innerText += currentArg;
-
             } else if (currentArg instanceof Element){
-                
                 //instance of element
                 rElement.appendChild(currentArg);
-
             } else {
                 //edge case
                 a7debug("cant recognize type of "+ currentArg);
             }
-
         }
         return rElement;
     }
@@ -315,31 +278,24 @@ a7.onDesktop = function(func){
 };
 
 a7.observable = function (){
-    
     var listeners = [];
     
     var set = function (newValue){
         this.value = newValue;
-        
         if(listeners !== undefined){
             var listLen = listeners.length;
-            
             for(var i = 0; i < listLen; i++){
                 listeners[i]();
             }
         }
-
         return newValue;
     };
-
     var addListener = function (Listener){
         listeners.push(Listener);
     };
-
     this.set = set;
     this.addListener = addListener;
     this.listeners = listeners;
-
     return this;
 };
 
@@ -379,22 +335,16 @@ a7.globalObservable = function (ObservalbeName) {
 };
 
 a7.documentFragment = function () {
-    
     var length = arguments.length,
         i,
         result = document.createDocumentFragment();
+
     for (i = 0; i < length; i++) {
-        
         if(typeof arguments[i] === "string"){
-
             result.appendChild(document.createTextNode(arguments[i]));
-
         } else {
-
             result.appendChild(arguments[i]);
-
         }
-
     }
     return result;
 };
@@ -405,11 +355,8 @@ a7.loadCSS = function(css){
 
 a7.registerComponent = function (compName, compFunc) {
     if (a7store[1][compName] === undefined) {
-
         a7store[1][compName] = compFunc;
-
     } else {
-        
         a7debug("That component is already registered!");
     }
 };
@@ -516,7 +463,6 @@ a7.path = function (newPath) {
 
 //Resolves any path you give
 a7.router = function (newPath) {
-
     if (newPath.indexOf("/") === 0) {
         newPath = newPath.replace("/", "");
     }
@@ -540,13 +486,11 @@ a7.router = function (newPath) {
     }
 
     var renderable = routes[route]();
-
     var i;
     var links = renderable.getElementsByTagName("a");
     
     if(links !== null){
         for (i = 0; i < links.length; i++) {
-
             if(links[i].getAttribute("a7link") === ""){
                 linkHandler(links[i]);
             }
@@ -559,7 +503,5 @@ a7.router = function (newPath) {
 
     scrollTo(0, pageXOffset);
 };
-/* outfacing api end */
-
 
 module.exports = a7;

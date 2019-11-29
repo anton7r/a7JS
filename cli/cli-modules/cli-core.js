@@ -24,7 +24,7 @@ module.exports = {
 
     importA7rx: /import (a7|{.+?}) from \"a7JS\"(;|)/i,
     pathToA7JS: require.resolve("../../src/a7.js"),
-    htmlTags: require("./cli-tags.js"),
+    htmlTags: fs.readFileSync(require.resolve("../htmltags.txt"), "utf-8").replace(/\r/g, "").split("\n"),
     componentSource: function (string){
         return string.match(/\".+\"/g)[0].replace(/\"/g, "");
     },
@@ -53,23 +53,23 @@ module.exports = {
     },
 
     atFileLog: function (file){
-        log(chalk.red("At file:"), file);
+        log(chalk.red("AT FILE:"), file);
     },
 
     successLog: function (msg){
-        log(chalk.green("SUCCESS:"), msg);
+        log(chalk.green("SUCCESS"), msg);
     },
 
     errorLog: function (msg){
-        log(chalk.red("ERROR:"), msg) ;
+        log(chalk.red("ERROR"), msg) ;
     },
 
     infoLog: function (msg){
-        log(chalk.cyan("INFO:"), msg);
+        log(chalk.cyan("INFO"), msg);
     },
 
     fileCreatedLog: function (fileName){
-        log(chalk.cyan("INFO:"), " file", fileName, "was created.");
+        log(chalk.cyan("INFO"), " file", fileName, "was created.");
     },
 
     helperLog: function (argument, text){

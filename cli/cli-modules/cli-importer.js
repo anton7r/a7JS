@@ -21,6 +21,15 @@ const minifier = function (source){
     }
 };
 
+const multiReplace = function(from){
+    const args = arguments;
+    for(let i = 1; i < arguments.length; i++){
+        let c = args[i];
+        from.replace(c[0], c[1]);
+    }
+    return from;
+}
+
 const existsRead = function (path){
     if(fs.existsSync(path)){
         return fs.readFileSync(path, "utf-8");
@@ -124,13 +133,16 @@ module.exports = function(sourceCode){
         componentImports.forEach(Import => {
             //imp means the imported object
             var imp = importHandler(Import);
-
             var documentFolder = imp.path.replace(/(\w|\n)+\.js/g, "");
-            //FIXME::::::::::::::: Abstraction move into import object
-            var componentSourceCode = fs.readFileSync(entryFolder + imp.path.replace(/(\.|\.\/)/, ""), "utf-8");
-            componentSourceCode = componentSourceCode.replace(/export default function\s*\(/, "function e(");
-            componentSourceCode = componentSourceCode.replace(/export default function/, "function");
-            //::::::::::::::::::::
+            
+            var componentSourceCode = multiReplace(
+                fs.readFileSync(entryFolder + imp.path.replace(/(\.|\.\/)/, ""), "utf-8"),
+                //legacy code below, it is definedly not needed
+                [/export default function\s*\(/, "function e("],
+                [/export default function/, "function"]
+            );
+            
+            console.log(componentSourceCode);
             
             var componentSetup = componentSourceCode.match(/return\s*\(\{(.|\s)*\}\)/)[0];
             var htmlPath = componentSource(findProp(componentSetup, "template"));
