@@ -47,15 +47,15 @@ const a7newproject = function (name) {
         recursive: true
     }, function (err) {
         if (err) {
-            log(chalk.red("ERROR:"), "there was an error while creating project folder.");
+            core.errorLog("there was an error while creating project folder.");
         } else {
-            log(chalk.green("SUCCESS:"), "project folder was created.");
+            core.successLog("project folder was created.");
         }
     });
 
     fs.writeFile(name + "/package.json", "{\n  \"name\":\"" + name + "\",\n  \"dependencies\": {\n    \"a7js\": \"^"+core.getVersion()+"\"\n  },\n  \"main\" :\"app/index.js\"\n}", function (err) {
         if (err) {
-            log(chalk.red("ERROR:"), "package.json could not be created.");
+            core.errorLog("package.json could not be created.");
         } else {
 
         }
@@ -65,7 +65,7 @@ const a7newproject = function (name) {
     fs.mkdirSync(name +"/app/components");
     fs.writeFile(name + "/index.html", createHtmlDoc(name), function (err) {
         if (err) {
-            log(chalk.red("ERROR:"), "index.html could not be created.");
+            core.errorLog("index.html could not be created.");
         }
     });
 
