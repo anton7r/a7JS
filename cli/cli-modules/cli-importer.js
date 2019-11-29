@@ -11,9 +11,11 @@ const csso = require("csso");
 var config = core.config;
 
 const minifier = function (source){
-    var min; 
     try {
-        min = uglifyJS.minify(source);
+        var min = uglifyJS.minify(source);
+        if(min.code === undefined){
+            return source;
+        }
         return min.code;
     } catch (e){
         core.errorLog("an error happened while trying to minify a script");
@@ -25,7 +27,7 @@ const multiReplace = function(from){
     const args = arguments;
     for(let i = 1; i < arguments.length; i++){
         let c = args[i];
-        from.replace(c[0], c[1]);
+        from = from.replace(c[0], c[1]);
     }
     return from;
 }
@@ -137,7 +139,6 @@ module.exports = function(sourceCode){
             
             var componentSourceCode = multiReplace(
                 fs.readFileSync(entryFolder + imp.path.replace(/(\.|\.\/)/, ""), "utf-8"),
-                //legacy code below, it is definedly not needed
                 [/export default function\s*\(/, "function e("],
                 [/export default function/, "function"]
             );
@@ -161,7 +162,6 @@ module.exports = function(sourceCode){
             var html = "a7.documentFragment(" + htmlCompiler(existsRead(htmlPath)) + ")";
             //replace literals
             templateLiterals = html.match(/{{\s*.+?\s*}}/);
-
             if(templateLiterals !== null){
                 templateLiterals.forEach(function(literal){
                     var cleanLiteral = literal.replace(/({{|}})/g, "");

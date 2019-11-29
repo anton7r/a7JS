@@ -45,7 +45,7 @@
   "homepage": "https://github.com/anton7r/a7JS#readme",
   "dependencies": {
     "chalk": "^2.4.2",
-    "csso": "^3.5.1",
+    "csso": "^4.0.2",
     "node-html-parser": "^1.1.16",
     "uglify-js": "^3.7.0"
   },

@@ -13,7 +13,7 @@
 
 ⚡ Its stupid fast.
 
-⚙️ Supports component design.
+⚙️ Supports modular design.
 
 😍 Easy to use.
 
@@ -23,11 +23,11 @@
 
 # Main features of A7JS
 
-CLI - Development server and boilerplate for new projects and components
+CLI - Development server and boilerplate for new projects, components
 
 Router - Fully working frontend routing system.
 
-Component Design - helps you with splitting your code into components.
+Modular Design - split parts of your app into components!
 
 # Setup
 
