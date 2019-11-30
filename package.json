@@ -1,7 +1,7 @@
 {
   "name": "a7js",
   "version": "4.0.0-rc1.6",
-  "description": "a7JS is a frontend spa framework which is very modular",
+  "description": "a7JS is a frontend spa framework which is made to be modular",
   "files": [
     "src/a7.js",
     "cli/cli.js",
