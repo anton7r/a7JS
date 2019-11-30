@@ -12,10 +12,8 @@ var config = core.config;
 const minifier = function (source){
     try {
         var m = uglifyJS.minify(source);
-        if(m.code === undefined){
-            return source;
-        }
-        return m.code;
+        if(m.code === undefined) return source;
+        else return m.code;
     } catch (e){
         core.errorLog("an error happened while trying to minify a script");
         return source;
@@ -35,23 +33,14 @@ const existsRead = function (path){
     path = purePath(path);
     if(fs.existsSync(path)){
         return fs.readFileSync(path, "utf-8");
-    } else {
-        core.errorLog("file could not be located. "+ path);
-        process.exit(); 
     }
+    core.errorLog("file could not be located. "+ path);
+    process.exit();
 };
 
 const componentSource = function (str){
     return str.match(/\".+\"/g)[0].replace(/\"/g, "");
 };
-
-let entryFolder = "";
-if(config.entry !== "noEntry"){
-    entryFolder = config.entry.replace(/(\w|\d)+\.js/i, "");
-} else {
-    core.errorLog("no entry to your application was defined in a7.config.json");
-    process.exit();
-}
 
 //purePath is our innovative technology to "relational pairing" from file paths to make them work on any given file system.
 //for example if you have ../ or ./ in the path purePath will happily remove it.
@@ -70,11 +59,13 @@ function findProp (from, find){
     return from.match(new RegExp(find + "\s*:\s*\".+?\"", "i"))[0];
 }
 
-const cssSplitter = function(csssrc, tag){
+//TODO:TODO:TODO:TODO:TODO:TODO:TODO:TODO:TODO:TODO: abstractify
+const cssSplitter = function(css, tag){
     //container RegExp
-    containerRx = new RegExp(tag, "g");
-    containerStylesRx = new RegExp(tag + "(.|\s)+?\{(.|\s)+?\}", "g");
-    var containerStyles = csssrc.match(containerStylesRx);
+    var containerStylesRx = new RegExp(tag + "(.|\s)+?\{(.|\s)+?\}", "g");
+    //TODO: instead of matching them by which are container styles remove them which aren't container styles and it is also the better option for performance
+    var notContainerStylesRx = new RegExp();
+    var containerStyles = css.match(containerStylesRx);
     var parsedContainerStyles = "";
 
     if (containerStyles !== null){
@@ -82,12 +73,17 @@ const cssSplitter = function(csssrc, tag){
             parsedContainerStyles += style;
         });
     }
-    parsedContainerStyles = parsedContainerStyles.replace(containerRx, ".a7-component." + tag);
-    return {container:parsedContainerStyles,innerStyles:csssrc.replace(containerStylesRx, "")};     
+    parsedContainerStyles = parsedContainerStyles.replace(new RegExp(tag, "g"), ".a7-component." + tag);
+    return {container:parsedContainerStyles,innerStyles:css.replace(containerStylesRx, "")};     
 };
 
 module.exports = function(sourceCode){
-    sourceCode = "var a7_i = {};\n" + sourceCode;
+    sourceCode = "var a7_i={};\n" + sourceCode;
+    if(config.entry === "noEntry"){
+        core.errorLog("no entry to your application was defined in a7.config.json");
+        process.exit();
+    }
+    let entryFolder = config.entry.replace(/(\w|\d)+\.js/i, "");
     var CSSBundle = "";
     
     if(config.css.bundle === true && config.css.file !== null){
@@ -111,12 +107,10 @@ module.exports = function(sourceCode){
 
     var partialImports = sourceCode.match(/import\s*{\s*.*?\s*}\s+from\s*\".+?\";*/gi);
     //TODO:(Pro tip) make foreach into for loop because it is faster
-    this.imports = 0;
     
     //Goes through component imports
     var len = 0;
     if (componentImports !== null){
-        this.imports += componentImports.length;
         len = componentImports.length;
     }
     for(let i = 0; i < len; i++){
@@ -173,7 +167,6 @@ module.exports = function(sourceCode){
 
     len = 0;
     if (wholeImports !== null){
-        this.imports += wholeImports.length;
         len = wholeImports.length;
     }
     for (let i = 0; i < len; i++){
@@ -220,7 +213,6 @@ module.exports = function(sourceCode){
 
     len = 0;
     if (partialImports !== null){
-        this.imports += partialImports.length;
         len = partialImports.length;
         return core.errorLog("Importing only a part of a framework or a library is not yet supported!");
     }

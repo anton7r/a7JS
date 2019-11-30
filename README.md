@@ -1,11 +1,11 @@
 
-# a7JS
+# A7JS
 
-![a7JS](./designs/banner.png)
+![A7JS](./designs/banner.png)
 
 ![Version](https://img.shields.io/npm/v/a7js)
-![size](https://img.shields.io/badge/Size-3kb-success)
-![downloads](https://img.shields.io/npm/dy/a7js)
+![size](https://img.shields.io/badge/size-3kb-success)
+![Downloads](https://img.shields.io/npm/dt/a7js)
 
 🔥 A lot of power in a small package.
 
@@ -19,7 +19,11 @@
 
 🚀 Provides compression and minification.
 
-👑 Supports ES6 Imports, while using ES5.
+👑 Supports ES6 Imports, while you write everything else in ES5.
+
+👨‍💻 Official Discord [discord.gg/388FREA](https://discord.gg/388FREA) - Server under construction
+
+🧩 Contributions and new issues are highly valued!
 
 # Main features of A7JS
 
@@ -75,9 +79,30 @@ For documentation and code examples please visit our [Wiki](https://github.com/a
 
 # License
 
-License is MIT see [license](https://github.com/anton7r/a7JS/blob/master/LICENSE)
+MIT License [license](https://github.com/anton7r/a7JS/blob/master/LICENSE)
 
 # Changes
+
+## Version 5 (March 2020)
+
+Expected to release in March 2020.
+Including better frontend performance and some changes that we can't change on version 4.
+
+Possibly even renaming A7JS to something different which would be easier to remember
+
+## Version 4 (December 2019)
+
+- Performance improvements
+
+- Better Documentation
+
+- Better CLI
+
+- Development Server
+
+- Etc...
+
+Also CLI now works silently unless an error occurs
 
 ## 4.0.0-rc.1.6
 
@@ -114,3 +139,15 @@ Bug Fixes.
 Fixed a bug in the development server.
 
 Added a feature that adds component automatically to your main javascript file when creating it using the `a7 newcomponent ...` command.
+
+## Before 4.0.0
+
+The state of A7JS back then was just small blob compared to the state of it right now.
+The only thing that has stayed from Version 1 is the router and how it works, since then it has been improved on.
+
+Writing apps in A7JS version 3 was also quite painful since you were writinh pretty much the code that your application is now adays compiled to.
+
+While version 3 wasn't the best, it enabled us to make it even better with version 4.
+Also version 3 was pretty much a complete rewrite of the framework.
+
+Around version 2 & version 1 it was a pain to make an application using A7JS.
