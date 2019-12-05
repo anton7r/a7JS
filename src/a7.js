@@ -140,7 +140,6 @@ var render = function (elem) {
     if(a7store[9].children.length !== 0){
         a7store[9].removeChild(a7store[9].lastChild);
     }
-
     a7store[9].appendChild(elem);
 };
 
@@ -153,14 +152,14 @@ if (!"".trim) String.prototype.trim = function () {
 //which gives us a huge performance increase
 var a7store = Array(15);
 a7store = [
-    "v4-pre", //Version       0
+    "", // Empty
     {}, //ComponentList       1
     {}, //Menus               2
     {}, //Observables         3
     {}, //Observable liste... 4
     {}, //onMenuToggleList    5
     [], //descriptionElements 6
-    {}, //cacheMatch          7
+    {}, //Empty               7
     false, //Empty            8
     {}, //pageContainer       9
     false, //initDone         10
@@ -173,10 +172,6 @@ a7store = [
 
 var a7 = {};
 
-a7.ver = function () {
-    return a7store[0];
-};
-
 a7.routes = function(routes){
     a7store[14] = routes;
     init();
@@ -187,7 +182,7 @@ a7.secureProps = function (mode) {
     if (mode === true || mode === false) {
         a7store[13] = mode;
     } else {
-        a7debug("The parameter 1 (mode) only accepts booleans.");
+        a7debug("The 1st parameter (mode) only accepts booleans.");
     }
     if (mode === false) {
         a7debug("BEWARE: Props are secure by default and setting them unsecure means that your app can potentially have an xss vulnerability.");
@@ -238,11 +233,11 @@ a7.createElement = function (element, attributes) {
         }
 
         //children
-        var curVal;
+        var i;
         var argLen = arguments.length;
 
-        for (curVal = 2; curVal < argLen; curVal++) {
-            var currentArg = arguments[curVal];
+        for (i = 2; i < argLen; i++) {
+            var currentArg = arguments[i];
             //loops through the rest of the arguments
             if(typeof currentArg === "string" && currentArg !== ""){
                 rElement.innerText += currentArg;
@@ -266,15 +261,11 @@ a7.app = function () {
 };
 
 a7.onMobile = function(func){
-    if(isMobile === true){
-        func();
-    }
+    if(isMobile === true) func();
 };
 
 a7.onDesktop = function(func){
-    if(isMobile === false){
-        func();
-    }
+    if(isMobile === false) func();
 };
 
 a7.observable = function (){
@@ -283,8 +274,7 @@ a7.observable = function (){
     var set = function (newValue){
         this.value = newValue;
         if(listeners !== undefined){
-            var listLen = listeners.length;
-            for(var i = 0; i < listLen; i++){
+            for(var i = 0; i < listeners.length; i++){
                 listeners[i]();
             }
         }
@@ -328,42 +318,40 @@ a7.globalObservable = function (ObservalbeName) {
     };
 
     __.listeners = listeners;
-
     __.value = observable;
-
     return __;
 };
 
 a7.documentFragment = function () {
-    var length = arguments.length,
+    var len = arguments.length,
         i,
-        result = document.createDocumentFragment();
+        res = document.createDocumentFragment();
 
-    for (i = 0; i < length; i++) {
+    for (i = 0; i < len; i++) {
         if(typeof arguments[i] === "string"){
-            result.appendChild(document.createTextNode(arguments[i]));
+            res.appendChild(document.createTextNode(arguments[i]));
         } else {
-            result.appendChild(arguments[i]);
+            res.appendChild(arguments[i]);
         }
     }
-    return result;
+    return res;
 };
 
 a7.loadCSS = function(css){
     document.head.insertAdjacentHTML("beforeend", "<style>" + css + "</style>");
 };
 
-a7.registerComponent = function (compName, compFunc) {
-    if (a7store[1][compName] === undefined) {
-        a7store[1][compName] = compFunc;
+a7.registerComponent = function (name, compFunc) {
+    if (a7store[1][name] === undefined) {
+        a7store[1][name] = compFunc;
     } else {
         a7debug("That component is already registered!");
     }
 };
 
 //html sanitizer
-a7.sanitizer = function (content) {
-    var result = content
+a7.sanitizer = function (str) {
+    var result = str
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
@@ -391,8 +379,8 @@ a7.setDesc = function (newContent) {
     }
 };
 
-a7.setTitle = function (newTitle) {
-    document.title = newTitle;
+a7.setTitle = function (title) {
+    document.title = title;
 };
 
 //Menu stuff
@@ -412,7 +400,7 @@ a7.toggleMenu = function (menuName) {
     if (menuToggleFunc === undefined) {
         return;
     }
-
+    //FIXME: BUG HERE
     if (classList.contains(open) === true) {
         menuState = "open";
     } else {
@@ -420,8 +408,6 @@ a7.toggleMenu = function (menuName) {
     }
 
     menuToggleFunc(menuState);
-
-    return;
 };
 
 a7.closeMenu = function (menuName) {
@@ -446,48 +432,44 @@ a7.onMenuToggle = function (menuName, func) {
 };
 
 //if newPath is not defined then it will return the current path
-a7.path = function (newPath) {
-    if (newPath === undefined) {
+a7.path = function (path) {
+    if (path === undefined) {
         return window.location.pathname.replace("/", "");
     } else {
-        if (newPath.indexOf("/") === 0) {
-            newPath = newPath.replace("/", "");
+        if (path.indexOf("/") !== 0) {
+            path = "/"+path;
         }
         if (!history.pushState) {
-            window.location = newPath;
+            window.location = path;
         } else {
-            history.pushState({}, undefined, "/" + newPath);
+            history.pushState({}, undefined, path);
         }
     }
 };
 
 //Resolves any path you give
 a7.router = function (newPath) {
-    if (newPath.indexOf("/") === 0) {
-        newPath = newPath.replace("/", "");
+    if (newPath.indexOf("/") !== 0) {
+        newPath = "/"+newPath;
     }
-
-    var mainPath = "/" + newPath.slice(0, newPath.indexOf("/") + 1) + "*",
-        route,
-        routes = a7store[14],
-        cacheMatch = a7store[7]["/" + newPath];
-
+    //cacheMath no longer most likely does anything
+    var mainPath = newPath.slice(0, newPath.indexOf("/") + 1) + "*",
+    route,
+    routes = a7store[14];
     //tries to match equal
-    if (cacheMatch) {
-        route = cacheMatch;
-    } else if (routes["/" + newPath]) {
-        route = "/" + newPath;
+    if (routes[newPath]){
+        route = newPath;
     } else if (routes[mainPath]) {
         route = mainPath;
     } else if (routes["/*"]) {
         route = "/*";
     } else {
-        return a7debug("we could not find the page which you were looking for");
+        return console.error("A7JS: no specified route matched "+newPath);
     }
 
-    var renderable = routes[route]();
-    var i;
-    var links = renderable.getElementsByTagName("a");
+    var renderable = routes[route](),
+    i,
+    links = renderable.getElementsByTagName("a");
     
     if(links !== null){
         for (i = 0; i < links.length; i++) {
@@ -498,9 +480,7 @@ a7.router = function (newPath) {
     }
 
     render(renderable);
-    a7store[15] = [];
     a7.path(newPath);
-
     scrollTo(0, pageXOffset);
 };
 

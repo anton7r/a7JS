@@ -38,7 +38,7 @@ module.exports = function(port, dir){
     if(dir !== undefined){
         rootDir = dir;
     } else {
-        rootDir = "./"
+        rootDir = "./";
     }
 
     function pack(){

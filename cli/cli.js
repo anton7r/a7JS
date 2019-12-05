@@ -21,17 +21,17 @@ const a7greet = function () {
 };
 
 const a7helper = function () {
-        log(chalk.blue("A7JS help\n"));
-        core.helperLog("newproject", "create a new project with a7.");
-        core.syntaxLog("a7 newproject [projectname]");
-        core.syntaxLog("a7 np [projectname]");
-        core.helperLog("newcomponent", "create a new component into the current project.");
-        core.syntaxLog("a7 newcomponent [componentname]");
-        core.syntaxLog("a7 nc [componentname]");
-        core.helperLog("build", "build the a7 project.");
-        core.syntaxLog("a7 build");
-        core.helperLog("devserver", "start a development server [beta]");
-        core.syntaxLog("a7 devserver [port(optional)]");
+    log(chalk.blue("A7JS help\n"));
+    core.helperLog("newproject", "create a new project with a7.");
+    core.syntaxLog("a7 newproject [projectname]");
+    core.syntaxLog("a7 np [projectname]");
+    core.helperLog("newcomponent", "create a new component into the current project.");
+    core.syntaxLog("a7 newcomponent [componentname]");
+    core.syntaxLog("a7 nc [componentname]");
+    core.helperLog("build", "build the a7 project.");
+    core.syntaxLog("a7 build");
+    core.helperLog("devserver", "start a development server [beta]");
+    core.syntaxLog("a7 devserver [port(optional)]");
 };
 
 const a7newproject = function (name) {
@@ -40,24 +40,18 @@ const a7newproject = function (name) {
     } else if (fs.existsSync(name) !== false) {
         return core.errorLog(name + " folder already exists in this directory.");
     }
-
     core.infoLog("creating a new project in " + name);
-
     fs.mkdir(name, {
         recursive: true
     }, function (err) {
         if (err) {
-            core.errorLog("there was an error while creating project folder.");
-        } else {
-            core.successLog("project folder was created.");
+            return core.errorLog("there was an error while creating project folder.");
         }
     });
 
     fs.writeFile(name + "/package.json", "{\n  \"name\":\"" + name + "\",\n  \"dependencies\": {\n    \"a7js\": \"^"+core.getVersion()+"\"\n  },\n  \"main\" :\"app/index.js\"\n}", function (err) {
         if (err) {
             core.errorLog("package.json could not be created.");
-        } else {
-
         }
     });
 
@@ -65,7 +59,7 @@ const a7newproject = function (name) {
     fs.mkdirSync(name +"/app/components");
     fs.writeFile(name + "/index.html", createHtmlDoc(name), function (err) {
         if (err) {
-            core.errorLog("index.html could not be created.");
+            return core.errorLog("index.html could not be created.");
         }
     });
 

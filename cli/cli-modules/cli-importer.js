@@ -27,7 +27,7 @@ const multiReplace = function(s){
         s = s.replace(a[i][0], a[i][1]);
     }
     return s;
-}
+};
 
 const existsRead = function (path){
     path = purePath(path);
@@ -45,8 +45,8 @@ const componentSource = function (str){
 //purePath is our innovative technology to "relational pairing" from file paths to make them work on any given file system.
 //for example if you have ../ or ./ in the path purePath will happily remove it.
 const purePath = (path) => {
-    return path.replace(/(\/\.\/|\/.*\/\.\.\/)/g, "/")
-}
+    return path.replace(/(\/\.\/|\/.*\/\.\.\/)/g, "/");
+};
 
 const importHandler = function(imp){
     this.path = imp.match(/(\"|\').+(\"|\')/i)[0].replace(/\"/g, "");
@@ -163,7 +163,7 @@ module.exports = function(sourceCode){
         var exec = "a7.registerComponent(\""+tag+"\","+out+");function "+imp.name+"(a){return a7.createElement(\""+tag+"\",a)}";
         sourceCode = sourceCode.replace(Import, exec);
         imports += {from:imp.path,as:imp.name};
-    };
+    }
 
     len = 0;
     if (wholeImports !== null){
@@ -177,7 +177,7 @@ module.exports = function(sourceCode){
         if(imp.path === "a7js"){
             imp.path = require.resolve("../../src/a7.js");
         } else if(imp.path.charAt(0) === "."){
-            imp.path = purePath("./app/" + imp.path)
+            imp.path = purePath("./app/" + imp.path);
         } else {
             imp.path = require.resolve(imp.path);
         }
@@ -209,7 +209,7 @@ module.exports = function(sourceCode){
             from:imp.path,
             as:imp.name
         };
-    };
+    }
 
     len = 0;
     if (partialImports !== null){
@@ -219,16 +219,22 @@ module.exports = function(sourceCode){
     for(let i = 0; i < len; i++){
         var Import = partialImports[i];
         var imp = importHandler(Import);
-    };
+    }
 
     if (CSSBundle != ""){
         sourceCode += "a7.loadCSS(\""+cssMinifier(CSSBundle)+"\")";
     }
-
+    
     if (config.mode === "production"){
-        sourceCode = uglifyJS.minify(`(function(){${sourceCode}})()`, {
+        var min = uglifyJS.minify(`(function(){${sourceCode}})()`, {
             compress:{passes:1}, mangle:{toplevel:true}
-        }).code;
+        });
+
+        if(min.error !== undefined){
+            core.errorLog("UglifyJS found an error in your code\n\n" + min.error);
+            process.exit();
+        }
+        sourceCode = min.code;
     }
     core.successLog("app was built.");
     return sourceCode;
