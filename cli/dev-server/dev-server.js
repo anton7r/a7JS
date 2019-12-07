@@ -2,9 +2,9 @@
 /* jshint -W119 */
 const http = require("http");
 const fs = require("fs");
-const core = require("./cli-core.js");
+const core = require("../core/core.js");
 const zlib = require("zlib");
-const build = require("./cli-importer");
+const build = require("../compiler/compiler");
 var conf = core.config;
 var rootDir;
 var buildMode = conf.devserver.buildmode;

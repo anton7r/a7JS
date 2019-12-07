@@ -4,8 +4,8 @@
 const log = console.log;
 const fs = require("fs");
 const chalk = require("chalk");
-const a7build = require("./cli-modules/cli-build.js");
-const core = require("./cli-modules/cli-core.js");
+const a7build = require("./build.js");
+const core = require("./core/core.js");
 const [,,...args] = process.argv;
 
 const createHtmlDoc = function (name) {
@@ -91,7 +91,7 @@ const a7createComponent = function(name, absolutePath) {
     if(absolutePath !== undefined){
         path = absolutePath + path;
     } else {
-        path = "./"+path
+        path = "./"+path;
     }
     var _file = path + name + "/" + name;
     var jsFileName = _file + ".js";
@@ -148,7 +148,7 @@ const a7test = function(){
         fs.mkdirSync(a7testFolder);
         log("folder " + a7testFolder + " was not found. So we added it");
     }
-    core.infoLog("the whole log is available in the ./tests/ folder")
+    core.infoLog("the whole log is available in the ./tests/ folder");
     try{
         a7newproject(a7testFolder + "x");
     } catch(err){
@@ -175,14 +175,14 @@ const a7test = function(){
             core.errorLog("could not store error log so here is the log");
             log(errors);
         }
-    })
-}
+    });
+};
 
 const a7unknownArg = function () {
     core.errorLog(chalk.cyan(args.join(" ")) + " is not a valid argument.");
 };
 
-const a7devServer = require("./cli-modules/cli-devserver.js"); 
+const a7devServer = require("./dev-server/dev-server.js"); 
 
 switch (args[0]) {
     case undefined:

@@ -3,9 +3,9 @@
 /* jshint -W049 */
 const fs = require("fs");
 const uglifyJS = require("uglify-js");
-const core = require("./cli-core");
-const cssMinifier = require("./cli-cssminifier");
-const htmlCompiler = require("./cli-htmlcompiler");
+const core = require("../core/core");
+const cssMinifier = require("./css-minifier");
+const htmlCompiler = require("./html-compiler");
 const csso = require("csso");
 var config = core.config;
 
@@ -146,7 +146,7 @@ module.exports = function(sourceCode){
         var cssObject = cssSplitter(css, tag);
         var cssRules = cssObject.innerStyles.match(/.+?\s*?\{.+?\}/g);
         if(cssRules !== null){
-            cssRules.forEach(function (rule){
+            cssRules.forEach(function(rule){
                 CSSBundle += ".a7-component."+tag+" "+rule;
             });
         }

@@ -83,5 +83,4 @@ module.exports = function htmlCompiler(html){
         compiled += buildEl(tag, attributes, inner);
     }
     return compiled.replace(/\,\)/g, ")").replace(/\,\"\"/g, "").replace(/\)\,$/g, ")").replace(/\',\)/g, "')").replace(/\),\)/g, "))");
-
 };

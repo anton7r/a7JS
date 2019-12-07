@@ -16,7 +16,6 @@ if(fs.existsSync(config.fileLoc) === true){
     );
 }
 module.exports = {
-    
     config: {
         ...config.default,
         ...config.custom
