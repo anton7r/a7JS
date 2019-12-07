@@ -5,36 +5,36 @@ const fs = require("fs");
 const core = require("../core/core.js");
 const zlib = require("zlib");
 const build = require("../compiler/compiler");
-var conf = core.config;
-var rootDir;
-var buildMode = conf.devserver.buildmode;
-var packaged = "";
-const resolveFile = function(url){
-    //CHECK:FIXME: abstraction needed
-    if(fs.existsSync(rootDir+url)){
-        if(url.charAt(0) === "/"){
-            url.replace("/", "");
-        }
-    }
-    // UP
-
-    if("."+url === conf.output){
-        return packaged;
-    } else if(url === "/"){
-        if (fs.existsSync(rootDir + "index.html")) {
-            return fs.readFileSync(rootDir + "index.html", "utf-8");
-        } else {
-            return "Could not find index.html file from directory";
-        }
-
-    } else if (fs.existsSync(rootDir+url) === true){
-        return fs.readFileSync(rootDir+url);
-    } else {
-        return fs.readFileSync(rootDir + "index.html", "utf-8");
-    }
-};
-
 module.exports = function(port, dir){
+    var conf = core.config;
+    var rootDir;
+    var buildMode = conf.devserver.buildmode;
+    var packaged = "";
+    function resolveFile(url){
+        //CHECK:FIXME: abstraction needed
+        if(fs.existsSync(rootDir+url)){
+            if(url.charAt(0) === "/"){
+                url.replace("/", "");
+            }
+        }
+        // UP
+    
+        if("."+url === conf.output){
+            return packaged;
+        } else if(url === "/"){
+            if (fs.existsSync(rootDir + "index.html")) {
+                return fs.readFileSync(rootDir + "index.html", "utf-8");
+            } else {
+                return "Could not find index.html file from directory";
+            }
+    
+        } else if (fs.existsSync(rootDir+url) === true){
+            return fs.readFileSync(rootDir+url);
+        } else {
+            return fs.readFileSync(rootDir + "index.html", "utf-8");
+        }
+    }
+    
     if(dir !== undefined){
         rootDir = dir;
     } else {
