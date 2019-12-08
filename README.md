@@ -1,7 +1,5 @@
 
-# A7JS
-
-![A7JS](./designs/banner.png)
+# ![A7JS](./designs/banner.png)
 
 ![Version](https://img.shields.io/npm/v/a7js)
 ![size](https://img.shields.io/badge/size-3kb-success)
@@ -23,7 +21,7 @@
 
 👨‍💻 Official Discord [discord.gg/388FREA](https://discord.gg/388FREA) - Server under construction
 
-🧩 Contributions and new issues are highly valued!
+🧩 Contributions are more than welcome!
 
 # Main features of A7JS
 
@@ -81,6 +79,11 @@ For documentation and code examples please visit our [Wiki](https://github.com/a
 
 MIT License [license](https://github.com/anton7r/a7JS/blob/master/LICENSE)
 
+# Community
+
+Discord: [discord.gg/388FREA](https://discord.gg/388FREA)
+Slack: -
+
 # Changes
 
 ## Version 5 (March 2020)
@@ -103,6 +106,12 @@ Possibly even renaming A7JS to something different which would be easier to reme
 - Etc...
 
 Also CLI now works silently unless an error occurs
+
+## 4.0.0-rc.1.7
+
+rewriting few parts in the framework.
+
+reduced size from 49kB to 47kB.
 
 ## 4.0.0-rc.1.6
 

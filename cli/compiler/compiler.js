@@ -1,6 +1,3 @@
-/* jshint -W104 */
-/* jshint -W119 */
-/* jshint -W049 */
 const fs = require("fs");
 const uglifyJS = require("uglify-js");
 const core = require("../core/core");
@@ -106,8 +103,6 @@ module.exports = function(sourceCode){
     });
 
     var partialImports = sourceCode.match(/import\s*{\s*.*?\s*}\s+from\s*\".+?\";*/gi);
-    //TODO:(Pro tip) make foreach into for loop because it is faster
-    
     //Goes through component imports
     var len = 0;
     if (componentImports !== null){
