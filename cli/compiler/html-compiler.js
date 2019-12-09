@@ -33,7 +33,7 @@ function buildEl(tag, src, content){
         attributes.a7link = "";
     }
     attributes = JSON.stringify(attributes);
-    var EvListener = attributes.match(/\"a7on\w*\":\"[\w|\d\_]*\"/i);
+    var EvListener = attributes.match(/\"a7on\w*\":\"[\w|\d\_]*\"/gi);
     if(EvListener !== null){
         EvListener.forEach(function(val){
             var event = val.match(/\".+?\"/);
