@@ -112,16 +112,17 @@ var eventListeners = function (elm, attributes){
         return elm;
     }
     //basic event listeners
+    
+    if(attributes.a7onInit){
+        attributes.a7onInit(elm);
+    }
+
     if(attributes.a7onClick){
         elm.addEventListener("click", attributes.a7onClick);
     }
 
     if(attributes.a7onHover){
         elm.addEventListener("hover", attributes.a7onHover);
-    }
-
-    if(attributes.a7onInit){
-        elm.a7onInit(rElement);
     }
 
     if(attributes.a7onChange){
