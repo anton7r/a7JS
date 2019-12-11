@@ -10,4 +10,5 @@ module.exports = function(settings) {
     }
     var file = fs.readFileSync(config.entry, "utf-8");
     fs.writeFileSync(config.output, compile(file));
+    core.successLog("app was built.");
 };

@@ -5,8 +5,5 @@
     "css": {
         "bundle": false,
         "file": ""
-    },
-    "devserver": {
-        "buildmode": "manual"
     }
 }

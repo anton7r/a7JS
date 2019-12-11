@@ -112,7 +112,7 @@ var eventListeners = function (elm, attributes){
         return elm;
     }
     //basic event listeners
-    
+
     if(attributes.a7onInit){
         attributes.a7onInit(elm);
     }
@@ -281,8 +281,8 @@ a7.observable = function (){
         }
         return newValue;
     };
-    var addListener = function (Listener){
-        listeners.push(Listener);
+    var addListener = function (l){
+        listeners.push(l);
     };
     this.set = set;
     this.addListener = addListener;

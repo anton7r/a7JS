@@ -7,7 +7,7 @@
 
 🔥 A lot of power in a small package.
 
-✅ Frontend framework only 3kb gzipped and minified.
+✅ 3kB Runtime when gzipped and minified.
 
 ⚡ Its stupid fast.
 
@@ -89,9 +89,7 @@ Slack: -
 ## Version 5 (March 2020)
 
 Expected to release in March 2020.
-Including better frontend performance and some changes that we can't change on version 4.
-
-Possibly even renaming A7JS to something different which would be easier to remember
+Including better frontend performance and some changes that we can't change anymore on version 4.
 
 ## Version 4 (December 2019)
 
@@ -106,6 +104,12 @@ Possibly even renaming A7JS to something different which would be easier to reme
 - Etc...
 
 Also CLI now works silently unless an error occurs
+
+## 4.0.0-rc.1.8 (In development)
+
+This update contains improvements to the development server,
+
+removed the need of defining development server in your project at `a7.config.json`.
 
 ## 4.0.0-rc.1.7
 

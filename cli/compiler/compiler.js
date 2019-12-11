@@ -231,6 +231,5 @@ module.exports = function(sourceCode){
         }
         sourceCode = min.code;
     }
-    core.successLog("app was built.");
     return sourceCode;
 };
