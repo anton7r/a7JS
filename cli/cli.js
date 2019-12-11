@@ -5,6 +5,7 @@ const log = console.log;
 const fs = require("fs");
 const chalk = require("chalk");
 const a7build = require("./build.js");
+const a7upgrade = require("./upgrade.js");
 const core = require("./core/core.js");
 const [,,...args] = process.argv;
 
@@ -22,16 +23,23 @@ const a7greet = function () {
 
 const a7helper = function () {
     log(chalk.blue("A7JS help\n"));
+    
     core.helperLog("newproject", "create a new project with a7.");
     core.syntaxLog("a7 newproject [projectname]");
     core.syntaxLog("a7 np [projectname]");
+    
     core.helperLog("newcomponent", "create a new component into the current project.");
     core.syntaxLog("a7 newcomponent [componentname]");
     core.syntaxLog("a7 nc [componentname]");
+    
     core.helperLog("build", "build the a7 project.");
     core.syntaxLog("a7 build");
+
     core.helperLog("devserver", "start a development server [beta]");
     core.syntaxLog("a7 devserver [port(optional)]");
+
+    core.helperLog("upgrade config", "upgrade your \"a7.config.json\" file");
+    core.syntaxLog("a7 upgrade config")
 };
 
 const a7newproject = function (name) {
@@ -208,6 +216,9 @@ switch (args[0]) {
         break;
     case "test":
         a7test();
+        break;
+    case "upgrade":
+        a7upgrade(args[1]);
         break;
     default:
         a7unknownArg();

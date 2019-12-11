@@ -17,7 +17,7 @@
 
 🚀 Provides compression and minification.
 
-👑 Supports ES6 Imports, while you write everything else in ES5.
+👑 Supports ES6 Imports abd exports, while you write everything else in ES5.
 
 👨‍💻 Official Discord [discord.gg/388FREA](https://discord.gg/388FREA) - Server under construction
 
@@ -82,6 +82,7 @@ MIT License [license](https://github.com/anton7r/a7JS/blob/master/LICENSE)
 # Community
 
 Discord: [discord.gg/388FREA](https://discord.gg/388FREA)
+
 Slack: -
 
 # Changes
@@ -90,6 +91,12 @@ Slack: -
 
 Expected to release in March 2020.
 Including better frontend performance and some changes that we can't change anymore on version 4.
+
+Features that we plan to release with it
+
+ - Static site generator
+
+ - Improved syntax
 
 ## Version 4 (December 2019)
 
@@ -110,6 +117,7 @@ Also CLI now works silently unless an error occurs
 This update contains improvements to the development server,
 
 removed the need of defining development server in your project at `a7.config.json`.
+to get rid of it simply just run `a7 upgrade config`;
 
 ## 4.0.0-rc.1.7
 
