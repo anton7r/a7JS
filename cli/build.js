@@ -4,6 +4,7 @@ const fs = require("fs");
 const core = require("./core/core.js");
 const compile = require("./compiler/compiler");
 module.exports = function(settings) {
+    core.config.mode = "production";
     var config = core.config;
     if (config.entry === undefined){
         return core.errorLog("You have not defined the entrypoint of your app.");

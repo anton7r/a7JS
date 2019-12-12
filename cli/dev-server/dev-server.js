@@ -7,11 +7,13 @@ const zlib = require("zlib");
 const build = require("../compiler/compiler");
 const chalk = require("chalk");
 module.exports = function(port, dir){
+    core.config.mode = "development";
     var conf = core.config;
     var rootDir;
     var packaged = "";
     function resolveFile(url){
         //CHECK:FIXME: abstraction needed
+        //core.debug(fs.statSync(rootDir+url).isFile());
         if(fs.existsSync(rootDir+url)){
             if(url.charAt(0) === "/"){
                 url.replace("/", "");
@@ -59,7 +61,7 @@ module.exports = function(port, dir){
         port = 2550;
     }
     pack();
-    setInterval(pack, 1000);
+    setInterval(pack, 10000);
 
     http.createServer(function (req, res){
         var types = req.headers.accept;//.split(",")

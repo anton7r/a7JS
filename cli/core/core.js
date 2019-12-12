@@ -15,6 +15,13 @@ if(fs.existsSync(config.fileLoc) === true){
         fs.readFileSync(config.fileLoc, "utf-8")
     );
 }
+
+var  debug;
+if (config.custom.debugger === true){
+    console.log(chalk.cyan("A7JS Debugger mode"), "is enabled");
+    debug = true;
+}
+
 module.exports = {
     config: {
         ...config.default,
@@ -50,7 +57,11 @@ module.exports = {
         var a7pack = JSON.parse(fs.readFileSync(require.resolve("../../package.json"), "utf-8"));
         return a7pack.version;
     },
-
+    debug: function(msg){
+        if(debug === true){
+            console.log(chalk.yellow("DEBUG"),msg);
+        }
+    },
     atFileLog: function (file){
         log(chalk.red("AT FILE:"), file);
     },

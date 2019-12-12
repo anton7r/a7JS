@@ -112,7 +112,7 @@ Features that we plan to release with it
 
 Also CLI now works silently unless an error occurs
 
-## 4.0.0-rc.1.8 (In development)
+## 4.0.0-rc.1.8
 
 This update contains improvements to the development server,
 
