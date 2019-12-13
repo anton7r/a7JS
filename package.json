@@ -7,6 +7,7 @@
     "cli/cli.js",
     "cli/htmltags.txt",
     "cli/core/core.js",
+    "cli/core/",
     "cli/build.js",
     "cli/dev-server/dev-server.js",
     "cli/compiler/css-minifier.js",
@@ -14,8 +15,7 @@
     "cli/compiler/compiler.js",
     "cli/defaults/config.json",
     "cli/defaults/index.html",
-    "cli/defaults/index.js",
-    "cli/upgrade.js"
+    "cli/installer.js"
   ],
   "main": "src/a7.js",
   "scripts": {

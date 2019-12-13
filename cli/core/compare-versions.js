@@ -15,10 +15,5 @@ module.exports = {
                 return false;
             }
         };
-
-        return {
-            oldV:oldVersion, 
-            newV:newVersion
-        };
     }
 }

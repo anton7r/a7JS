@@ -8,45 +8,17 @@ function testFail(msg){
     console.log(chalk.black.bgRed("Test failed"), msg)
 }
 
-//Old code
-
-/*
-module.exports = function simpleTester(functionResult, testCase , expectedResult, testName){
-    if (testCase === "==="){
-        //when result should be equal
-        if(functionResult === expectedResult){
-            testPassed(testName);
-        } else {
-            testFail(testName);
-        }
-
-    } else if (testCase === "!=="){
-        //when result should not be equal
-        if(functionResult !== expectedResult){
-            testPassed(testName);
-        } else {
-            testFail(testName);
-        }
-
-
-    } else if(testCase === undefined){
-        console.log(chalk.black.bgRed("ERROR"), "test case is undefined.")
-    } else {
-        console.log(chalk.black.bgRed("ERROR"), "test case not supported.");
-    }
-}
-*/
-
 module.exports = {
     passed: 0,
     failed: 0,
     tests:[],
 
-    addTest(test, testName){
-        this.tests.push({test, testName});
+    addTest(name, test){
+        this.tests.push({func:test, name});
     },
 
     runTests(testMode){
+        //checks that testMode is not braking
         if(testMode === undefined){
             testMode = "default";
         } else if (testMode === "silent"){
@@ -56,11 +28,25 @@ module.exports = {
             chalk.black.bgRed("ERROR")
         }
 
-
-        for(var i = 0; i < tests.length; i++){
-            var test = tests[i];
+        //runs tests
+        for(var i = 0; i < this.tests.length; i++){
+            var test = this.tests[i];
+            //run tests here
+            if(test.func === true){
+                this.passed++;
+                testPassed(test.name);
+            } else {
+                testFail(test.name);
+                this.failed++;
+            }
         }
 
+        if(this.failed !== 0 && this.passed === 0){
+            console.log("we have some bugs to fix,", this.passed+"/"+this.tests.length, "test passed");
+        } else if(this.failed !== 0){
+            console.log("we have some bugs to fix, only", this.passed+"/"+this.tests.length, "test passed");
+        } else {
+            console.log("All tests passed:", this.passed+"/"+this.tests.length);
+        }
     }
-
 }

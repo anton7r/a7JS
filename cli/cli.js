@@ -5,7 +5,6 @@ const log = console.log;
 const fs = require("fs");
 const chalk = require("chalk");
 const a7build = require("./build.js");
-const a7upgrade = require("./upgrade.js");
 const core = require("./core/core.js");
 const [,,...args] = process.argv;
 
