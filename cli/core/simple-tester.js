@@ -32,7 +32,7 @@ module.exports = {
         for(var i = 0; i < this.tests.length; i++){
             var test = this.tests[i];
             //run tests here
-            if(test.func === true){
+            if(test.func() === true){
                 this.passed++;
                 testPassed(test.name);
             } else {
