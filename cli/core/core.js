@@ -31,11 +31,11 @@ module.exports = {
     importA7rx: /import (a7|{.+?}) from \"a7JS\"(;|)/i,
     pathToA7JS: require.resolve("../../src/a7.js"),
     htmlTags: fs.readFileSync(require.resolve("../htmltags.txt"), "utf-8").replace(/\r/g, "").split("\n"),
-    componentSource: function (string){
+    componentSource(string){
         return string.match(/\".+\"/g)[0].replace(/\"/g, "");
     },
 
-    isRelativePath: function (url){
+    isRelativePath(url){
         if (url[0].charAt(0) === "."){
             return true;
         } else {
@@ -43,50 +43,50 @@ module.exports = {
         }
     },
 
-    getImports: function(){
+    getImports(){
         var source = fs.readFileSync(this.config.entry, "utf-8");
         var imports = source.match(/import\s+(\d|\w|\_)+\s+from\s*\".+\";*/gi);
         return {imports:imports,source:source};
     },
 
-    getEntryFolder: function(){
+    getEntryFolder(){
         return core.config.entry.replace(/[^\/]+\.js/, "");
     },
 
-    getVersion: function(){
+    getVersion(){
         var a7pack = JSON.parse(fs.readFileSync(require.resolve("../../package.json"), "utf-8"));
         return a7pack.version;
     },
-    debug: function(msg){
+    debug(msg){
         if(debug === true){
             console.log(chalk.yellow("DEBUG"),msg);
         }
     },
-    atFileLog: function (file){
+    atFileLog(file){
         log(chalk.red("AT FILE:"), file);
     },
 
-    successLog: function (msg){
+    successLog(msg){
         log(chalk.green("SUCCESS"), msg);
     },
 
-    errorLog: function (msg){
+    errorLog(msg){
         log(chalk.red("ERROR"), msg) ;
     },
 
-    infoLog: function (msg){
+    infoLog(msg){
         log(chalk.cyan("INFO"), msg);
     },
 
-    fileCreatedLog: function (fileName){
+    fileCreatedLog(fileName){
         log(chalk.cyan("INFO"), " file", fileName, "was created.");
     },
 
-    helperLog: function (argument, text){
+    helperLog(argument, text){
         log(chalk.cyan(argument), "-", text);
     },
 
-    syntaxLog: function(syntax){
+    syntaxLog(syntax){
         log(chalk.gray(" - Syntax: " + syntax));
     }
 };

@@ -1,4 +1,5 @@
 const fs = require("fs");
+const fsx = require("../core/fsx");
 const uglifyJS = require("uglify-js");
 const core = require("../core/core");
 const cssMinifier = require("./css-minifier");
@@ -27,7 +28,7 @@ const multiReplace = function(s){
 };
 
 const existsRead = function (path){
-    path = purePath(path);
+    path = fsx.purePath(path);
     if(fs.existsSync(path)){
         return fs.readFileSync(path, "utf-8");
     }
@@ -37,12 +38,6 @@ const existsRead = function (path){
 
 const componentSource = function (str){
     return str.match(/\".+\"/g)[0].replace(/\"/g, "");
-};
-
-//purePath is our innovative technology to "relational pairing" from file paths to make them work on any given file system.
-//for example if you have ../ or ./ in the path purePath will happily remove it.
-const purePath = (path) => {
-    return path.replace(/(\/\.\/|\/.*\/\.\.\/)/g, "/");
 };
 
 const importHandler = function(imp){
@@ -113,7 +108,7 @@ module.exports = function(sourceCode){
         //imp means the imported object
         var imp = importHandler(Import);
         //path to component folder
-        var folder = purePath(entryFolder +imp.path.replace(/(\w|\n)+\.js/g, ""));
+        var folder = fsx.purePath(entryFolder +imp.path.replace(/(\w|\n)+\.js/g, ""));
         
         //Component sourcecode
         var componentSrc = multiReplace(
@@ -172,7 +167,7 @@ module.exports = function(sourceCode){
         if(imp.path === "a7js"){
             imp.path = require.resolve("../../src/a7.js");
         } else if(imp.path.charAt(0) === "."){
-            imp.path = purePath("./app/" + imp.path);
+            imp.path = fsx.purePath("./app/" + imp.path);
         } else {
             imp.path = require.resolve(imp.path);
         }

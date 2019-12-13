@@ -2,27 +2,13 @@
 /* jshint -W119 */
 const http = require("http");
 const fs = require("fs");
-const core = require("../core/core.js");
+const core = require("../core/core");
 const zlib = require("zlib");
 const build = require("../compiler/compiler");
 const chalk = require("chalk");
+const fsx = require("../core/fsx");
 
 module.exports = function(port, dir){
-
-    function existsFile (path){
-        
-        if(fs.existsSync(path) === true){
-            
-            if(fs.statSync(path).isFile() === true){
-                return true
-            } else {
-                return false;
-            }
-
-        } else {
-            return false
-        }
-    };
 
     core.config.mode = "development";
     var conf = core.config;
@@ -33,13 +19,13 @@ module.exports = function(port, dir){
         if("."+url === conf.output){
             return packaged;
         } else if(url === "/"){
-            if (existsFile(rootDir + "index.html")) {
+            if (fsx.fileExists(rootDir + "index.html")) {
                 return fs.readFileSync(rootDir + "index.html", "utf-8");
             } else {
                 return "Could not find index.html file from directory";
             }
     
-        } else if (existsFile(rootDir+url) === true){
+        } else if (fsx.fileExists(rootDir+url) === true){
             return fs.readFileSync(rootDir+url);
         } else {
             return fs.readFileSync(rootDir + "index.html", "utf-8");
@@ -70,7 +56,7 @@ module.exports = function(port, dir){
         port = 2550;
     }
     pack();
-    setInterval(pack, 10000);
+    setInterval(pack, 1000);
 
     http.createServer(function (req, res){
         var types = req.headers.accept;//.split(",")

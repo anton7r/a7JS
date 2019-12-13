@@ -7,6 +7,7 @@ const chalk = require("chalk");
 const a7build = require("./build.js");
 const core = require("./core/core.js");
 const [,,...args] = process.argv;
+const updater = require("./updater");
 
 const createHtmlDoc = function (name) {
     return fs.readFileSync(require.resolve("./defaults/index.html"), "utf-8", function(err){

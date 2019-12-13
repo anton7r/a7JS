@@ -15,7 +15,8 @@
     "cli/compiler/compiler.js",
     "cli/defaults/config.json",
     "cli/defaults/index.html",
-    "cli/installer.js"
+    "cli/updater.js",
+    "cli/core/fsx.js"
   ],
   "main": "src/a7.js",
   "scripts": {
