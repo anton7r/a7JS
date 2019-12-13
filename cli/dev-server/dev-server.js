@@ -80,6 +80,7 @@ module.exports = function(port, dir){
             type = "";
         } else if (types.indexOf("," > 0)){
             var t = types.split(",");
+            
             for(var i = 0; i<t.length; i++){
                 if(t[i] !== "*/*"){
                     type = t[i];

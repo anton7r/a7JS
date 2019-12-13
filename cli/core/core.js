@@ -16,7 +16,7 @@ if(fs.existsSync(config.fileLoc) === true){
     );
 }
 
-var  debug;
+var debug;
 if (config.custom.debugger === true){
     console.log(chalk.cyan("A7JS Debugger mode"), "is enabled");
     debug = true;
