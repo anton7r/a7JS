@@ -7,7 +7,7 @@
     "cli/cli.js",
     "cli/htmltags.txt",
     "cli/core/core.js",
-    "cli/core/",
+    "cli/core/compare-versions.js",
     "cli/build.js",
     "cli/dev-server/dev-server.js",
     "cli/compiler/css-minifier.js",
@@ -20,7 +20,7 @@
   ],
   "main": "src/a7.js",
   "scripts": {
-    "test": "node ./test/a7.test"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -50,5 +50,8 @@
     "node-html-parser": "^1.1.16",
     "uglify-js": "^3.7.0"
   },
-  "types": "src/a7.d.ts"
+  "types": "src/a7.d.ts",
+  "devDependencies": {
+    "jest": "^24.9.0"
+  }
 }
