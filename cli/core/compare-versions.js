@@ -97,6 +97,5 @@ module.exports = {
 
             i++;
         }
-        console.log(olderStages, newerStages);
     }
 }

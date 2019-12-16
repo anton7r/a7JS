@@ -3,51 +3,55 @@ const fs = require("fs");
 const fsx = require("./core/fsx.js");
 const core = require("./core/core");
 const ver = require("./core/compare-versions");
-
-/*
-if(core.config.devserver !== undefined){
-    delete core.config.devserver;
-}
-
-fs.writeFile("./a7.config.json", JSON.stringify(core.config, null, 4), err => {
-    if (err !== null){
-        core.errorLog("We have ran into a problem while trying to upgrade your configuration file");
-    }
-});
-
-*/
-//file name
-//module.path;
+const input = process.stdin;
 
 //needs to check wether directory has a7 config file
-if (fsx.fileExists("./a7.config.json")) {
-
-    var dataFolder = fsx.purePath(module.path + "/../data");
-
-    if (fsx.dirExists(dataFolder) === false) {
-        fs.mkdirSync(dataFolder);
-    }
-
-    dataFile = dataFolder + "/project.data.json";
-
-    if (fsx.fileExists(dataFile) === false) {
-        fs.writeFileSync(dataFile, "{}");
-    }
-
-    var projectData = fsx.readJSONfile(dataFile);
-
-    var projectFolder = fsx.formatSlashes(process.cwd());
-    if (projectData[projectFolder] === undefined) {
-        projectData[projectFolder] = {};
-    }
-
-    if (projectData[projectFolder].onVersion === undefined) {
-        projectData[projectFolder].onVersion = core.getVersion();
-    }
-
-    if (projectData[projectFolder].opened === undefined) {
-        projectData[projectFolder].opened = new Date();
-    }
-
-    fs.writeFileSync(dataFile, JSON.stringify(projectData));
+if (fsx.fileExists("./a7.config.json") === false) {
+    return;
 }
+
+var pk;
+
+if(fsx.fileExists("./package.json") === true){
+    pk = fsx.readJSONfile("./package.json");
+}
+
+var init = false;
+
+if(pk.a7js === undefined){
+    pk.a7js = {
+        metadata: {
+            lastUsedVersion: core.getVersion(),
+            lastUsedTime: new Date()
+        }
+    }
+    init = true;
+}
+
+//if true perform upgrade
+if(ver.isNewer("4.0.0", pk.a7js.metadata.lastUsedVersion)){
+    
+    console.log("Updating project's a7.config.json...");
+    delete core.config.devserver;
+    var conf = core.config;
+    delete conf.mode;
+
+    fs.writeFile("./a7.config.json", JSON.stringify(conf, null, 4), function(err){
+        if(err != null){
+            console.log("Configuration update was not successful");
+        }
+    });
+
+    pk.a7js.metadata.lastUsedVersion = core.getVersion();
+    pk.a7js.metadata.lastUsedTime = new Date();
+    
+    fs.writeFile("./package.json", JSON.stringify(pk, null, 4), function(err){
+        if(err !== null){
+            console.log("an error happened while trying to update package.json");
+        }
+    })
+
+} else if (init === true){
+    //TODO: make it async
+    fs.writeFileSync("./package.json", JSON.stringify(pk, null, 4));
+};

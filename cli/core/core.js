@@ -10,10 +10,21 @@ var config = {
     custom: {},
     default: JSON.parse(fs.readFileSync(require.resolve("../defaults/config.json"), "utf-8"))
 };
+
 if(fs.existsSync(config.fileLoc) === true){
-    config.custom = JSON.parse(
-        fs.readFileSync(config.fileLoc, "utf-8")
-    );
+    var configFile = fs.readFileSync(config.fileLoc, "utf-8");
+    
+    if (configFile !== ""){
+        config.custom = JSON.parse(configFile);
+    } else {
+        config.custom = {};
+        log(chalk.yellow("WARN") + " Your configuration file seems empty, we are going to set it to the defaults.");
+        fs.writeFile("./a7.config.json", JSON.stringify(config.default), function(err){
+            if(err !== null){
+                console.log("failed to save a7.config");
+            }
+        });
+    }
 }
 
 var debug;
@@ -22,7 +33,7 @@ if (config.custom.debugger === true){
     debug = true;
 }
 
-module.exports = {
+module.exports = core = {
     config: {
         ...config.default,
         ...config.custom
@@ -57,11 +68,13 @@ module.exports = {
         var a7pack = JSON.parse(fs.readFileSync(require.resolve("../../package.json"), "utf-8"));
         return a7pack.version;
     },
+
     debug(msg){
         if(debug === true){
             console.log(chalk.yellow("DEBUG"),msg);
         }
     },
+
     atFileLog(file){
         log(chalk.red("AT FILE:"), file);
     },

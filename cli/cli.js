@@ -7,7 +7,7 @@ const chalk = require("chalk");
 const a7build = require("./build.js");
 const core = require("./core/core.js");
 const [,,...args] = process.argv;
-const updater = require("./updater");
+require("./updater");
 
 const createHtmlDoc = function (name) {
     return fs.readFileSync(require.resolve("./defaults/index.html"), "utf-8", function(err){
@@ -48,7 +48,9 @@ const a7newproject = function (name) {
     } else if (fs.existsSync(name) !== false) {
         return core.errorLog(name + " folder already exists in this directory.");
     }
+
     core.infoLog("creating a new project in " + name);
+    
     fs.mkdir(name, {
         recursive: true
     }, function (err) {
@@ -57,7 +59,24 @@ const a7newproject = function (name) {
         }
     });
 
-    fs.writeFile(name + "/package.json", "{\n  \"name\":\"" + name + "\",\n  \"dependencies\": {\n    \"a7js\": \"^"+core.getVersion()+"\"\n  },\n  \"main\" :\"app/index.js\"\n}", function (err) {
+    fs.writeFile(name + "/package.json", JSON.stringify({
+        
+        name,
+        version:"0.0.1",
+        description: name + " is a A7JS application.",
+        private: true,
+        dependencies: {
+            "a7js": "^"+core.getVersion()
+        },
+        main: "app/index.js",
+        a7js: {
+            metadata: {
+                lastUsedVersion: core.getVersion(),
+                lastUsedTime: new Date()
+            }
+        }
+
+    },null, 4), function (err) {
         if (err) {
             core.errorLog("package.json could not be created.");
         }
@@ -124,7 +143,7 @@ const a7createComponent = function(name, absolutePath) {
     });
 
     fs.mkdirSync(path + name);
-    fs.writeFile(jsFileName, "export default function(){\n\nreturn({\n    tag:\""+name+"\",\n    template:\"./"+name+".html\",\n    styles:\"./"+name+".css\"\n});\n}",function(err){
+    fs.writeFile(jsFileName, "export default function(){\n\n    return({\n        tag:\""+name+"\",\n        template:\"./"+name+".html\",\n        styles:\"./"+name+".css\"\n});\n}",function(err){
         if(err){
             core.errorLog("There was an error while generating the js file for " + name + ".");
         } else {
@@ -146,6 +165,7 @@ const a7createComponent = function(name, absolutePath) {
 };
 //TODO: FIXME: Move it also to another dir
 const http = require("http");
+
 const a7test = function(){
     core.infoLog("starting an automatic a7 tester");
     core.infoLog("this is the tool to find to the most critical bugs in the code.");
