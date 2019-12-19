@@ -112,6 +112,14 @@ Features that we plan to release with it
 
 Also CLI now works silently unless an error occurs
 
+## 4.0.0 Initial release (Very close)
+
+Project metadata is now saved to `./package.json`, this is neccessary for upgrading configuration files
+
+Configuration file loading more stricter and less error prone.
+
+Removed "scoped css", it did not work as intended so we removed it
+
 ## 4.0.0-rc.1.8
 
 This update contains improvements to the development server,

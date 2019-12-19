@@ -51,24 +51,6 @@ function findProp (from, find){
     return from.match(new RegExp(find + "\s*:\s*\".+?\"", "i"))[0];
 }
 
-//TODO:TODO:TODO:TODO:TODO:TODO:TODO:TODO:TODO:TODO: abstractify
-const cssSplitter = function(css, tag){
-    //container RegExp
-    var containerStylesRx = new RegExp(tag + "(.|\s)+?\{(.|\s)+?\}", "g");
-    //TODO: instead of matching them by which are container styles remove them which aren't container styles and it is also the better option for performance
-    var notContainerStylesRx = new RegExp();
-    var containerStyles = css.match(containerStylesRx);
-    var parsedContainerStyles = "";
-
-    if (containerStyles !== null){
-        containerStyles.forEach(function(style){
-            parsedContainerStyles += style;
-        });
-    }
-    parsedContainerStyles = parsedContainerStyles.replace(new RegExp(tag, "g"), ".a7-component." + tag);
-    return {container:parsedContainerStyles,innerStyles:css.replace(containerStylesRx, "")};     
-};
-
 module.exports = function(sourceCode){
     sourceCode = "var a7_i={};\n" + sourceCode;
     if(config.entry === "noEntry"){
@@ -123,26 +105,16 @@ module.exports = function(sourceCode){
         var tag = findProp(componentSetup, "tag");
         tag = tag.match(/\".+?\"/)[0].replace(/\"/g, "");
 
-        var css = existsRead(CSSPath).replace(/\s+/g, " ");
+        CSSBundle += existsRead(CSSPath).replace(/\s+/g, " ");
         var html = "a7.documentFragment(" + htmlCompiler(existsRead(htmlPath)) + ")";
         //replace literals
         templateLiterals = html.match(/{{\s*.+?\s*}}/);
+
         if(templateLiterals !== null){
             templateLiterals.forEach(function(literal){
                 var clean = literal.replace(/({{|}})/g, "");
                 html = html.replace(literal, "\'+"+clean+"+\'");
             });
-        }
-        var cssObject = cssSplitter(css, tag);
-        var cssRules = cssObject.innerStyles.match(/.+?\s*?\{.+?\}/g);
-        if(cssRules !== null){
-            cssRules.forEach(function(rule){
-                CSSBundle += ".a7-component."+tag+" "+rule;
-            });
-        }
-
-        if (cssObject.container != ""){
-            CSSBundle += cssObject.container;
         }
 
         var out = minifier(multiReplace(componentSrc,

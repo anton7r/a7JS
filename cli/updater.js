@@ -3,7 +3,6 @@ const fs = require("fs");
 const fsx = require("./core/fsx.js");
 const core = require("./core/core");
 const ver = require("./core/compare-versions");
-const input = process.stdin;
 
 //needs to check wether directory has a7 config file
 if (fsx.fileExists("./a7.config.json") === false) {
@@ -35,6 +34,7 @@ if(ver.isNewer("4.0.0", pk.a7js.metadata.lastUsedVersion)){
     delete core.config.devserver;
     var conf = core.config;
     delete conf.mode;
+    delete conf.devserver;
 
     fs.writeFile("./a7.config.json", JSON.stringify(conf, null, 4), function(err){
         if(err != null){
