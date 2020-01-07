@@ -20,7 +20,10 @@ module.exports = function(port, dir){
             return packaged;
         } else if(url === "/"){
             if (fsx.fileExists(rootDir + "index.html")) {
-                return fs.readFileSync(rootDir + "index.html", "utf-8");
+                var file = fs.readFileSync(rootDir + "index.html", "utf-8");
+                var script = fs.readFileSync(require.resolve("./errormsg.js"), "utf-8");
+                file = file.replace("</body>", `<!-- a7js inserted script file ---><script>${script}</script></body>`);
+                return file;
             } else {
                 return "Could not find index.html file from directory";
             }
