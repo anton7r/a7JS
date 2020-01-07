@@ -1,0 +1,17 @@
+body{
+    background-color:rgb(27, 27, 27);
+}
+header{
+    font-family: Arial;
+    font-size: 30px;
+    color: red;
+    margin-top: 20px;
+    margin-left: 150px;
+}
+#tiedosto{
+    font-family: arial;
+    font-size: 22px;
+    text-align: left;
+    margin-left: 150px;
+    color: white;
+}
