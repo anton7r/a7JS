@@ -143,7 +143,7 @@ const a7createComponent = function(name, absolutePath) {
     });
 
     fs.mkdirSync(path + name);
-    fs.writeFile(jsFileName, "export default function(){\n\n    return({\n        tag:\""+name+"\",\n        template:\"./"+name+".html\",\n        styles:\"./"+name+".css\"\n});\n}",function(err){
+    fs.writeFile(jsFileName, fs.readFileSync(require.resolve("../defaults/component.txt")),function(err){
         if(err){
             core.errorLog("There was an error while generating the js file for " + name + ".");
         } else {
