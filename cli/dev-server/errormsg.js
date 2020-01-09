@@ -19,12 +19,13 @@ header{
 }
 `
 
-var template = `<header>Error: $errormsg</header>
+var template = `<header>Error: errormsg</header>
 <div id="file">
-    <p> $file<br>$file2</p>
+    <p> file1</p>
 </div>`
 
 addEventListener("error", function(ev){
-    
-    
+    var message = ev.message
+    var file = ev.filename
+    var t = template.replace("errormsg", message).replace("file1", file)
 });
