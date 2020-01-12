@@ -3,6 +3,7 @@
 const fs = require("fs");
 const chalk = require("chalk");
 const log = console.log;
+var configLoaded = false;
 
 //config Loading settings
 var config = {
@@ -13,7 +14,8 @@ var config = {
 
 if(fs.existsSync(config.fileLoc) === true){
     var configFile = fs.readFileSync(config.fileLoc, "utf-8");
-    
+    configLoaded = true;
+
     if (configFile !== ""){
         config.custom = JSON.parse(configFile);
     } else {
@@ -38,6 +40,8 @@ module.exports = core = {
         ...config.default,
         ...config.custom
     },
+
+    configLoaded,
 
     importA7rx: /import (a7|{.+?}) from \"a7JS\"(;|)/i,
     pathToA7JS: require.resolve("../../src/a7.js"),

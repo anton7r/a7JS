@@ -116,7 +116,7 @@ module.exports = function(sourceCode){
                 html = html.replace(literal, "\'+"+clean+"+\'");
             });
         }
-
+        
         var out = minifier(multiReplace(componentSrc,
             [componentSetup, "return " + html],
             [/((\'\')\s*\+\s*|(\s*\+\s*\'\'))/g, ""]

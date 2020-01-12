@@ -1,8 +1,7 @@
 var socket = new WebSocket("localhost:{{ port }}");
 
-socket.onopen = function(e) {
-    alert("[open] Connection established");
-    alert("Sending to server");
+socket.onopen = function() {
+    alert("[Auto Refresh] Established");
     socket.send("Io sono Aldo");
 };
 

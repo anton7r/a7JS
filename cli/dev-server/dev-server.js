@@ -10,6 +10,11 @@ const fsx = require("../core/fsx");
 
 module.exports = function(port, dir){
 
+    if(core.configLoaded === false){
+        core.errorLog("Couldn't find configuration file in the directory.")
+        return;
+    }
+
     core.config.mode = "development";
     var conf = core.config;
     var rootDir;
