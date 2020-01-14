@@ -34,6 +34,13 @@ addEventListener("error", function(ev){
     var t = template.replace("errormsg", message).replace("file1", file);
 });
 
+function showerror (errormsg, file){
+    var container = document.createElement("div");
+
+
+    
+    document.getElementsByTagName("body").appendChild(container)
+}
 
 //Lauri
 var socket = new WebSocket("localhost:{{ port }}");
