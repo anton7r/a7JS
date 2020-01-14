@@ -27,6 +27,7 @@ module.exports = function(port, dir){
             if (fsx.fileExists(rootDir + "index.html")) {
                 var file = fs.readFileSync(rootDir + "index.html", "utf-8");
                 var script = fs.readFileSync(require.resolve("./client.js"), "utf-8");
+                script = script.replace("{{ port }}", port);
                 file = file.replace("</body>", `<!-- a7js inserted script file ---><script>${script}</script></body>`);
                 return file;
             } else {
