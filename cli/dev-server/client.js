@@ -22,11 +22,6 @@ header {
     color: white;
 }`;
 
-var template = `
-<header>Error: errormsg</header>
-<div id="file">
-    <p> file1</p>
-</div>`;
 
 addEventListener("error", function(ev){
     var message = ev.message;
@@ -36,9 +31,14 @@ addEventListener("error", function(ev){
 
 function showerror (errormsg, file){
     var container = document.createElement("div");
-
-
-    
+    var header = document.createElement("h1");
+    header.textContent = errormsg;
+    container.appendChild(header);
+    var atfile = document.createElement("p");
+    atfile.textContent = file;
+    container.appendChild(atfile);
+    a7.loadCSS(css)
+ 
     document.getElementsByTagName("body").appendChild(container)
 }
 
