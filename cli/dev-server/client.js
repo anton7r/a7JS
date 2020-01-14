@@ -51,17 +51,19 @@ socket.onopen = function() {
 
 socket.onmessage = function(ev) {
     var msg = ev.data;
-    
-};
-
-socket.onclose = function(ev) {
-    if (ev.wasClean) {
-        alert(`[close] Connection closed cleanly, code=${ev.code} reason=${ev.reason}`);
+    if(msg.startsWith("error:")) {
+        var json = msg.replace("error:","");
+        var error = JSON.parse(json);
+        showerror(error.error, error.file)
     } else {
-        alert('[close] Connection is dead!');
+        location.reload(true);
     }
 };
 
+socket.onclose = function(ev) {
+    console.log("[Auto Refresh] connection closed because: " + ev.reason);
+};
+
 socket.onerror = function(error) {
-    alert(`[error] ${error.message}`);
+    console.error(`[Auto Refresh] ${error.message}`);
 };
