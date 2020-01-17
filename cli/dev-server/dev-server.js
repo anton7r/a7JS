@@ -7,6 +7,7 @@ const zlib = require("zlib");
 const build = require("../compiler/compiler");
 const chalk = require("chalk");
 const fsx = require("../core/fsx");
+const websocket = require("ws");
 
 module.exports = function(port, dir){
 
@@ -19,17 +20,24 @@ module.exports = function(port, dir){
     var conf = core.config;
     var rootDir;
     var packaged = "";
+
+    var webSocketPort = 63005;
+
+    function getIndexHTML(){
+        var index = fs.readFileSync(rootDir + "index.html", "utf-8");
+        var script = fs.readFileSync(require.resolve("./client.js"), "utf-8");
+        script = script.replace("{{ port }}", port);
+        index = index.replace("</body>", `<!-- a7js inserted script file ---><script>${script}</script></body>`);
+        return index;
+    }
+
     function resolveFile(url){
         //core.debug(fs.statSync(rootDir+url).isFile());
         if("."+url === conf.output){
             return packaged;
         } else if(url === "/"){
             if (fsx.fileExists(rootDir + "index.html")) {
-                var file = fs.readFileSync(rootDir + "index.html", "utf-8");
-                var script = fs.readFileSync(require.resolve("./client.js"), "utf-8");
-                script = script.replace("{{ port }}", port);
-                file = file.replace("</body>", `<!-- a7js inserted script file ---><script>${script}</script></body>`);
-                return file;
+                return getIndexHTML();
             } else {
                 return "Could not find index.html file from directory";
             }
@@ -37,7 +45,7 @@ module.exports = function(port, dir){
         } else if (fsx.fileExists(rootDir+url) === true){
             return fs.readFileSync(rootDir+url);
         } else {
-            return fs.readFileSync(rootDir + "index.html", "utf-8");
+            return getIndexHTML();
         }
     }
     
@@ -66,6 +74,22 @@ module.exports = function(port, dir){
     }
     pack();
     setInterval(pack, 1000);
+
+    var ws = new WebSocket.Server({
+        port: webSocketPort,
+        perMessageDeflate: {
+            zlibDeflateOptions: {
+                chunkSize: 1024,
+                memLevel: 7,
+                level: 3
+            },
+            zlibInflateOptions: {
+                chunkSize: 10 * 1024
+            }
+          }
+    })
+
+    
 
     http.createServer(function (req, res){
         var types = req.headers.accept;//.split(",")
