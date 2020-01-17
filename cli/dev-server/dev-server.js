@@ -7,7 +7,7 @@ const zlib = require("zlib");
 const build = require("../compiler/compiler");
 const chalk = require("chalk");
 const fsx = require("../core/fsx");
-const websocket = require("ws");
+const WebSocket = require("ws");
 
 module.exports = function(port, dir){
 
@@ -20,8 +20,6 @@ module.exports = function(port, dir){
     var conf = core.config;
     var rootDir;
     var packaged = "";
-
-    var webSocketPort = 63005;
 
     function getIndexHTML(){
         var index = fs.readFileSync(rootDir + "index.html", "utf-8");
@@ -75,23 +73,8 @@ module.exports = function(port, dir){
     pack();
     setInterval(pack, 1000);
 
-    var ws = new WebSocket.Server({
-        port: webSocketPort,
-        perMessageDeflate: {
-            zlibDeflateOptions: {
-                chunkSize: 1024,
-                memLevel: 7,
-                level: 3
-            },
-            zlibInflateOptions: {
-                chunkSize: 10 * 1024
-            }
-          }
-    })
 
-    
-
-    http.createServer(function (req, res){
+    var server = http.createServer(function (req, res){
         var types = req.headers.accept;//.split(",")
         var type;
 
@@ -123,5 +106,37 @@ module.exports = function(port, dir){
             res.end(file);
         }
 
-    }).listen(port);
+    });
+    
+    var listeners = [];
+    function sendAll(message){
+        for(var i; i < listeners.length; i++){
+            listeners[i].send(message);
+        }
+    }
+
+    var w = new WebSocket.Server({ server });
+    w.on("connection", function(ws){
+        id = listeners.length;
+        listeners += ws;
+
+        //removes 
+        ws.on("close", function(){
+            listeners.splice(id, 1);
+            //TODO: listeners after the removed id are invalid so;
+        });
+    }); 
+
+    //send refresh message to the client
+    function onUpdate(){
+        sendAll("R");
+    }
+
+    //send the error message to the client
+    function onError(obj){
+        sendAll("error:" + JSON.stringify(obj));
+    }
+
+    server.listen(port);
+
 };
