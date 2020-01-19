@@ -111,29 +111,34 @@ module.exports = function(port, dir){
     var listeners = [];
     function sendAll(message){
         for(var i; i < listeners.length; i++){
-            listeners[i].send(message);
+            listeners[i].ws.send(message);
         }
     }
 
     var w = new WebSocket.Server({ server });
     w.on("connection", function(ws){
         id = listeners.length;
-        listeners += ws;
+        function correct(){
+            id--;
+        }
+        listeners += {ws, correct};
 
         //removes 
         ws.on("close", function(){
             listeners.splice(id, 1);
-            //TODO: listeners after the removed id are invalid so;
+            for(var i = id; i < listeners.length; i++){
+                listeners[i].correct();
+            }
         });
-    }); 
+    });
 
     //send refresh message to the client
-    function onUpdate(){
+    function clientUpdate(){
         sendAll("R");
     }
 
     //send the error message to the client
-    function onError(obj){
+    function clientError(obj){
         sendAll("error:" + JSON.stringify(obj));
     }
 
