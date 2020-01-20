@@ -4,6 +4,10 @@ const fs = require("fs");
 const core = require("./core/core.js");
 const compile = require("./compiler/compiler");
 module.exports = function(settings) {
+    if(core.configLoaded === false){
+        return core.errorLog("can't run build command on this directory."); 
+    }
+
     core.config.mode = "production";
     var config = core.config;
     if (config.entry === undefined){
