@@ -66,4 +66,4 @@ socket.onclose = function(ev) {
 
 socket.onerror = function(error) {
     console.error(`[Auto Refresh] ${error.message}`);
-};
+}; //© Lauri Särkioja 2020
