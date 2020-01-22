@@ -29,7 +29,6 @@ if(pk.a7js === undefined){
 
 //if true perform upgrade
 if(ver.isNewer("4.0.0", pk.a7js.metadata.lastUsedVersion)){
-    
     console.log("Updating project's a7.config.json...");
     var conf = core.config;
     delete conf.mode;

@@ -3,5 +3,5 @@ import testing from "./components/testing/testing.js";
 
 
 a7.routes({
-    "/*":""
+    "/*":testing()
 });

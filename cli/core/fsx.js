@@ -31,7 +31,7 @@ module.exports = {
     readJSONfile(path) {
         var file = fs.readFileSync(path, "utf-8");
         if(file === ""){
-            return "";
+            return {};
         }
         return JSON.parse(file);
     }
