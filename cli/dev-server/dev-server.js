@@ -68,7 +68,12 @@ module.exports = function(port, dir){
         port = 2550;
     }
     pack();
-    setInterval(pack, 1000);
+    //Lauri
+    var filepath = "./app/";
+
+    fs.watch(filepath, "utf8", function (event, filename) {
+        console.log("event = " + event, "\n filename = " + filename)
+    }); //© Lauri Särkioja 2020
 
 
     var server = http.createServer(function (req, res){
