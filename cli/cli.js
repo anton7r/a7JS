@@ -134,7 +134,7 @@ const a7createComponent = function(name, rootPath) {
     });
 
     fs.mkdirSync(path + name);
-    fs.writeFile(jsFileName, fs.readFileSync(require.resolve("./defaults/component.js").replace(/name/g, name), "utf-8"),function(err){
+    fs.writeFile(jsFileName, fs.readFileSync(require.resolve("./defaults/component.js"), "utf-8").replace(/name/g, name),function(err){
         if(err){
             return core.errorLog("There was an error while generating the js file for " + name + ".");
         } else {
@@ -197,10 +197,6 @@ const a7test = function(){
     });
 };
 
-const a7unknownArg = function () {
-    core.errorLog(chalk.cyan(args.join(" ")) + " is not a valid argument.");
-};
-
 const a7devServer = require("./dev-server/dev-server.js"); 
 
 switch (args[0]) {
@@ -229,6 +225,6 @@ switch (args[0]) {
         a7test();
         break;
     default:
-        a7unknownArg();
+        core.errorLog(chalk.cyan(args.join(" ")) + " is not a valid argument.");
         break;
 }
