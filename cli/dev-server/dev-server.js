@@ -69,10 +69,14 @@ module.exports = function(port, dir){
     }
     pack();
     //Lauri
-    var filepath = "./app/";
+    var filepath = "./";
 
     fs.watch(filepath, "utf8", function (event, filename) {
-        console.log("event = " + event, "\n filename = " + filename)
+        if(event !== "change"){
+            return
+        }
+        console.log("Changed")
+        pack()
     }); //© Lauri Särkioja 2020
 
 
