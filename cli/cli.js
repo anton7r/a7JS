@@ -134,7 +134,7 @@ const a7createComponent = function(name, rootPath) {
     });
 
     fs.mkdirSync(path + name);
-    fs.writeFile(jsFileName, fs.readFileSync("./defaults/component.txt"),function(err){
+    fs.writeFile(jsFileName, fs.readFileSync(require.resolve("./defaults/component.txt"), "utf-8"),function(err){
         if(err){
             core.errorLog("There was an error while generating the js file for " + name + ".");
         } else {
