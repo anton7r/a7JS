@@ -29,6 +29,10 @@ module.exports = {
     },
 
     readJSONfile(path) {
-        return JSON.parse(fs.readFileSync(path, "utf-8"));
+        var file = fs.readFileSync(path, "utf-8");
+        if(file === ""){
+            return {};
+        }
+        return JSON.parse(file);
     }
 }

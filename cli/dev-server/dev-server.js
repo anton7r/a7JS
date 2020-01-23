@@ -25,13 +25,11 @@ module.exports = function(port, dir){
         var index = fs.readFileSync(rootDir + "index.html", "utf-8");
         var script = fs.readFileSync(require.resolve("./client.js"), "utf-8");
         script = script.replace("{{ port }}", port);
-        index = index.replace("</body>", `<!-- a7js inserted script file ---><script>${script}</script></body>`);
-        return index;
+        return index.replace("</body>", `<!-- a7js dev script ---><script>${script}</script></body>`);
     }
 
     function resolveFile(url){
-        //core.debug(fs.statSync(rootDir+url).isFile());
-        if("."+url === conf.output){
+        if("." + url === conf.output){
             return packaged;
         } else if(url === "/"){
             if (fsx.fileExists(rootDir + "index.html")) {
@@ -53,17 +51,16 @@ module.exports = function(port, dir){
         rootDir = "./";
     }
 
+    //Builds the app
     function pack(){
         console.clear();
         packaged = build(fs.readFileSync(conf.entry, "utf-8"));
-        var time = new Date();
-        console.log(chalk.green("SUCCESS"), "app was built at", chalk.gray(time),
+        console.log(chalk.green("SUCCESS"), "app was built at", chalk.gray(new Date()),
 `
 
   Your app is running at ` + chalk.blue("localhost:"+port+"/") + `
   
-  To exit A7JS Development server press `+ chalk.black.bgBlue("CTRL") +` and `+ chalk.black.bgBlue("C") +`
-`
+  To exit A7JS Development server press `+ chalk.black.bgBlue("CTRL") +` and `+ chalk.black.bgBlue("C")
         );
     }
 
@@ -71,7 +68,16 @@ module.exports = function(port, dir){
         port = 2550;
     }
     pack();
-    setInterval(pack, 1000);
+    //Lauri
+    var filepath = "./";
+
+    fs.watch(filepath, "utf8", function (event, filename) {
+        if(event !== "change"){
+            return
+        }
+        console.log("Changed")
+        pack()
+    }); //© Lauri Särkioja 2020
 
 
     var server = http.createServer(function (req, res){

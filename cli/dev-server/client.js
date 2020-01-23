@@ -23,11 +23,6 @@ header {
 }`;
 
 
-addEventListener("error", function(ev){
-    var message = ev.message;
-    var file = ev.filename;
-    var t = template.replace("errormsg", message).replace("file1", file);
-});
 
 function showerror (errormsg, file){
     var container = document.createElement("div");
@@ -42,6 +37,9 @@ function showerror (errormsg, file){
     document.getElementsByTagName("body").appendChild(container)
 }
 
+addEventListener("error", function(ev){
+   showerror(ev.error, ev.filename) 
+});
 //Lauri
 var socket = new WebSocket("localhost:{{ port }}");
 
@@ -66,4 +64,4 @@ socket.onclose = function(ev) {
 
 socket.onerror = function(error) {
     console.error(`[Auto Refresh] ${error.message}`);
-};
+}; //© Lauri Särkioja 2020

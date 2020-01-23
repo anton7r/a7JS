@@ -3,20 +3,8 @@
   "version": "5.0.0-indev",
   "description": "a7JS is a frontend spa framework made to be simple and scalable",
   "files": [
-    "src/a7.js",
-    "cli/cli.js",
-    "cli/build.js",
-    "cli/updater.js",
-    "cli/htmltags.txt",
-    "cli/core/fsx.js",
-    "cli/core/core.js",
-    "cli/core/compare-versions.js",
-    "cli/dev-server/dev-server.js",
-    "cli/compiler/css-minifier.js",
-    "cli/compiler/html-compiler.js",
-    "cli/compiler/compiler.js",
-    "cli/defaults/config.json",
-    "cli/defaults/index.html"
+    "src/*",
+    "cli/*"
   ],
   "main": "src/a7.js",
   "scripts": {
@@ -48,7 +36,7 @@
     "chalk": "^2.4.2",
     "csso": "^4.0.2",
     "node-html-parser": "^1.1.18",
-    "uglify-js": "^3.7.5",
+    "uglify-js": "^3.7.6",
     "ws": "^7.2.1"
   },
   "types": "src/a7.d.ts",

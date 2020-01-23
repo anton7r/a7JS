@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-/* jshint -W104 */
-/* jshint -W119 */
 const log = console.log;
 const fs = require("fs");
 const chalk = require("chalk");
@@ -15,31 +13,26 @@ const createHtmlDoc = function (name) {
     }).replace(/\$/g, name);
 };
 
-const cssDoc = `:root{}\n\n* {\n    margin:0px;\n    padding:0px;\n}\n\nbody {\n    font-family:"FONT HERE";\n}`;
+const cssDoc = `* {\n    margin:0px;\n    padding:0px;\n}\n\nbody {\n    font-family:"FONT HERE";\n}`;
 
 const a7greet = function () {
     log(chalk.blue("A7JS")+chalk.gray("@"+core.getVersion()), "\n");
 };
 
 const a7helper = function () {
-    log(chalk.blue("A7JS help\n"));
-    
     core.helperLog("newproject", "create a new project with a7.");
     core.syntaxLog("a7 newproject [projectname]");
     core.syntaxLog("a7 np [projectname]");
-    
+
     core.helperLog("newcomponent", "create a new component into the current project.");
     core.syntaxLog("a7 newcomponent [componentname]");
     core.syntaxLog("a7 nc [componentname]");
-    
+
     core.helperLog("build", "build the a7 project.");
     core.syntaxLog("a7 build");
 
     core.helperLog("devserver", "start a development server [beta]");
     core.syntaxLog("a7 devserver [port(optional)]");
-
-    core.helperLog("upgrade config", "upgrade your \"a7.config.json\" file");
-    core.syntaxLog("a7 upgrade config")
 };
 
 const a7newproject = function (name) {
@@ -50,7 +43,7 @@ const a7newproject = function (name) {
     }
 
     core.infoLog("creating a new project in " + name);
-    
+
     fs.mkdir(name, {
         recursive: true
     }, function (err) {
@@ -59,8 +52,7 @@ const a7newproject = function (name) {
         }
     });
 
-    fs.writeFile(name + "/package.json", JSON.stringify({
-        
+    fs.writeFile(name + "/package.json", JSON.stringify({    
         name,
         version:"0.0.1",
         description: name + " is a A7JS application.",
@@ -75,7 +67,6 @@ const a7newproject = function (name) {
                 lastUsedTime: new Date()
             }
         }
-
     },null, 4), function (err) {
         if (err) {
             core.errorLog("package.json could not be created.");
@@ -109,14 +100,13 @@ const a7newproject = function (name) {
         }
     });
 
-    core.successLog("the project was created without any errors!");
+    core.successLog("the project was created successfully!");
 };
 
-//TODO:
-const a7createComponent = function(name, absolutePath) {
+const a7createComponent = function(name, rootPath) {
     var path = "app/components/";
-    if(absolutePath !== undefined){
-        path = absolutePath + path;
+    if(rootPath !== undefined){
+        path = rootPath + path;
     } else {
         path = "./"+path;
     }
@@ -125,6 +115,7 @@ const a7createComponent = function(name, absolutePath) {
     var cssFileName = _file + ".css";
     var htmlFileName = _file + ".html";
     var _imports = core.getImports();
+    //the last import
     var last = _imports.imports[_imports.imports.length - 1];
     var source = _imports.source.replace(last, last + ";\nimport "+name+" from \"./components/"+name+"/"+name+".js\";").replace(";;", ";");
 
@@ -143,9 +134,9 @@ const a7createComponent = function(name, absolutePath) {
     });
 
     fs.mkdirSync(path + name);
-    fs.writeFile(jsFileName, fs.readFileSync(require.resolve("../defaults/component.txt")),function(err){
+    fs.writeFile(jsFileName, fs.readFileSync(require.resolve("./defaults/component.js"), "utf-8").replace(/name/g, name),function(err){
         if(err){
-            core.errorLog("There was an error while generating the js file for " + name + ".");
+            return core.errorLog("There was an error while generating the js file for " + name + ".");
         } else {
             core.successLog("Component " + name + " was successfully created.");
         }
@@ -163,7 +154,7 @@ const a7createComponent = function(name, absolutePath) {
 
     });
 };
-//TODO: FIXME: Move it also to another dir
+//TODO: Move it also to another dir
 const http = require("http");
 
 const a7test = function(){
@@ -206,10 +197,6 @@ const a7test = function(){
     });
 };
 
-const a7unknownArg = function () {
-    core.errorLog(chalk.cyan(args.join(" ")) + " is not a valid argument.");
-};
-
 const a7devServer = require("./dev-server/dev-server.js"); 
 
 switch (args[0]) {
@@ -237,10 +224,7 @@ switch (args[0]) {
     case "test":
         a7test();
         break;
-    case "upgrade":
-        a7upgrade(args[1]);
-        break;
     default:
-        a7unknownArg();
+        core.errorLog(chalk.cyan(args.join(" ")) + " is not a valid argument.");
         break;
 }
