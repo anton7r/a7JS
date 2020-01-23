@@ -21,6 +21,7 @@ module.exports = function(port, dir){
     var rootDir;
     var packaged = "";
 
+    //returns the index file
     function getIndexHTML(){
         var index = fs.readFileSync(rootDir + "index.html", "utf-8");
         var script = fs.readFileSync(require.resolve("./client.js"), "utf-8");
@@ -68,16 +69,6 @@ module.exports = function(port, dir){
         port = 2550;
     }
     pack();
-    //Lauri
-    var filepath = "./";
-
-    fs.watch(filepath, "utf8", function (event, filename) {
-        if(event !== "change"){
-            return
-        }
-        console.log("Changed")
-        pack()
-    }); //© Lauri Särkioja 2020
 
 
     var server = http.createServer(function (req, res){
@@ -127,15 +118,17 @@ module.exports = function(port, dir){
     var w = new WebSocket.Server({ server });
     w.on("connection", function(ws){
         id = listeners.length;
+        console.log("new connection");
         function correct(){
             id--;
         }
 
         //adds new listener to the list
-        listeners += {ws, correct};
+        listeners.push({ws, correct});
 
         //removes it self from the list
         ws.on("close", function(){
+            console.log(listeners);
             listeners.splice(id, 1);
             for(var i = id; i < listeners.length; i++){
                 listeners[i].correct();
@@ -152,6 +145,16 @@ module.exports = function(port, dir){
     function clientError(obj){
         sendAll("error:" + JSON.stringify(obj));
     }
+
+    //Lauri
+    fs.watch(rootDir, { encoding: "utf-8", recursive:true }, function (event, filename) {
+        if(event !== "change"){
+            return
+        }
+        console.log("Changed");
+        pack();
+        clientUpdate();
+    }); //© Lauri Särkioja 2020
 
     server.listen(port);
 };
