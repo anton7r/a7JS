@@ -10,7 +10,6 @@ const fsx = require("../core/fsx");
 const WebSocket = require("ws");
 
 module.exports = function(port, dir){
-
     if(core.configLoaded === false){
         core.errorLog("Couldn't find configuration file in the directory.")
         return;
@@ -109,7 +108,7 @@ module.exports = function(port, dir){
 
     //sends messages to all websocket connections
     function sendAll(message){
-        for(var i; i < listeners.length; i++){
+        for(var i = 0; i < listeners.length; i++){
             listeners[i].ws.send(message);
         }
     }
@@ -118,7 +117,6 @@ module.exports = function(port, dir){
     var w = new WebSocket.Server({ server });
     w.on("connection", function(ws){
         id = listeners.length;
-        console.log("new connection");
         function correct(){
             id--;
         }
@@ -128,7 +126,6 @@ module.exports = function(port, dir){
 
         //removes it self from the list
         ws.on("close", function(){
-            console.log(listeners);
             listeners.splice(id, 1);
             for(var i = id; i < listeners.length; i++){
                 listeners[i].correct();
@@ -138,7 +135,7 @@ module.exports = function(port, dir){
 
     //send refresh message to the client
     function clientUpdate(){
-        sendAll("R");
+        sendAll("r");
     }
 
     //send the error message to the client
@@ -151,7 +148,6 @@ module.exports = function(port, dir){
         if(event !== "change"){
             return
         }
-        console.log("Changed");
         pack();
         clientUpdate();
     }); //© Lauri Särkioja 2020

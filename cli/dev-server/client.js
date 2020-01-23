@@ -43,12 +43,11 @@ addEventListener("error", function(ev){
 var socket = new WebSocket("ws://localhost:{{ port }}");
 
 socket.onopen = function() {
-    alert("[Auto Refresh] Connection established");
+    console.log("[Auto Refresh] Connection established");
 };
 
 socket.onmessage = function(ev) {
     var msg = ev.data;
-    console.log("Recieved from the server: " + msg);
     if(msg.startsWith("error:")) {
         var json = msg.replace("error:","");
         var error = JSON.parse(json);
@@ -58,8 +57,8 @@ socket.onmessage = function(ev) {
     }
 };
 
-socket.onclose = function(ev) {
-    console.log("[Auto Refresh] connection closed because: " + ev.reason);
+socket.onclose = function() {
+    console.log("[Auto Refresh] Connection closed.");
 };
 
 socket.onerror = function(error) {
