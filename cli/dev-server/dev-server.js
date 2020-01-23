@@ -109,21 +109,26 @@ module.exports = function(port, dir){
     });
     
     var listeners = [];
+
+    //sends messages to all websocket connections
     function sendAll(message){
         for(var i; i < listeners.length; i++){
             listeners[i].ws.send(message);
         }
     }
 
+    //initializes the websocket
     var w = new WebSocket.Server({ server });
     w.on("connection", function(ws){
         id = listeners.length;
         function correct(){
             id--;
         }
+
+        //adds new listener to the list
         listeners += {ws, correct};
 
-        //removes 
+        //removes it self from the list
         ws.on("close", function(){
             listeners.splice(id, 1);
             for(var i = id; i < listeners.length; i++){
@@ -143,5 +148,4 @@ module.exports = function(port, dir){
     }
 
     server.listen(port);
-
 };
