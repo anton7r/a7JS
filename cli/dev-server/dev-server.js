@@ -75,8 +75,8 @@ module.exports = function(port, dir){
         if(event !== "change"){
             return
         }
-        console.log("Changed")
         pack()
+        console.log("Changed")
     }); //© Lauri Särkioja 2020
 
 
