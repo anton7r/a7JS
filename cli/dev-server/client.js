@@ -9,7 +9,7 @@ function showerror (errormsg, file){
     header.textContent = errormsg;
     container.appendChild(header);
     var atfile = document.createElement("p");
-    container.id = "file";
+    atfile.id = "file";
     atfile.textContent = file;
     container.appendChild(atfile);
     document.head.insertAdjacentHTML("beforeend", "<style>{{ css }}</style>");

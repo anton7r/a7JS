@@ -1,5 +1,8 @@
 #container {
     background-color:rgb(27, 27, 27);
+    padding-left: 150px;
+    padding-top: 20px;
+    height: 100vw;
 }
 
 #header {
@@ -7,13 +10,11 @@
     font-size: 30px;
     color: red;
     margin-top: 20px;
-    margin-left: 150px;
 }
 
 #file {
     font-family: arial;
     font-size: 22px;
     text-align: left;
-    margin-left: 150px;
-    color: white;
+    color: rgb(192, 192, 192);
 }
