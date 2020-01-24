@@ -2,7 +2,7 @@
     background-color:rgb(27, 27, 27);
     padding-left: 150px;
     padding-top: 20px;
-    height: 100vw;
+    height: calc(100vh - 20px);
 }
 
 #header {

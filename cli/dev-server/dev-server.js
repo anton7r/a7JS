@@ -17,12 +17,11 @@ module.exports = function(port, dir){
 
     core.config.mode = "development";
     var conf = core.config;
-    var rootDir;
     var packaged = "";
 
     //returns the index file
     function getIndexHTML(){
-        var index = fs.readFileSync(rootDir + "index.html", "utf-8");
+        var index = fs.readFileSync(dir + "index.html", "utf-8");
         var script = fs.readFileSync(require.resolve("./client.js"), "utf-8");
         script = script.replace("{{ port }}", port);
         var css = fs.readFileSync(require.resolve("./client.css"), "utf-8");
@@ -35,23 +34,21 @@ module.exports = function(port, dir){
         if("." + url === conf.output){
             return packaged;
         } else if(url === "/"){
-            if (fsx.fileExists(rootDir + "index.html")) {
+            if (fsx.fileExists(dir + "index.html")) {
                 return getIndexHTML();
             } else {
                 return "Could not find index.html file from directory";
             }
     
-        } else if (fsx.fileExists(rootDir+url) === true){
-            return fs.readFileSync(rootDir+url);
+        } else if (fsx.fileExists(dir+url) === true){
+            return fs.readFileSync(dir+url);
         } else {
             return getIndexHTML();
         }
     }
     
-    if(dir !== undefined){
-        rootDir = dir;
-    } else {
-        rootDir = "./";
+    if(dir === undefined){
+        dir = "./";
     }
 
     if(port === undefined){
@@ -91,34 +88,18 @@ module.exports = function(port, dir){
         }
 
     });
+    var w = new WebSocket.Server({ server });
     
-    var listeners = [];
-
     //sends messages to all websocket connections
-    function sendAll(message){
-        for(var i = 0; i < listeners.length; i++){
-            listeners[i].ws.send(message);
-        }
+    function sendAll(m){
+        w.clients.forEach((client) => {
+            client.send(m)
+        })
     }
 
     //initializes the websocket
-    var w = new WebSocket.Server({ server });
     w.on("connection", function(ws){
-        id = listeners.length;
-        function correct(){
-            id--;
-        }
 
-        //adds new listener to the list
-        listeners.push({ws, correct});
-
-        //removes it self from the list
-        ws.on("close", function(){
-            listeners.splice(id, 1);
-            for(var i = id; i < listeners.length; i++){
-                listeners[i].correct();
-            }
-        });
     });
 
     //send refresh message to the client
@@ -151,7 +132,7 @@ module.exports = function(port, dir){
     pack();
 
     //Lauri
-    fs.watch(rootDir, { encoding: "utf-8", recursive:true }, function (event, filename) {
+    fs.watch(dir, { encoding: "utf-8", recursive:true }, function (event, filename) {
         if(event !== "change"){
             return
         }
