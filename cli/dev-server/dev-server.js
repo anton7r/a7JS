@@ -10,7 +10,6 @@ const fsx = require("../core/fsx");
 const WebSocket = require("ws");
 
 module.exports = function(port, dir){
-
     if(core.configLoaded === false){
         core.errorLog("Couldn't find configuration file in the directory.")
         return;
@@ -21,6 +20,7 @@ module.exports = function(port, dir){
     var rootDir;
     var packaged = "";
 
+    //returns the index file
     function getIndexHTML(){
         var index = fs.readFileSync(rootDir + "index.html", "utf-8");
         var script = fs.readFileSync(require.resolve("./client.js"), "utf-8");
@@ -51,34 +51,9 @@ module.exports = function(port, dir){
         rootDir = "./";
     }
 
-    //Builds the app
-    function pack(){
-        console.clear();
-        packaged = build(fs.readFileSync(conf.entry, "utf-8"));
-        console.log(chalk.green("SUCCESS"), "app was built at", chalk.gray(new Date()),
-`
-
-  Your app is running at ` + chalk.blue("localhost:"+port+"/") + `
-  
-  To exit A7JS Development server press `+ chalk.black.bgBlue("CTRL") +` and `+ chalk.black.bgBlue("C")
-        );
-    }
-
     if(port === undefined){
         port = 2550;
     }
-    pack();
-    //Lauri
-    var filepath = "./";
-
-    fs.watch(filepath, "utf8", function (event, filename) {
-        if(event !== "change"){
-            return
-        }
-        pack()
-        console.log("Changed")
-    }); //© Lauri Särkioja 2020
-
 
     var server = http.createServer(function (req, res){
         var types = req.headers.accept;//.split(",")
@@ -115,21 +90,26 @@ module.exports = function(port, dir){
     });
     
     var listeners = [];
+
+    //sends messages to all websocket connections
     function sendAll(message){
-        for(var i; i < listeners.length; i++){
+        for(var i = 0; i < listeners.length; i++){
             listeners[i].ws.send(message);
         }
     }
 
+    //initializes the websocket
     var w = new WebSocket.Server({ server });
     w.on("connection", function(ws){
         id = listeners.length;
         function correct(){
             id--;
         }
-        listeners += {ws, correct};
 
-        //removes 
+        //adds new listener to the list
+        listeners.push({ws, correct});
+
+        //removes it self from the list
         ws.on("close", function(){
             listeners.splice(id, 1);
             for(var i = id; i < listeners.length; i++){
@@ -140,7 +120,7 @@ module.exports = function(port, dir){
 
     //send refresh message to the client
     function clientUpdate(){
-        sendAll("R");
+        sendAll("r");
     }
 
     //send the error message to the client
@@ -148,6 +128,32 @@ module.exports = function(port, dir){
         sendAll("error:" + JSON.stringify(obj));
     }
 
-    server.listen(port);
+    //Builds the app
+    function pack(){
+        console.clear();
+        var newPackaged = build(fs.readFileSync(conf.entry, "utf-8"));
+        console.log(chalk.green("SUCCESS"), "app was built at", chalk.gray(new Date()),
+`
 
+  Your app is running at ` + chalk.blue("localhost:"+port+"/") + `
+  
+  To exit A7JS Development server press `+ chalk.black.bgBlue("CTRL") +` and `+ chalk.black.bgBlue("C")
+        );
+
+        if(packaged !== newPackaged){
+            packaged = newPackaged;
+            clientUpdate();
+        }
+    }
+    pack();
+
+    //Lauri
+    fs.watch(rootDir, { encoding: "utf-8", recursive:true }, function (event, filename) {
+        if(event !== "change"){
+            return
+        }
+        pack();
+    }); //© Lauri Särkioja 2020
+
+    server.listen(port);
 };

@@ -23,7 +23,7 @@ header {
 }`;
 
 
-
+//shows the error message
 function showerror (errormsg, file){
     var container = document.createElement("div");
     var header = document.createElement("h1");
@@ -32,19 +32,18 @@ function showerror (errormsg, file){
     var atfile = document.createElement("p");
     atfile.textContent = file;
     container.appendChild(atfile);
-    a7.loadCSS(css)
- 
-    document.getElementsByTagName("body").appendChild(container)
+    document.head.insertAdjacentHTML("beforeend", "<style>" + css + "</style>");
+    document.getElementsByTagName("body")[0].appendChild(container)
 }
 
 addEventListener("error", function(ev){
    showerror(ev.error, ev.filename) 
 });
 //Lauri
-var socket = new WebSocket("localhost:{{ port }}");
+var socket = new WebSocket("ws://localhost:{{ port }}");
 
 socket.onopen = function() {
-    alert("[Auto Refresh] Connection established");
+    console.log("[Auto Refresh] Connection established");
 };
 
 socket.onmessage = function(ev) {
@@ -58,8 +57,8 @@ socket.onmessage = function(ev) {
     }
 };
 
-socket.onclose = function(ev) {
-    console.log("[Auto Refresh] connection closed because: " + ev.reason);
+socket.onclose = function() {
+    console.log("[Auto Refresh] Connection closed.");
 };
 
 socket.onerror = function(error) {
