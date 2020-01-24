@@ -109,31 +109,36 @@ var linkHandler = function (link) {
 
 var eventListeners = function (elm, attributes){
     if(typeof attributes === "number"){
-        return elm;
+        return [elm, attributes];
     }
     //basic event listeners
 
     if(attributes.a7onInit){
         attributes.a7onInit(elm);
+        delete attributes.a7onInit
     }
 
     if(attributes.a7onClick){
         elm.addEventListener("click", attributes.a7onClick);
+        delete attributes.a7onClick
     }
 
     if(attributes.a7onHover){
         elm.addEventListener("hover", attributes.a7onHover);
+        delete attributes.a7onHover
     }
 
     if(attributes.a7onChange){
         elm.addEventListener("change", attributes.a7onChange);
+        delete attributes.a7onChange
     }
 
     if(attributes.a7onInput){
         elm.addEventListener("input", attributes.a7onInput);
+        delete attributes.a7onInput
     }
 
-    return elm;
+    return [elm, attributes];
 };
 
 var render = function (elem) {
@@ -219,7 +224,11 @@ a7.createElement = function (element, attributes) {
         var cElement = document.createElement("div");
         cElement.className = "a7-component " + element;
         cElement.appendChild(component(props));
-        cElement = eventListeners(cElement, attributes);
+        //cElement = eventListeners(cElement, attributes);
+        var xElem = eventListeners(cElement, attributes);
+        console.log(xElem);
+        cElement = xElem[0];
+        attributes = xElem[1];
         //FIXME: for in loops not recommended
         for (attr in attributes){
             cElement.setAttribute(attr, attributes[attr]);
