@@ -1,27 +1,4 @@
-//this file will be executed on the frontend!
 //Tapio
-
-var css = `
-body {
-    background-color:rgb(27, 27, 27);
-}
-
-header {
-    font-family: Arial;
-    font-size: 30px;
-    color: red;
-    margin-top: 20px;
-    margin-left: 150px;
-}
-
-#file {
-    font-family: arial;
-    font-size: 22px;
-    text-align: left;
-    margin-left: 150px;
-    color: white;
-}`;
-
 
 //shows the error message
 function showerror (errormsg, file){
@@ -32,7 +9,7 @@ function showerror (errormsg, file){
     var atfile = document.createElement("p");
     atfile.textContent = file;
     container.appendChild(atfile);
-    document.head.insertAdjacentHTML("beforeend", "<style>" + css + "</style>");
+    document.head.insertAdjacentHTML("beforeend", "<style>{{ css }}</style>");
     document.getElementsByTagName("body")[0].appendChild(container)
 }
 

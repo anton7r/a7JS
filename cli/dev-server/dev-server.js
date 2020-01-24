@@ -25,6 +25,9 @@ module.exports = function(port, dir){
         var index = fs.readFileSync(rootDir + "index.html", "utf-8");
         var script = fs.readFileSync(require.resolve("./client.js"), "utf-8");
         script = script.replace("{{ port }}", port);
+        var css = fs.readFileSync(require.resolve("./client.css"), "utf-8");
+        css = css.replace(/[\r\n]/g, "");
+        script = script.replace("{{ css }}", css);
         return index.replace("</body>", `<!-- a7js dev script ---><script>${script}</script></body>`);
     }
 
