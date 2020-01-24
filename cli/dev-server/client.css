@@ -1,8 +1,8 @@
-body {
+#container {
     background-color:rgb(27, 27, 27);
 }
 
-header {
+#header {
     font-family: Arial;
     font-size: 30px;
     color: red;

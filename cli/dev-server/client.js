@@ -3,10 +3,13 @@
 //shows the error message
 function showerror (errormsg, file){
     var container = document.createElement("div");
+    container.id = "container";
     var header = document.createElement("h1");
+    header.id = "header";
     header.textContent = errormsg;
     container.appendChild(header);
     var atfile = document.createElement("p");
+    container.id = "file";
     atfile.textContent = file;
     container.appendChild(atfile);
     document.head.insertAdjacentHTML("beforeend", "<style>{{ css }}</style>");
