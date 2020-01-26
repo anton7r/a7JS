@@ -47,15 +47,10 @@ module.exports = function(port, dir){
         }
     }
     
-    if(dir === undefined){
-        dir = "./";
-    }
+    if(dir === undefined) dir = "./";
+    if(port === undefined) port = 2550;
 
-    if(port === undefined){
-        port = 2550;
-    }
-
-    var server = http.createServer(function (req, res){
+    var server = http.createServer((req, res) => {
         var types = req.headers.accept;//.split(",")
         var type;
 
@@ -97,11 +92,6 @@ module.exports = function(port, dir){
         })
     }
 
-    //initializes the websocket
-    w.on("connection", function(ws){
-
-    });
-
     //send refresh message to the client
     function clientUpdate(){
         sendAll("r");
@@ -116,13 +106,11 @@ module.exports = function(port, dir){
     function pack(){
         console.clear();
         var newPackaged = build(fs.readFileSync(conf.entry, "utf-8"));
-        console.log(chalk.green("SUCCESS"), "app was built at", chalk.gray(new Date()),
-`
+        console.log(`${chalk.green("SUCCESS")} app was built at ${chalk.gray(new Date())}
 
-  Your app is running at ` + chalk.blue("localhost:"+port+"/") + `
+  Your app is running at ${chalk.blue(`localhost:${port}/`)}
   
-  To exit A7JS Development server press `+ chalk.black.bgBlue("CTRL") +` and `+ chalk.black.bgBlue("C")
-        );
+  To exit A7JS Development server press ${chalk.black.bgBlue("CTRL")} and ${chalk.black.bgBlue("C")}`);
 
         if(packaged !== newPackaged){
             packaged = newPackaged;
@@ -132,7 +120,7 @@ module.exports = function(port, dir){
     pack();
 
     //Lauri
-    fs.watch(dir, { encoding: "utf-8", recursive:true }, function (event, filename) {
+    fs.watch(dir, { encoding: "utf-8", recursive:true }, (event, filename) => {
         if(event !== "change"){
             return
         }

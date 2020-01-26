@@ -17,7 +17,7 @@ function showerror (errormsg, file){
 }
 
 addEventListener("error", function(ev){
-   showerror(ev.error, ev.filename) 
+   showerror(ev.error, `${ev.filename}:${ev.lineno}`) 
 });
 //Lauri
 var socket = new WebSocket("ws://localhost:{{ port }}");

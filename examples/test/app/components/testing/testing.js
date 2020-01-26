@@ -5,6 +5,10 @@ export default function(){
         self.id = "self"
     }
 
+    function click(){
+        console.log("fired click");
+    }
+
     return({
         tag:"testing",
         template:"./testing.html",

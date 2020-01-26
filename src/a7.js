@@ -22,16 +22,6 @@ var init = function () {
         return;
     }
 
-    var deprecated = document.querySelector("[data-a7-page-container]");
-    var deprecated2 = document.querySelector("[a7-page-container]");
-
-    if(deprecated !== null){
-        a7debug("Replace \"data-a7-page-container\" with \"a7app\" in the index.html file and then your app should work fine, this error message is going to be removed when a7js v4 full release comes around");
-        return;
-    } else if (deprecated2 !== null){
-        a7debug("Replace \"a7-page-container\" with \"a7app\" in the index.html file and then your app should work fine, this error message is going to be removed when a7js v4 full release comes around");
-        return;
-    }
     var pageContainerEL = document.querySelector("[a7app]");
     if (pageContainerEL === null) {
         a7debug("Page Container Could not be found, It has to have the attribute \"a7app\". Your website won't function without that.");
@@ -52,8 +42,6 @@ var init = function () {
             a7store[2][menuname] = elem;
             if (state === "open") {
                 elem.classList.add("a7-menu-" + menuname + "-open");
-            } else if (state === "closed") {
-                elem.classList.add("a7-menu-" + menuname + "-closed");
             } else {
                 elem.classList.add("a7-menu-" + menuname + "-closed");
             }
@@ -109,36 +97,32 @@ var linkHandler = function (link) {
 
 var eventListeners = function (elm, attributes){
     if(typeof attributes === "number"){
-        return [elm, attributes];
+        console.log("is number")
+        return elm;
     }
     //basic event listeners
 
     if(attributes.a7onInit){
         attributes.a7onInit(elm);
-        delete attributes.a7onInit
     }
 
     if(attributes.a7onClick){
         elm.addEventListener("click", attributes.a7onClick);
-        delete attributes.a7onClick
     }
 
     if(attributes.a7onHover){
         elm.addEventListener("hover", attributes.a7onHover);
-        delete attributes.a7onHover
     }
 
     if(attributes.a7onChange){
         elm.addEventListener("change", attributes.a7onChange);
-        delete attributes.a7onChange
     }
 
     if(attributes.a7onInput){
         elm.addEventListener("input", attributes.a7onInput);
-        delete attributes.a7onInput
     }
 
-    return [elm, attributes];
+    return elm;
 };
 
 var render = function (elem) {
@@ -147,11 +131,6 @@ var render = function (elem) {
         a7store[9].removeChild(a7store[9].lastChild);
     }
     a7store[9].appendChild(elem);
-};
-
-//very useful 
-if (!"".trim) String.prototype.trim = function () {
-    return this.replace(/^[\s﻿]+|[\s﻿]+$/g, '');
 };
 
 //arrays are simply about 33% faster than objects
@@ -224,11 +203,7 @@ a7.createElement = function (element, attributes) {
         var cElement = document.createElement("div");
         cElement.className = "a7-component " + element;
         cElement.appendChild(component(props));
-        //cElement = eventListeners(cElement, attributes);
-        var xElem = eventListeners(cElement, attributes);
-        console.log(xElem);
-        cElement = xElem[0];
-        attributes = xElem[1];
+        cElement = eventListeners(cElement, attributes);
         //FIXME: for in loops not recommended
         for (attr in attributes){
             cElement.setAttribute(attr, attributes[attr]);
@@ -237,7 +212,7 @@ a7.createElement = function (element, attributes) {
     } else {
         //It's a regular element
         var rElement = document.createElement(element);
-        rElement = eventListeners(rElement, attributes); 
+        rElement = eventListeners(rElement, attributes);
         for (attr in attributes){
             rElement.setAttribute(attr, attributes[attr]);
         }
@@ -347,6 +322,7 @@ a7.documentFragment = function () {
     return res;
 };
 
+//inserts css into the document head
 a7.loadCSS = function(css){
     document.head.insertAdjacentHTML("beforeend", "<style>" + css + "</style>");
 };
