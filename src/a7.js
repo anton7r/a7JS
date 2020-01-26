@@ -97,7 +97,6 @@ var linkHandler = function (link) {
 
 var eventListeners = function (elm, attributes){
     if(typeof attributes === "number"){
-        console.log("is number")
         return elm;
     }
     //basic event listeners
@@ -120,6 +119,11 @@ var eventListeners = function (elm, attributes){
 
     if(attributes.a7onInput){
         elm.addEventListener("input", attributes.a7onInput);
+    }
+
+    var attr;
+    for (attr in attributes){
+        if(attr.indexOf("a7on") !== 0) elm.setAttribute(attr, attributes[attr]);
     }
 
     return elm;
@@ -204,37 +208,30 @@ a7.createElement = function (element, attributes) {
         cElement.className = "a7-component " + element;
         cElement.appendChild(component(props));
         cElement = eventListeners(cElement, attributes);
-        //FIXME: for in loops not recommended
-        for (attr in attributes){
-            cElement.setAttribute(attr, attributes[attr]);
-        }
         return cElement;
     } else {
         //It's a regular element
         var rElement = document.createElement(element);
         rElement = eventListeners(rElement, attributes);
-        for (attr in attributes){
-            rElement.setAttribute(attr, attributes[attr]);
-        }
-
-        //children
+        
+        //child elements
         var i;
         var argLen = arguments.length;
 
         for (i = 2; i < argLen; i++) {
-            var currentArg = arguments[i];
+            var childEl = arguments[i];
             //loops through the rest of the arguments
-            if(typeof currentArg === "string" && currentArg !== ""){
-                rElement.innerText += currentArg;
-            } else if (typeof currentArg === "number"){
+            if(typeof childEl === "string" && childEl !== ""){
+                rElement.innerText += childEl;
+            } else if (typeof childEl === "number"){
                 // instance of number
-                rElement.innerText += currentArg;
-            } else if (currentArg instanceof Element){
+                rElement.innerText += childEl;
+            } else if (childEl instanceof Element){
                 //instance of element
-                rElement.appendChild(currentArg);
+                rElement.appendChild(childEl);
             } else {
                 //edge case
-                a7debug("cant recognize type of "+ currentArg);
+                a7debug("cant recognize type of "+ childEl);
             }
         }
         return rElement;
