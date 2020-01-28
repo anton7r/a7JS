@@ -138,7 +138,7 @@ var render = function(elem) {
 };
 
 //arrays are simply about 33% faster than objects
-var a7store = Array(15);
+var a7store = Array(13);
 a7store = [
     "", // Empty
     {}, //ComponentList       1
