@@ -17,8 +17,8 @@ function a7debug(message) {
 /* internal methods start */
 //Init will run once
 var init = function () {
-    //a7store[10] is initDone
-    if (a7store[10] === true) {
+    //a7store[8] is initDone
+    if (a7store[8] === true) {
         return;
     }
 
@@ -30,7 +30,7 @@ var init = function () {
 
     //assignment of a7store[7] aka pageContainer
     a7store[7] = pageContainerEL;
-    a7store[10] = true;
+    a7store[8] = true;
 
     //menu init
     var menuElements = document.querySelectorAll("[data-a7-menu]");
@@ -69,7 +69,7 @@ var init = function () {
         a7store[6].push(descL[0]);
         var descContent = descL[0].getAttribute("content");
         if (descContent !== undefined) {
-            a7store[11] = descContent;
+            a7store[9] = descContent;
         }
     } else {
         document.getElementsByTagName("head")[0].innerHTML += "<meta name=\"description\" content=\"\">";
@@ -77,7 +77,7 @@ var init = function () {
     }
 
     //conf
-    a7store[12] = document.title;
+    a7store[11] = document.title;
 
     //first route and enabling back button
     a7.router(a7.path());
@@ -148,26 +148,24 @@ a7store = [
     {}, //onMenuToggleList    5
     [], //descriptionElements 6
     {}, //pageContainer       7
-    false, //Empty            8
-    {}, //Empty               9
-    false, //initDone         10
-    "", //description         11
-    "", //title               12
-    true, //secureProps mode  13
-    {}, //Routes              14
+    false, //initDone         8
+    "", //description         9
+    false,//secureProps mode  10
+    "", //title               11
+    {}, //Routes              12
 ];
 
 var a7 = {};
 
 a7.routes = function(routes){
-    a7store[14] = routes;
+    a7store[12] = routes;
     init();
-    return a7store[14];
+    return a7store[12];
 };
 
 a7.secureProps = function (mode) {
     if (mode === true || mode === false) {
-        a7store[13] = mode;
+        a7store[10] = mode;
     } else {
         a7debug("The 1st parameter (mode) only accepts booleans.");
     }
@@ -191,7 +189,7 @@ a7.createElement = function (element, attributes) {
     }
     //Secure also attributes
     //If secure mode is enabled
-    if (a7store[13] === true) {
+    if (a7store[10] === true) {
         //sanitize props
         var key;
         for (key in props) {
@@ -436,7 +434,7 @@ a7.router = function (newPath) {
     //cacheMath no longer most likely does anything
     var mainPath = newPath.slice(0, newPath.indexOf("/") + 1) + "*",
     route,
-    routes = a7store[14];
+    routes = a7store[12];
     //tries to match equal
     if (routes[newPath]){
         route = newPath;
