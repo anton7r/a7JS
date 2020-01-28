@@ -1,8 +1,9 @@
-export default function(){
+export default {
+    data: {
+
+    },
     
-    return({
-        tag:"name",
-        template:"./name.html",
-        styles:"./name.css"
-    });
-}
+    functions: {
+
+    }
+};
