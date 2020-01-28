@@ -28,8 +28,8 @@ var init = function () {
         return;
     }
 
-    //assignment of a7store[9] aka pageContainer
-    a7store[9] = pageContainerEL;
+    //assignment of a7store[7] aka pageContainer
+    a7store[7] = pageContainerEL;
     a7store[10] = true;
 
     //menu init
@@ -97,6 +97,7 @@ var linkHandler = function (link) {
 
 var eventListeners = function (elm, attributes){
     if(typeof attributes === "number"){
+        //returns if there is no attributes
         return elm;
     }
     //basic event listeners
@@ -121,24 +122,22 @@ var eventListeners = function (elm, attributes){
         elm.addEventListener("input", attributes.a7onInput);
     }
 
-    var attr;
-    for (attr in attributes){
+    for (var attr in attributes){
         if(attr.indexOf("a7on") !== 0) elm.setAttribute(attr, attributes[attr]);
     }
 
     return elm;
 };
 
-var render = function (elem) {
-    //a7store[9] is pageContainer
-    if(a7store[9].children.length !== 0){
-        a7store[9].removeChild(a7store[9].lastChild);
+var render = function(elem) {
+    //a7store[7] is pageContainer
+    if(a7store[7].children.length !== 0){
+        a7store[7].removeChild(a7store[7].lastChild);
     }
-    a7store[9].appendChild(elem);
+    a7store[7].appendChild(elem);
 };
 
 //arrays are simply about 33% faster than objects
-//which gives us a huge performance increase
 var a7store = Array(15);
 a7store = [
     "", // Empty
@@ -148,16 +147,15 @@ a7store = [
     {}, //Observable liste... 4
     {}, //onMenuToggleList    5
     [], //descriptionElements 6
-    {}, //Empty               7
+    {}, //pageContainer       7
     false, //Empty            8
-    {}, //pageContainer       9
+    {}, //Empty               9
     false, //initDone         10
     "", //description         11
     "", //title               12
     true, //secureProps mode  13
     {}, //Routes              14
 ];
-/* internal methods end */
 
 var a7 = {};
 
@@ -239,7 +237,7 @@ a7.createElement = function (element, attributes) {
 };
 
 a7.app = function () {
-    return a7store[9];
+    return a7store[7];
 };
 
 a7.onMobile = function(func){
