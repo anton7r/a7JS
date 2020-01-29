@@ -95,10 +95,9 @@ module.exports = function(sourceCode){
         //Component sourcecode
         var componentSrc = existsRead(entryFolder + imp.path).replace(/export default\s*/, "");
 
-        var componentSetup = componentSrc.match(/return\s*\(\{(.|\s)*\}\)/)[0];
-        var htmlPath = folder + componentSource(findProp(componentSetup, "template"));
-        var CSSPath = folder + componentSource(findProp(componentSetup, "styles"));
-        var tag = imp.name
+        var htmlPath = folder + imp.name + ".html";
+        var CSSPath = folder + imp.name + ".css";
+        var tag = imp.name;
 
         CSSBundle += existsRead(CSSPath).replace(/\s+/g, " ");
         var html = "a7.documentFragment(" + htmlCompiler(existsRead(htmlPath)) + ")";
@@ -108,7 +107,7 @@ module.exports = function(sourceCode){
         if(templateLiterals !== null){
             templateLiterals.forEach(function(literal){
                 var clean = literal.replace(/({{|}})/g, "");
-                html = html.replace(literal, "\'+"+clean+"+\'");
+                html = html.replace(literal, `\'+${clean}+\'`);
             });
         }
         
