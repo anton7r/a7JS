@@ -176,7 +176,6 @@ a7.secureProps = function (mode) {
 
 //REVIEW:
 a7.createElement = function (element, attributes) {
-    // secure createElement
     //Replace this
     var props;
     var component = a7store[1][element];
@@ -187,8 +186,7 @@ a7.createElement = function (element, attributes) {
         props = attributes.props;
         delete attributes.props;
     }
-    //Secure also attributes
-    //If secure mode is enabled
+
     if (a7store[10] === true) {
         //sanitize props
         var key;
@@ -196,7 +194,7 @@ a7.createElement = function (element, attributes) {
             props[key] = a7.sanitizer(props[key]);
         }
     }
-    var attr;
+
     //if the element is a component
     if (component !== undefined) {
         //It's a component
@@ -231,7 +229,7 @@ a7.createElement = function (element, attributes) {
             }
         }
         return rElement;
-    }
+    } 
 };
 
 a7.app = function () {

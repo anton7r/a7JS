@@ -93,17 +93,12 @@ module.exports = function(sourceCode){
         var folder = fsx.purePath(entryFolder +imp.path.replace(/(\w|\n)+\.js/g, ""));
         
         //Component sourcecode
-        var componentSrc = multiReplace(
-            existsRead(entryFolder + imp.path),
-            [/export default function\s*\(/, "function e("],
-            [/export default function/, "function"]
-        );
+        var componentSrc = existsRead(entryFolder + imp.path).replace(/export default\s*/, "");
 
         var componentSetup = componentSrc.match(/return\s*\(\{(.|\s)*\}\)/)[0];
         var htmlPath = folder + componentSource(findProp(componentSetup, "template"));
         var CSSPath = folder + componentSource(findProp(componentSetup, "styles"));
-        var tag = findProp(componentSetup, "tag");
-        tag = tag.match(/\".+?\"/)[0].replace(/\"/g, "");
+        var tag = imp.name
 
         CSSBundle += existsRead(CSSPath).replace(/\s+/g, " ");
         var html = "a7.documentFragment(" + htmlCompiler(existsRead(htmlPath)) + ")";
