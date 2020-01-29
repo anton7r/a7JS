@@ -140,7 +140,7 @@ var render = function(elem) {
 //arrays are simply about 33% faster than objects
 var a7store = Array(13);
 a7store = [
-    "", // Empty
+    {}, //Routes              0
     {}, //ComponentList       1
     {}, //Menus               2
     {}, //Observables         3
@@ -150,17 +150,17 @@ a7store = [
     {}, //pageContainer       7
     false, //initDone         8
     "", //description         9
-    true,//secureProps mode  10
-    "", //title              11
-    {}, //Routes             12
+    false,//secureProps mode  10
+    "", //title               11
+    
 ];
 
 var a7 = {};
 
 a7.routes = function(routes){
-    a7store[12] = routes;
+    a7store[0] = routes;
     init();
-    return a7store[12];
+    return a7store[0];
 };
 
 a7.secureProps = function (mode) {
@@ -432,7 +432,7 @@ a7.router = function (newPath) {
     //cacheMath no longer most likely does anything
     var mainPath = newPath.slice(0, newPath.indexOf("/") + 1) + "*",
     route,
-    routes = a7store[12];
+    routes = a7store[0];
     //tries to match equal
     if (routes[newPath]){
         route = newPath;
