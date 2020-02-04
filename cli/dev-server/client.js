@@ -21,14 +21,12 @@ function showerror (errormsg, file){
 }
 
 addEventListener("error", function(ev){
+    var fileName = ev.filename.replace()
    showerror(ev.error, `${ev.filename}:${ev.lineno}`) 
 });
 //Lauri
 var socket = new WebSocket("ws://localhost:{{ port }}");
-
-socket.onopen = function() {
-    console.log("[Auto Refresh] Connection established");
-};
+socket.onopen = () => console.log("[Auto Refresh] Connection established");
 
 socket.onmessage = function(ev) {
     var msg = ev.data;
@@ -41,10 +39,6 @@ socket.onmessage = function(ev) {
     }
 };
 
-socket.onclose = function() {
-    console.log("[Auto Refresh] Connection closed.");
-};
-
-socket.onerror = function(error) {
-    console.error(`[Auto Refresh] ${error.message}`);
-}; //© Lauri Särkioja 2020
+socket.onclose = () => console.log("[Auto Refresh] Connection closed.");
+socket.onerror = (error) => console.error(`[Auto Refresh] ${error.message}`);
+//© Lauri Särkioja 2020
