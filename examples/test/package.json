@@ -1,12 +1,4 @@
 {
-    "name": "test",
-    "version": "0.0.1",
-    "description": "test is a A7JS application.",
-    "private": true,
-    "dependencies": {
-        "a7js": "^5.0.0-indev"
-    },
-    "main": "app/index.js",
     "a7js": {
         "metadata": {
             "lastUsedVersion": "5.0.0-indev",
