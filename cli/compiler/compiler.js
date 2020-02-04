@@ -110,13 +110,16 @@ module.exports = function(sourceCode){
                 html = html.replace(literal, `\'+${clean}+\'`);
             });
         }
-        
+
+        object = componentSrc.replace(/^{/, "").replace(/}$/, "");
+        objectWithRenderer = object + `,render(){return ${html}}`.replace(/,,/g, ",")        
+
         var out = minifier(multiReplace(componentSrc,
-            [componentSetup, "return " + html],
+            [object, objectWithRenderer],
             [/((\'\')\s*\+\s*|(\s*\+\s*\'\'))/g, ""]
         ));
 
-        var exec = "a7.registerComponent(\""+tag+"\","+out+");function "+imp.name+"(a){return a7.createElement(\""+tag+"\",a)}";
+        var exec = `a7.registerComponent(\"${tag}\",${out});function ${imp.name}(a){return a7.createElement(\"${tag}\",a)}`;
         sourceCode = sourceCode.replace(Import, exec);
         imports += {from:imp.path,as:imp.name};
     }
@@ -141,7 +144,7 @@ module.exports = function(sourceCode){
         //modImp finds modules imports
         var modImp = modSrc.match(/(import\s+.+?\s+from\".*?\"|require\(.*?\))/g);
         if(modImp !== null){
-            core.errorLog("Module " + imp.name +" has its own imports which we cannot right now import with our detections!");
+            core.errorLog(`Module ${imp.name} has its own imports which we cannot right now import with our detections!`);
             return;
         } else if(config.mode === "production"){
             modSrc = minifier(modSrc);
@@ -160,7 +163,7 @@ module.exports = function(sourceCode){
             mod = minifier(mod);
         }
         //replacing the import on the sourcecode with the modules contens
-        sourceCode = sourceCode.replace(Import, "/* " + imp.name + " */" + mod);
+        sourceCode = sourceCode.replace(Import, `/* ${imp.name} */ ${mod}`);
         imports += {
             from:imp.path,
             as:imp.name

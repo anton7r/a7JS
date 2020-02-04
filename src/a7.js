@@ -138,7 +138,7 @@ var render = function(elem) {
 };
 
 //arrays are simply about 33% faster than objects
-var a7store = Array(13);
+var a7store = Array(12);
 a7store = [
     {}, //Routes              0
     {}, //ComponentList       1
@@ -152,7 +152,6 @@ a7store = [
     "", //description         9
     false,//secureProps mode  10
     "", //title               11
-    
 ];
 
 var a7 = {};
@@ -208,7 +207,7 @@ a7.createElement = function (element, attributes) {
         var rElement = document.createElement(element);
         rElement = eventListeners(rElement, attributes);
         
-        //child elements
+        //child elements and text nodes
         var i;
         var argLen = arguments.length;
 
@@ -318,9 +317,9 @@ a7.loadCSS = function(css){
     document.head.insertAdjacentHTML("beforeend", "<style>" + css + "</style>");
 };
 
-a7.registerComponent = function (name, compFunc) {
+a7.registerComponent = function (name, compObj) {
     if (a7store[1][name] === undefined) {
-        a7store[1][name] = compFunc;
+        a7store[1][name] = compObj;
     } else {
         a7debug("That component is already registered!");
     }
@@ -444,7 +443,9 @@ a7.router = function (newPath) {
         return console.error("A7JS: no specified route matched "+newPath);
     }
 
-    var renderable = routes[route](),
+    console.log(routes[route]());
+
+    var renderable = routes[route].render(),
     i,
     links = renderable.getElementsByTagName("a");
     
