@@ -3,6 +3,7 @@
 
 //This file is used to compile html to our javascript equivelant code.
 const HTMLParser = require("node-html-parser");
+const errorHandler = require("../core/errorhandler");
 
 function buildEl(tag, src, content){
     var attributes = {};
@@ -74,6 +75,13 @@ module.exports = function htmlCompiler(html){
     //parses html
     var Nodes = HTMLParser.parse(html).childNodes;
     var NodeCount = Nodes.length;
+
+    if (NodeCount > 1){
+        errorHandler.notify({
+            error:"more than one root element was found", file:"unknown"
+        })
+    }
+
 
     for(var i = 0; i < NodeCount; i++){
         var currentNode = Nodes[i];

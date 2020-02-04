@@ -8,6 +8,7 @@ const build = require("../compiler/compiler");
 const chalk = require("chalk");
 const fsx = require("../core/fsx");
 const WebSocket = require("ws");
+const errorHandler = require("../core/errorhandler");
 
 module.exports = function(port, dir){
     if(core.configLoaded === false){
@@ -102,17 +103,24 @@ module.exports = function(port, dir){
         sendAll("error:" + JSON.stringify(obj));
     }
 
+    errorHandler.addObserver(clientError);
+
     //Builds the app
     function pack(){
         console.clear();
         var newPackaged = build(fs.readFileSync(conf.entry, "utf-8"));
+        try {
+            newPackaged = build(fs.readFileSync(conf.entry, "utf-8"));
+        } catch(e){
+
+        }
         console.log(`${chalk.green("SUCCESS")} app was built at ${chalk.gray(new Date())}
 
   Your app is running at ${chalk.blue(`localhost:${port}/`)}
   
   To exit A7JS Development server press ${chalk.black.bgBlue("CTRL")} and ${chalk.black.bgBlue("C")}`);
 
-        if(packaged !== newPackaged){
+        if(packaged !== newPackaged && newPackaged !== ""){
             packaged = newPackaged;
             clientUpdate();
         }

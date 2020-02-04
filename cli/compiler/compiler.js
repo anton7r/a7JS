@@ -6,6 +6,7 @@ const cssMinifier = require("./css-minifier");
 const htmlCompiler = require("./html-compiler");
 const csso = require("csso");
 var config = core.config;
+const errorHandler = require("../core/errorhandler");
 
 const minifier = function (source){
     try {
@@ -52,6 +53,7 @@ function findProp (from, find){
 }
 
 module.exports = function(sourceCode){
+
     sourceCode = "var a7_i={};\n" + sourceCode;
     if(config.entry === "noEntry"){
         core.errorLog("no entry to your application was defined in a7.config.json");
