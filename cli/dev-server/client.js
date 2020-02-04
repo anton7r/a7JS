@@ -1,7 +1,10 @@
 //Tapio
 
+var errorAmount = 0
+
 //shows the error message
 function showerror (errormsg, file){
+    if(errorAmount > 0) return;
     var container = document.createElement("div");
     container.id = "container";
     var header = document.createElement("h1");
@@ -14,6 +17,7 @@ function showerror (errormsg, file){
     container.appendChild(atfile);
     document.head.insertAdjacentHTML("beforeend", "<style>{{ css }}</style>");
     document.getElementsByTagName("body")[0].appendChild(container)
+    errorAmount++
 }
 
 addEventListener("error", function(ev){

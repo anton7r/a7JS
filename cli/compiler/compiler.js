@@ -6,7 +6,6 @@ const cssMinifier = require("./css-minifier");
 const htmlCompiler = require("./html-compiler");
 const csso = require("csso");
 var config = core.config;
-const errorHandler = require("../core/errorhandler");
 
 const minifier = function (source){
     try {
