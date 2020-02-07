@@ -4,6 +4,10 @@
     padding-left: 150px;
     padding-top: 20px;
     height: calc(100vh - 20px);
+    position: absolute;
+    top:0;
+    right:0;
+    left:0;
 }
 
 #header {

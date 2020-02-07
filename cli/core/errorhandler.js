@@ -1,13 +1,12 @@
 module.exports = {
-    observers: [],
-
-  addObserver(observer) {
-    this.observers.push(observer);
+  errors: [],
+  errorCount:0,
+  addError(e){
+    this.errors.push(e);
+    this.errorCount++;
   },
-
-  notify(data) {
-    if (this.observers.length > 0) {
-      this.observers.forEach(observer => observer(data));
-    }
+  clear(){
+    this.errors = [];
+    this.errorCount = 0;
   }
 }

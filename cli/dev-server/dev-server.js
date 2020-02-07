@@ -26,7 +26,7 @@ module.exports = function(port, dir){
         var script = fs.readFileSync(require.resolve("./client.js"), "utf-8");
         script = script.replace("{{ port }}", port);
         var css = fs.readFileSync(require.resolve("./client.css"), "utf-8");
-        css = css.replace(/[\r\n\s+]/g, "");
+        css = css.replace(/[\r\n]/g, "").replace(/\s+/g, " ");
         script = script.replace("{{ css }}", css);
         return index.replace("</body>", `<!-- a7js dev script ---><script>${script}</script></body>`);
     }
@@ -85,16 +85,16 @@ module.exports = function(port, dir){
 
     });
     var w = new WebSocket.Server({ server });
-    
-    //sends messages to all websocket connections
-    var sendAll=(m)=>w.clients.forEach((client)=>{
-        client.send(m)
+    w.on("connection", (c) => {
+        c.send(`error:${JSON.stringify(errorHandler.errors[0])}`)
     })
-    
-    errorHandler.addObserver((obj)=>sendAll(`error:${JSON.stringify(obj)}`));
+
+    //sends messages to all websocket connections
+    var sendAll=(m)=>w.clients.forEach((client)=>client.send(m));
 
     //Builds the app
     function pack(){
+        errorHandler.clear();
         console.clear();
         var newPackaged = build(fs.readFileSync(conf.entry, "utf-8"));
         try {

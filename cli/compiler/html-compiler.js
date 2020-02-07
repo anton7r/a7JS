@@ -78,7 +78,7 @@ module.exports = function htmlCompiler(html){
     var NodeCount = Nodes.length;
 
     if (NodeCount > 1){
-        errorHandler.notify({
+        errorHandler.addError({
             error:"more than one root element was found", file:"unknown"
         })
     }

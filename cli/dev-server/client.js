@@ -30,6 +30,7 @@ socket.onopen = () => console.log("[Auto Refresh] Connection established");
 
 socket.onmessage = function(ev) {
     var msg = ev.data;
+    console.log(msg);
     if(msg.startsWith("error:")) {
         var json = msg.replace("error:","");
         var error = JSON.parse(json);
