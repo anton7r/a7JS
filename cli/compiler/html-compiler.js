@@ -16,8 +16,7 @@ function buildEl(tag, src, content){
                 //is not a property
                 if(attrName.indexOf("@") !== 0){
                     if(attrName.indexOf("a7on") === 0){
-                        attrValue = attrValue.replace("()", "");
-                        attrValue = "this.functions." + attrValue;
+                        attrValue = "this.functions." + attrValue.replace("()", "");
                     }
                     attributes[attrName] = attrValue;
                 } else {
@@ -35,7 +34,8 @@ function buildEl(tag, src, content){
         attributes.a7link = "";
     }
     attributes = JSON.stringify(attributes);
-    var EvListener = attributes.match(/\"a7on\w*\":\"[\w|\d\_]*\"/gi);
+    //replaces evlisteners with the real thing
+    var EvListener = attributes.match(/\"a7on\w*\":\"[\w|\d\_\.]*\"/gi);
     if(EvListener !== null){
         EvListener.forEach(function(val){
             var event = val.match(/\".+?\"/);
