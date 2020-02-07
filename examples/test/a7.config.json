@@ -1,0 +1,8 @@
+{
+    "entry": "./app/index.js",
+    "output": "./appbuild.js",
+    "css": {
+        "bundle": false,
+        "file": ""
+    }
+}

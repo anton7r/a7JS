@@ -199,13 +199,12 @@ a7.createElement = function (element, attributes) {
         //It's a component
         var cElement = document.createElement("div");
         cElement.className = "a7-component " + element;
-        cElement.appendChild(component(props));
+        cElement.appendChild(component.render(props));
         cElement = eventListeners(cElement, attributes);
         return cElement;
     } else {
         //It's a regular element
-        var rElement = document.createElement(element);
-        rElement = eventListeners(rElement, attributes);
+        var rElement = eventListeners(document.createElement(element), attributes);
         
         //child elements and text nodes
         var i;
@@ -443,9 +442,7 @@ a7.router = function (newPath) {
         return console.error("A7JS: no specified route matched "+newPath);
     }
 
-    console.log(routes[route]());
-
-    var renderable = routes[route].render(),
+    var renderable = routes[route](),
     i,
     links = renderable.getElementsByTagName("a");
     

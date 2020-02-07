@@ -17,6 +17,7 @@ function buildEl(tag, src, content){
                 if(attrName.indexOf("@") !== 0){
                     if(attrName.indexOf("a7on") === 0){
                         attrValue = attrValue.replace("()", "");
+                        attrValue = "this.functions." + attrValue;
                     }
                     attributes[attrName] = attrValue;
                 } else {

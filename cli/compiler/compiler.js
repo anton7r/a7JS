@@ -36,20 +36,11 @@ const existsRead = function (path){
     process.exit();
 };
 
-const componentSource = function (str){
-    return str.match(/\".+\"/g)[0].replace(/\"/g, "");
-};
-
 const importHandler = function(imp){
     this.path = imp.match(/(\"|\').+(\"|\')/i)[0].replace(/\"/g, "");
     this.name = imp.replace(/import\s*/, "").replace(/\s*from\s*\".+?\";*/, "");
     return this;
 };
-
-//Searches properties from objects in sourceCode
-function findProp (from, find){
-    return from.match(new RegExp(find + "\s*:\s*\".+?\"", "i"))[0];
-}
 
 module.exports = function(sourceCode){
 
@@ -107,8 +98,8 @@ module.exports = function(sourceCode){
 
         if(templateLiterals !== null){
             templateLiterals.forEach(function(literal){
-                var clean = literal.replace(/({{|}})/g, "");
-                html = html.replace(literal, `\'+${clean}+\'`);
+                var clean = literal.replace(/({{|}})/g, "").replace(/\s/g, "");
+                html = html.replace(literal, `\'+this.data.${clean}+\'`);
             });
         }
 
