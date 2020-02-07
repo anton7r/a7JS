@@ -26,7 +26,7 @@ module.exports = function(port, dir){
         var script = fs.readFileSync(require.resolve("./client.js"), "utf-8");
         script = script.replace("{{ port }}", port);
         var css = fs.readFileSync(require.resolve("./client.css"), "utf-8");
-        css = css.replace(/[\r\n]/g, "");
+        css = css.replace(/[\r\n\s+]/g, "");
         script = script.replace("{{ css }}", css);
         return index.replace("</body>", `<!-- a7js dev script ---><script>${script}</script></body>`);
     }
@@ -87,23 +87,11 @@ module.exports = function(port, dir){
     var w = new WebSocket.Server({ server });
     
     //sends messages to all websocket connections
-    function sendAll(m){
-        w.clients.forEach((client) => {
-            client.send(m)
-        })
-    }
-
-    //send refresh message to the client
-    function clientUpdate(){
-        sendAll("r");
-    }
-
-    //send the error message to the client
-    function clientError(obj){
-        sendAll("error:" + JSON.stringify(obj));
-    }
-
-    errorHandler.addObserver(clientError);
+    var sendAll=(m)=>w.clients.forEach((client)=>{
+        client.send(m)
+    })
+    
+    errorHandler.addObserver((obj)=>sendAll(`error:${JSON.stringify(obj)}`));
 
     //Builds the app
     function pack(){
@@ -122,7 +110,7 @@ module.exports = function(port, dir){
 
         if(packaged !== newPackaged && newPackaged !== ""){
             packaged = newPackaged;
-            clientUpdate();
+            sendAll("r");
         }
     }
     pack();

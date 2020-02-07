@@ -94,7 +94,7 @@ module.exports = function(sourceCode){
         CSSBundle += existsRead(CSSPath).replace(/\s+/g, " ");
         var html = "a7.documentFragment(" + htmlCompiler(existsRead(htmlPath)) + ")";
         //replace literals
-        templateLiterals = html.match(/{{\s*.+?\s*}}/);
+        templateLiterals = html.match(/{{\s*.+?\s*}}/g);
 
         if(templateLiterals !== null){
             templateLiterals.forEach(function(literal){
