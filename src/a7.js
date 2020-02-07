@@ -16,7 +16,7 @@ function a7debug(message) {
 
 /* internal methods start */
 //Init will run once
-var init = function () {
+var init = function(){
     //a7store[8] is initDone
     if (a7store[8] === true) {
         return;
@@ -288,7 +288,6 @@ a7.globalObservable = function (ObservalbeName) {
 
     __.addListener = function(Listener){
         a7store[4][ObservalbeName].push(Listener);
-
     };
 
     __.listeners = listeners;
@@ -375,7 +374,7 @@ a7.toggleMenu = function (menuName) {
     if (menuToggleFunc === undefined) {
         return;
     }
-    //FIXME: BUG HERE
+
     if (classList.contains(open) === true) {
         menuState = "open";
     } else {
