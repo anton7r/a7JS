@@ -24,17 +24,14 @@ addEventListener("error", (e) => {
 //Lauri
 var ws = new WebSocket("ws://localhost:{{ port }}");
 ws.onopen = () => console.log("[Auto Refresh] Connection established");
-
 ws.onmessage = (e) => {
     var m=e.data;
     if(m.startsWith("error:")) {
+        console.log(m)
         var er = JSON.parse(m.replace("error:",""));
         showerror(er.error, er.file)
     } else location.reload(true);
 };
-
 ws.onclose = () => console.log("[Auto Refresh] Connection closed.");
 ws.onerror = (error) => console.error(`[Auto Refresh] ${error.message}`);
 //© Lauri Särkioja 2020
-
-console.error("IM TRIGGERED!!!!");

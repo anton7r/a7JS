@@ -93,11 +93,10 @@ module.exports = function(port, dir){
     function pack(){
         errorHandler.clear();
         console.clear();
-        var newPackaged = build(fs.readFileSync(conf.entry, "utf-8"));
         try {
             newPackaged = build(fs.readFileSync(conf.entry, "utf-8"));
         } catch(e){
-
+            console.log(e);
         }
         console.log(`${chalk.green("SUCCESS")} app was built at ${chalk.gray(new Date())}
 
