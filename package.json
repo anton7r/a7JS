@@ -1,6 +1,6 @@
 {
   "name": "a7js",
-  "version": "5.0.0-alpha1",
+  "version": "5.0.0-alpha1.1",
   "description": "a7JS is a frontend spa framework made to be simple and scalable",
   "files": [
     "src/*",
