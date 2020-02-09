@@ -59,7 +59,6 @@ module.exports = function(port, dir){
             type = "";
         } else if (types.indexOf("," > 0)){
             var t = types.split(",");
-            
             for(var i = 0; i<t.length; i++){
                 if(t[i] !== "*/*"){
                     type = t[i];
@@ -70,16 +69,14 @@ module.exports = function(port, dir){
                 }
             }
         }
-
         var file = resolveFile(req.url);
-
         if(type !== "png/image" || type !== "") {
             res.writeHead(200, {'Content-Type': type, 'Content-Encoding': "gzip"});
             zlib.gzip(new Buffer.from(file, "utf-8"), function(_, result){
                 res.end(result);
             });
         } else {
-            res.writeHead(200, {'Content-Type': type});
+            res.writeHead(200, {'Content-Type':type});
             res.end(file);
         }
 
@@ -90,7 +87,7 @@ module.exports = function(port, dir){
     })
 
     //sends messages to all websocket connections
-    var sendAll=(m)=>w.clients.forEach((client)=>client.send(m));
+    var sendAll=(m)=>w.clients.forEach((c)=>c.send(m));
 
     //Builds the app
     function pack(){
@@ -116,7 +113,7 @@ module.exports = function(port, dir){
     pack();
 
     //Lauri
-    fs.watch(dir, { encoding: "utf-8", recursive:true }, (event, filename) => {
+    fs.watch(dir, { encoding: "utf-8", recursive:true }, (event) => {
         if(event !== "change"){
             return
         }

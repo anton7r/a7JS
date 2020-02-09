@@ -10,34 +10,30 @@ function buildEl(tag, src, content){
     if(src !== undefined){
         var srcAttr = src.match(/(\@|)(\w|\d|\.)+?\=\'[^']+\'/g);
         if(srcAttr !== null){
-            srcAttr.forEach(function(val){
-                var attrName = val.match(/[^=]+/)[0];
-                var attrValue = val.match(/[^=]+$/)[0].replace(/\'/g, "");
+            //loop trough attributes
+            srcAttr.forEach((val)=>{
+                var name = val.match(/[^=]+/)[0];
+                var value = val.match(/[^=]+$/)[0].replace(/\'/g, "");
                 //is not a property
-                if(attrName.indexOf("@") !== 0){
-                    if(attrName.indexOf("a7on") === 0){
-                        attrValue = "this.functions." + attrValue.replace("()", "");
+                if(name.indexOf("@") !== 0){
+                    if(name.indexOf("a7on") === 0){
+                        value = "this.functions." + value.replace("()", "");
                     }
-                    attributes[attrName] = attrValue;
+                    attributes[name] = value;
                 } else {
-                    if(attributes.props === undefined){
-                        attributes.props = {};
-                    }
-                    var attrRName = attrName.replace("@", "");
-                    attributes.props[attrRName] = attrValue;
+                    if(attributes.props===undefined)attributes.props={};
+                    attributes.props[name.replace("@","")]=value;
                 }
             });
         }
     }
 
-    if (src.match("a7link") !== null){
-        attributes.a7link = "";
-    }
+    if (src.match("a7link") !== null) attributes.a7link = "";
     attributes = JSON.stringify(attributes);
     //replaces evlisteners with the real thing
-    var EvListener = attributes.match(/\"a7on\w*\":\"[\w|\d\_\.]*\"/gi);
-    if(EvListener !== null){
-        EvListener.forEach(function(val){
+    var ev = attributes.match(/\"a7on\w*\":\"[\w|\d\_\.]*\"/gi);
+    if(ev !== null){
+        ev.forEach(function(val){
             var event = val.match(/\".+?\"/);
             var listener = val.match(/\:\".+?\"/)[0].replace(/\"/g, "");
             attributes = attributes.replace(val, event + listener);
@@ -53,42 +49,32 @@ function buildEl(tag, src, content){
 }
 
 function __ChildNodes(nodes){
-
     var compiled = "";
+    if(nodes.length === 0)return"";
 
-    if(nodes.length === 0){
-        return "";
-    }
-
-    nodes.forEach(function(_node){
-        if(_node.tagName !== undefined){
-            compiled += buildEl(_node.tagName, _node.rawAttrs,__ChildNodes(_node.childNodes) + ",");
-        } else {
-            compiled += "\'" + _node.rawText + "\',";
-        }
+    nodes.forEach((node)=>{
+        if(node.tagName !== undefined) compiled += buildEl(node.tagName, node.rawAttrs,__ChildNodes(node.childNodes) + ",");
+        else compiled += "\'" + node.rawText + "\',";
     });
     return compiled.replace(/,\)/, ")").replace(/\',\)/, "')");
 }
 
-module.exports = function htmlCompiler(html){
-    html = html.replace(/\s+/g, " ").replace(/\r\n/g, "").replace(/\>\s/g, ">").replace(/\s\</g, "<").replace(/\"/g, "\'");
+module.exports=(html)=>{
+    html=html.replace(/\>\s/g, ">").replace(/\s\</g, "<").replace(/\"/g, "\'");
     var compiled = "";
-    //parses html
     var Nodes = HTMLParser.parse(html).childNodes;
-    var NodeCount = Nodes.length;
+    var count = Nodes.length;
 
-    if (NodeCount > 1){
+    if (count > 1){
         errorHandler.addError({
             error:"more than one root element was found", file:"unknown"
         })
     }
 
-
-    for(var i = 0; i < NodeCount; i++){
-        var currentNode = Nodes[i];
-        var tag = currentNode.tagName;
-        var inner = __ChildNodes(currentNode.childNodes);
-        var attributes = currentNode.rawAttrs;
+    for(var i = 0; i < count; i++){
+        var tag = Nodes[i].tagName;
+        var inner = __ChildNodes(Nodes[i].childNodes);
+        var attributes = Nodes[i].rawAttrs;
         compiled += buildEl(tag, attributes, inner);
     }
     return compiled.replace(/\,\)/g, ")").replace(/\,\"\"/g, "").replace(/\)\,$/g, ")").replace(/\',\)/g, "')").replace(/\),\)/g, "))");
