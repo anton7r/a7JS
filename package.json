@@ -35,8 +35,8 @@
   "dependencies": {
     "chalk": "^2.4.2",
     "csso": "^4.0.2",
-    "node-html-parser": "^1.1.18",
-    "uglify-js": "^3.7.6",
+    "node-html-parser": "^1.2.4",
+    "uglify-js": "^3.7.7",
     "ws": "^7.2.1"
   },
   "types": "src/a7.d.ts",
