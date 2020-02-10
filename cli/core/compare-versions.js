@@ -21,7 +21,9 @@ module.exports = {
                 oldHasDash = true;
             }
 
-            if(newVersion[i] > oldVersion[i]){
+            if(oldVersion[i] > newVersion[i]){
+                return false
+            } else if(newVersion[i] > oldVersion[i]){
                 return true;   
             } else if (oldHasDash === true && newHasDash === false && newVersion[i] == oldVersion[i]){
                 return true;

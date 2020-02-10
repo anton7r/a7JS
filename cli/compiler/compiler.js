@@ -7,7 +7,7 @@ const htmlCompiler = require("./html-compiler");
 const csso = require("csso");
 var config = core.config;
 
-const minifier = function (source){
+const minifier = source => {
     try {
         var m = uglifyJS.minify(source);
         if(m.code === undefined) return source;
@@ -19,7 +19,7 @@ const minifier = function (source){
 };
 
 //replace multiple things from a string;
-const multiReplace = function(s){
+const multiReplace = s => {
     const a = arguments;
     for(let i = 1; i < a.length; i++){
         s = s.replace(a[i][0], a[i][1]);
@@ -27,7 +27,7 @@ const multiReplace = function(s){
     return s;
 };
 
-const existsRead = function (path){
+const existsRead = path => {
     path = fsx.purePath(path);
     if(fs.existsSync(path)){
         return fs.readFileSync(path, "utf-8");
@@ -36,13 +36,21 @@ const existsRead = function (path){
     process.exit();
 };
 
-const importHandler = function(imp){
+const importHandler = imp => {
     this.path = imp.match(/(\"|\').+(\"|\')/i)[0].replace(/\"/g, "");
     this.name = imp.replace(/import\s*/, "").replace(/\s*from\s*\".+?\";*/, "");
     return this;
 };
 
-module.exports = function(sourceCode){
+String.prototype.safeMatch = regexp => {
+    var match = this.match(regexp);
+    if(match !== null){
+        return match;
+    }
+    return [];
+}
+
+module.exports = sourceCode => {
 
     sourceCode = "var a7_i={};\n" + sourceCode;
     if(config.entry === "noEntry"){
@@ -62,21 +70,17 @@ module.exports = function(sourceCode){
     }
 
     var imports = [];
-    var componentImports = sourceCode.match(/import\s+(\d|\w|\_)+\s+from\s*\"\.\/components\/.+?\";*/gi);
-    var wholeImports = sourceCode.match(/import\s+(\d|\w|\_)+\s+from\s*\".+\";*/gi);
+    var componentImports = sourceCode.safeMatch(/import\s+(\d|\w|\_)+\s+from\s*\"\.\/components\/.+?\";*/gi);
+    var wholeImports = sourceCode.safeMatch(/import\s+(\d|\w|\_)+\s+from\s*\".+\";*/gi);
 
     //Whole imports eliminate component imports
-    wholeImports = wholeImports.filter(function(val){
+    wholeImports = wholeImports.filter(val => {
         if(val.match(/"\.\/components\/.+?\"/) !== null) return false;
         else return true;
     });
 
-    var partialImports = sourceCode.match(/import\s*{\s*.*?\s*}\s+from\s*\".+?\";*/gi);
+    var partialImports = sourceCode.safeMatch(/import\s*{\s*.*?\s*}\s+from\s*\".+?\";*/gi);
     //Goes through component imports
-    var len = 0;
-    if (componentImports !== null){
-        len = componentImports.length;
-    }
     for(let i = 0; i < len; i++){
         var Import = componentImports[i];
         //imp means the imported object
@@ -92,16 +96,13 @@ module.exports = function(sourceCode){
         var tag = imp.name;
 
         CSSBundle += existsRead(CSSPath).replace(/\s+/g, " ");
-        var html = "a7.documentFragment(" + htmlCompiler(existsRead(htmlPath)) + ")";
+        var html = `a7.documentFragment(${htmlCompiler(existsRead(htmlPath), htmlPath)})`;
         //replace literals
-        templateLiterals = html.match(/{{\s*.+?\s*}}/g);
-
-        if(templateLiterals !== null){
-            templateLiterals.forEach(function(literal){
-                var clean = literal.replace(/({{|}})/g, "").replace(/\s/g, "");
-                html = html.replace(literal, `\'+this.data.${clean}+\'`);
-            });
-        }
+        templateLiterals = html.safeMatch(/{{\s*.+?\s*}}/g);
+        templateLiterals.forEach(literal => {
+            var clean = literal.replace(/({{|}})/g, "").replace(/\s/g, "");
+            html = html.replace(literal, `\'+this.data.${clean}+\'`);
+        });
 
         object = componentSrc.replace(/^{/, "").replace(/}$/, "");
         objectWithRenderer = object + `,render(){return ${html}}`.replace(/,,/g, ",")        
@@ -116,10 +117,7 @@ module.exports = function(sourceCode){
         imports += {from:imp.path,as:imp.name};
     }
 
-    len = 0;
-    if (wholeImports !== null){
-        len = wholeImports.length;
-    }
+    len = wholeImports.length;
     for (let i = 0; i < len; i++){
         var Import = wholeImports[i];
         var imp = importHandler(Import);

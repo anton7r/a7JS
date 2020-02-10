@@ -23,3 +23,7 @@ test('both are beta', () => {
 test('beta vs alpha', () => {
     expect(version.isNewer("1.0.0-beta", "1.0.0-alpha")).toBe(true);
 });
+
+test('major difference', ()=> {
+    expect(version.isNewer("4.0.0", "5.0.0-alpha1.1")).toBe(false);
+});

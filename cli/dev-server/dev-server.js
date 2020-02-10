@@ -90,7 +90,7 @@ module.exports = function(port, dir){
     var sendAll=(m)=>w.clients.forEach((c)=>c.send(m));
 
     //Builds the app
-    function pack(){
+    var pack = () => {
         errorHandler.clear();
         console.clear();
         try {

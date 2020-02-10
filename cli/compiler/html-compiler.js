@@ -59,7 +59,7 @@ function __ChildNodes(nodes){
     return compiled.replace(/,\)/, ")").replace(/\',\)/, "')");
 }
 
-module.exports=(html)=>{
+module.exports=(html, path)=>{
     html=html.replace(/\r\n/g, "").replace(/\>\s/g, ">").replace(/\s\</g, "<").replace(/\"/g, "\'");
     var compiled = "";
     var Nodes = HTMLParser.parse(html).childNodes;
@@ -67,7 +67,7 @@ module.exports=(html)=>{
 
     if (count > 1){
         errorHandler.addError({
-            error:"more than one root element was found", file:"unknown"
+            error:"more than one root element was found", file:path
         })
     }
 
