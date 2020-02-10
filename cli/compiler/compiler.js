@@ -6,15 +6,16 @@ const cssMinifier = require("./css-minifier");
 const htmlCompiler = require("./html-compiler");
 const csso = require("csso");
 var config = core.config;
+const safeMatch = require("./safematch");
 
-const minifier = source => {
+const minifier = src => {
     try {
-        var m = uglifyJS.minify(source);
-        if(m.code === undefined) return source;
-        else return m.code;
-    } catch (e){
+        var m = uglifyJS.minify(src);
+        if(m.code === undefined) return src;
+        return m.code;
+    } catch(e){
         core.errorLog("an error happened while trying to minify a script");
-        return source;
+        return src;
     }
 };
 
@@ -29,9 +30,7 @@ const multiReplace = s => {
 
 const existsRead = path => {
     path = fsx.purePath(path);
-    if(fs.existsSync(path)){
-        return fs.readFileSync(path, "utf-8");
-    }
+    if(fs.existsSync(path)) return fs.readFileSync(path, "utf-8");
     core.errorLog("file could not be located. "+ path);
     process.exit();
 };
@@ -42,16 +41,7 @@ const importHandler = imp => {
     return this;
 };
 
-String.prototype.safeMatch = regexp => {
-    var match = this.match(regexp);
-    if(match !== null){
-        return match;
-    }
-    return [];
-}
-
 module.exports = sourceCode => {
-
     sourceCode = "var a7_i={};\n" + sourceCode;
     if(config.entry === "noEntry"){
         core.errorLog("no entry to your application was defined in a7.config.json");
@@ -60,9 +50,9 @@ module.exports = sourceCode => {
     let entryFolder = config.entry.replace(/(\w|\d)+\.js/i, "");
     var CSSBundle = "";
     
-    if(config.css.bundle === true && config.css.file !== null){
+    if(config.css.bundle && config.css.file !== null){
         var cssFile = config.css.file;
-        if(fs.existsSync(cssFile) === true){
+        if(fs.existsSync(cssFile)){
             CSSBundle += csso.minify(fs.readFileSync(cssFile, "utf-8"), {
                 filename:cssFile
             });
@@ -70,8 +60,8 @@ module.exports = sourceCode => {
     }
 
     var imports = [];
-    var componentImports = sourceCode.safeMatch(/import\s+(\d|\w|\_)+\s+from\s*\"\.\/components\/.+?\";*/gi);
-    var wholeImports = sourceCode.safeMatch(/import\s+(\d|\w|\_)+\s+from\s*\".+\";*/gi);
+    var componentImports = safeMatch(sourceCode, /import\s+(\d|\w|\_)+\s+from\s*\"\.\/components\/.+?\";*/gi);
+    var wholeImports = safeMatch(sourceCode, /import\s+(\d|\w|\_)+\s+from\s*\".+\";*/gi);
 
     //Whole imports eliminate component imports
     wholeImports = wholeImports.filter(val => {
@@ -79,9 +69,10 @@ module.exports = sourceCode => {
         else return true;
     });
 
-    var partialImports = sourceCode.safeMatch(/import\s*{\s*.*?\s*}\s+from\s*\".+?\";*/gi);
+    var partialImports = safeMatch(sourceCode, /import\s*{\s*.*?\s*}\s+from\s*\".+?\";*/gi);
+
     //Goes through component imports
-    for(let i = 0; i < len; i++){
+    for(let i = 0; i < componentImports.length; i++){
         var Import = componentImports[i];
         //imp means the imported object
         var imp = importHandler(Import);
@@ -98,7 +89,7 @@ module.exports = sourceCode => {
         CSSBundle += existsRead(CSSPath).replace(/\s+/g, " ");
         var html = `a7.documentFragment(${htmlCompiler(existsRead(htmlPath), htmlPath)})`;
         //replace literals
-        templateLiterals = html.safeMatch(/{{\s*.+?\s*}}/g);
+        templateLiterals = safeMatch(html, /{{\s*.+?\s*}}/g);
         templateLiterals.forEach(literal => {
             var clean = literal.replace(/({{|}})/g, "").replace(/\s/g, "");
             html = html.replace(literal, `\'+this.data.${clean}+\'`);
@@ -117,8 +108,7 @@ module.exports = sourceCode => {
         imports += {from:imp.path,as:imp.name};
     }
 
-    len = wholeImports.length;
-    for (let i = 0; i < len; i++){
+    for (let i = 0; i < wholeImports.length; i++){
         var Import = wholeImports[i];
         var imp = importHandler(Import);
         
@@ -160,20 +150,14 @@ module.exports = sourceCode => {
         };
     }
 
-    len = 0;
-    if (partialImports !== null){
-        len = partialImports.length;
-        return core.errorLog("Importing only a part of a framework or a library is not yet supported!");
-    }
+    var len = partialImports.length;
+    if (len > 0) return core.errorLog("Importing only a part of a framework or a library is not yet supported!");
     for(let i = 0; i < len; i++){
         var Import = partialImports[i];
         var imp = importHandler(Import);
     }
 
-    if (CSSBundle != ""){
-        sourceCode += "a7.loadCSS(\""+cssMinifier(CSSBundle)+"\")";
-    }
-    
+    if (CSSBundle != "") sourceCode += "a7.loadCSS(\""+cssMinifier(CSSBundle)+"\")";
     if (config.mode === "production"){
         var min = uglifyJS.minify(`(function(){${sourceCode}})()`, {
             compress:{passes:1}, mangle:{toplevel:true}

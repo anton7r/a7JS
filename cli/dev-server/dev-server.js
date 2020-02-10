@@ -72,9 +72,7 @@ module.exports = function(port, dir){
         var file = resolveFile(req.url);
         if(type !== "png/image" || type !== "") {
             res.writeHead(200, {'Content-Type': type, 'Content-Encoding': "gzip"});
-            zlib.gzip(new Buffer.from(file, "utf-8"), function(_, result){
-                res.end(result);
-            });
+            zlib.gzip(new Buffer.from(file, "utf-8"), (_, result) => res.end(result));
         } else {
             res.writeHead(200, {'Content-Type':type});
             res.end(file);
@@ -113,9 +111,7 @@ module.exports = function(port, dir){
 
     //Lauri
     fs.watch(dir, { encoding: "utf-8", recursive:true }, (event) => {
-        if(event !== "change"){
-            return
-        }
+        if(event !== "change") return;
         pack();
     }); //© Lauri Särkioja 2020
 

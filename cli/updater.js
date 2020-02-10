@@ -10,13 +10,11 @@ if (fsx.fileExists("./a7.config.json") === false) {
 }
 
 var pk;
-
 if(fsx.fileExists("./package.json") === true){
     pk = fsx.readJSONfile("./package.json");
 }
 
 var init = false;
-
 if(pk.a7js === undefined){
     pk.a7js = {
         metadata: {
@@ -27,26 +25,21 @@ if(pk.a7js === undefined){
     init = true;
 }
 
-//if(ver.isNewer("4.0.0", pk.a7js.metadata.lastUsedVersion)){
-if(true){
+if(ver.isNewer("4.0.0", pk.a7js.metadata.lastUsedVersion)){
     console.log("Updating project's a7.config.json...");
-    var conf = core.config;
+    var conf = new core.config;
     delete conf.mode;
     delete conf.devserver;
 
     fs.writeFile("./a7.config.json", JSON.stringify(conf, null, 4), err => {
-        if(err != null){
-            console.log("Configuration update was not successful");
-        }
+        if(err != null) console.log("Configuration update was not successful");
     });
 
     pk.a7js.metadata.lastUsedVersion = core.getVersion();
     pk.a7js.metadata.lastUsedTime = new Date();
     
     fs.writeFile("./package.json", JSON.stringify(pk, null, 4), err => {
-        if(err !== null){
-            console.log("an error happened while trying to update package.json");
-        }
+        if(err !== null) console.log("an error happened while trying to update package.json");
     })
 
 } else if (init === true){
