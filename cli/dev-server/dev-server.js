@@ -96,7 +96,14 @@ module.exports = function(port, dir){
         } catch(e){
             console.log(e);
         }
-        console.log(`${chalk.green("SUCCESS")} app was built at ${chalk.gray(new Date())}
+        var date = new Date();
+        var hour = date.getHours();
+        var t;
+        if (hour > 12){
+            hour = hour - 12;
+            t = "PM";
+        } else t = "AM";
+        console.log(`${chalk.green("SUCCESS")} app was built at ${chalk.gray(hour+":"+date.getMinutes(), t)}
 
   Your app is running at ${chalk.blue(`localhost:${port}/`)}
   

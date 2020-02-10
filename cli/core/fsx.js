@@ -1,20 +1,18 @@
 //this is our extension of node file system
 const fs = require("fs");
-
 module.exports = { 
-    
     fileExists(path) {
         if(fs.existsSync(path)){
             if(fs.statSync(path).isFile()) return true
-            else return false;
-        } else return false;
+            return false;
+        } return false;
     },
 
     dirExists(path) {
         if(fs.existsSync(path)) {
             if(fs.statSync(path).isDirectory()) return true;
-            else return false;
-        } else return false;
+            return false;
+        } return false;
     },
 
     formatSlashes(path){
