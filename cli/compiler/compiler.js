@@ -20,9 +20,9 @@ const minifier = src => {
 };
 
 //replace multiple things from a string;
-const multiReplace = s => {
+function multiReplace (s) {
     const a = arguments;
-    for(let i = 1; i < a.length; i++){
+    for(var i = 1; i < a.length; i++){
         s = s.replace(a[i][0], a[i][1]);
     }
     return s;
