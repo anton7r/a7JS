@@ -81,7 +81,7 @@ module.exports = function(port, dir){
     });
     var w = new WebSocket.Server({ server });
     w.on("connection", (c) => {
-        if(errorHandler.errorCount !== 0) c.send(`error:${JSON.stringify(errorHandler.errors[0])}`)
+        if(errorHandler.errorCount !== 0) c.send(JSON.stringify(errorHandler.errors[0]));
     })
 
     //sends messages to all websocket connections
@@ -111,7 +111,7 @@ module.exports = function(port, dir){
 
         if(packaged !== newPackaged && newPackaged !== ""){
             packaged = newPackaged;
-            sendAll();
+            sendAll("");
         }
     }
     pack();

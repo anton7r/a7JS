@@ -24,11 +24,10 @@ addEventListener("error", (e) => {
 //Lauri
 var ws = new WebSocket("ws://localhost:{{ port }}");
 ws.onopen = () => console.log("[Auto Refresh] Connection established");
-ws.onmessage = (e) => {
+ws.onmessage = e => {
     var m=e.data;
-    if(m.startsWith("error:")) {
-        console.log(m)
-        var er = JSON.parse(m.replace("error:",""));
+    if(m.startsWith("{")) {
+        var er = JSON.parse(m);
         showerror(er.error, er.file)
     } else location.reload(true);
 };
