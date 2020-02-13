@@ -20,7 +20,7 @@ const minifier = src => {
 };
 
 //replace multiple things from a string;
-function multiReplace (s) {
+function multiReplace(s){
     const a = arguments;
     for(var i = 1; i < a.length; i++){
         s = s.replace(a[i][0], a[i][1]);
@@ -126,9 +126,7 @@ module.exports = sourceCode => {
         if(modImp !== null){
             core.errorLog(`Module ${imp.name} has its own imports which we cannot right now import with our detections!`);
             return;
-        } else if(config.mode === "production"){
-            modSrc = minifier(modSrc);
-        }
+        } else if(config.mode === "production") modSrc = minifier(modSrc);
 
         var expName = "";
         var modExp = modSrc.match(/module.exports\s*=\s*(\w|\d)*;*/g);

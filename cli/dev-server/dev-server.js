@@ -103,7 +103,7 @@ module.exports = function(port, dir){
             hour = hour - 12;
             t = "PM";
         } else t = "AM";
-        console.log(`${chalk.green("SUCCESS")} app was built at ${chalk.gray(hour+":"+date.getMinutes(), t)}
+        console.log(`${chalk.green("SUCCESS")} app was built at ${chalk.gray(hour+":"+date.getMinutes()+t)}
 
   Your app is running at ${chalk.blue(`localhost:${port}/`)}
   
@@ -111,7 +111,7 @@ module.exports = function(port, dir){
 
         if(packaged !== newPackaged && newPackaged !== ""){
             packaged = newPackaged;
-            sendAll("r");
+            sendAll();
         }
     }
     pack();
