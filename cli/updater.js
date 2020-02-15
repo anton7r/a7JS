@@ -25,8 +25,7 @@ module.exports = ()=>{
         init = true;
     }
 
-    if(true){
-    //if(ver.isNewer("4.0.0", pk.a7js.metadata.lastUsedVersion)){
+    if(ver.isNewer("4.0.0", pk.a7js.metadata.lastUsedVersion)){
         console.log("Updating project's a7.config.json...");
         var conf = core.config;
         delete conf.mode;

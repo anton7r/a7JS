@@ -1,7 +1,7 @@
-module.exports = function(sourceCode){
+module.exports = sourceCode => {
     var parser = {};
 
-    parser.getImports = function() {
+    parser.getImports = () => {
         imports = sourceCode.match(/import\s+(\d|\w|\_)+\s+from\s*\".+\";*/gi);
         imports2 = sourceCode.match(/import\s*{\s*.*?\s*}\s+from\s*\".+?\";*/gi);
 
