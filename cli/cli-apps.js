@@ -3,8 +3,8 @@ const fs = require("fs");
 const chalk = require("chalk");
 const core = require("./core/core.js");
 var programs = {
-    build: require("./build.js"),
-    devserver: require("./dev-server/dev-server.js")
+    build:require("./build.js"),
+    devserver:require("./dev-server/dev-server.js")
 };
 
 const createHtmlDoc = name => {
@@ -28,11 +28,11 @@ programs.default=()=>{
     core.helperLog("build", "build the a7 project.");
     core.syntaxLog("a7 build");
 
-    core.helperLog("devserver", "start a development server [beta]");
+    core.helperLog("devserver", "start a development server");
     core.syntaxLog("a7 devserver [port(optional)]");
 };
 
-programs.newproject=name=>{
+programs.np=programs.newproject=name=>{
     if (name === undefined) {
         return core.errorLog("you have not defined a name for your project.");
     } else if (fs.existsSync(name) !== false) {
@@ -87,7 +87,7 @@ programs.newproject=name=>{
 
     core.successLog("the project was created successfully!");
 };
-programs.newcomponent = (name, rootPath) => {
+programs.nc=programs.newcomponent=(name, rootPath) => {
     var path = `app/components/${name}/${name}`;
     if(rootPath !== undefined) path = rootPath + path;
     else path = "./"+path;
@@ -132,8 +132,7 @@ programs.test = ()=>{
     core.infoLog("this is the tool to find to the most critical bugs in the code.");
     var a7testFolder =  module.filename.replace(/cli(\/|\\)cli\.js/, "tests/");
     var errors = "";
-    if(fs.existsSync(a7testFolder)){
-    } else {
+    if(fs.existsSync(a7testFolder) === false){
         fs.mkdirSync(a7testFolder);
         log("folder " + a7testFolder + " was not found. So we added it");
     }
