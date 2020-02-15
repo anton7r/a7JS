@@ -3,7 +3,7 @@ var err=false;
 function showerror (errormsg, file){
     if(err) return;
     var container = document.createElement("div");
-    container.id = "container";
+    container.id = "errorContainer";
     var header = document.createElement("h1");
     header.id = "header";
     header.textContent = errormsg;
@@ -17,10 +17,7 @@ function showerror (errormsg, file){
     err=true;
 }
 
-addEventListener("error", (e) => {
-    var f = e.filename.replace("http://", "")
-   showerror(e.error, `${f}:${e.lineno}`) 
-});
+addEventListener("error", e => showerror(e.error, `${e.filename.replace("http://", "")}:${e.lineno}`));
 //Lauri
 var ws = new WebSocket("ws://localhost:{{ port }}");
 ws.onopen = () => console.log("[Auto Refresh] Connection established");
@@ -32,5 +29,5 @@ ws.onmessage = e => {
     } else location.reload(true);
 };
 ws.onclose = () => console.log("[Auto Refresh] Connection closed.");
-ws.onerror = (error) => console.error(`[Auto Refresh] ${error.message}`);
+ws.onerror = error => console.error(`[Auto Refresh] ${error.message}`);
 //© Lauri Särkioja 2020

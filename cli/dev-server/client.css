@@ -1,4 +1,4 @@
-#container {
+#errorContainer {
     background-color:rgb(27, 27, 27);
     font-family: Consolas;
     padding-left: 150px;
@@ -10,13 +10,13 @@
     left:0;
 }
 
-#header {
+#errorContainer #header {
     font-size: 30px;
     color: red;
     margin-top: 20px;
 }
 
-#file {
+#errorContainer #file {
     font-size: 22px;
     text-align: left;
     color: rgb(192, 192, 192);

@@ -5,21 +5,18 @@ const chalk = require("chalk");
 const a7build = require("./build.js");
 const core = require("./core/core.js");
 const [,,...args] = process.argv;
-require("./updater");
+var programs = {};
 
-const createHtmlDoc = function (name) {
-    return fs.readFileSync(require.resolve("./defaults/index.html"), "utf-8", function(err){
+const createHtmlDoc = name => {
+    return fs.readFileSync(require.resolve("./defaults/index.html"), "utf-8", ()=>{
         core.errorLog("an error happened while trying to generate html index file.");
     }).replace(/\$/g, name);
 };
 
 const cssDoc = `* {\n    margin:0px;\n    padding:0px;\n}\n\nbody {\n    font-family:"FONT HERE";\n}`;
 
-const a7greet = function () {
-    log(chalk.blue("A7JS")+chalk.gray("@"+core.getVersion()), "\n");
-};
-
-const a7helper = function () {
+programs.default = ()=>{
+    log(chalk.blue("A7JS")+chalk.gray("@"+core.getVersion())+"\n");
     core.helperLog("newproject", "create a new project with a7.");
     core.syntaxLog("a7 newproject [projectname]");
     core.syntaxLog("a7 np [projectname]");
@@ -35,21 +32,19 @@ const a7helper = function () {
     core.syntaxLog("a7 devserver [port(optional)]");
 };
 
-const a7newproject = function (name) {
+programs.newproject = name=>{
     if (name === undefined) {
         return core.errorLog("you have not defined a name for your project.");
     } else if (fs.existsSync(name) !== false) {
         return core.errorLog(name + " folder already exists in this directory.");
     }
 
-    core.infoLog("creating a new project in " + name);
+    core.infoLog(`creating a new project in ${name}`);
 
     fs.mkdir(name, {
         recursive: true
-    }, function (err) {
-        if (err) {
-            return core.errorLog("there was an error while creating project folder.");
-        }
+    }, err => {
+        if (err) return core.errorLog("there was an error while creating project folder.");
     });
 
     fs.writeFile(name + "/package.json", JSON.stringify({    
@@ -67,53 +62,39 @@ const a7newproject = function (name) {
                 lastUsedTime: new Date()
             }
         }
-    },null, 4), function (err) {
-        if (err) {
-            core.errorLog("package.json could not be created.");
-        }
+    },null, 4), err=>{
+        if(err)core.errorLog("package.json could not be created.");
     });
 
     fs.mkdirSync(name +"/app");
     fs.mkdirSync(name +"/app/components");
-    fs.writeFile(name + "/index.html", createHtmlDoc(name), function (err) {
-        if (err) {
-            return core.errorLog("index.html could not be created.");
-        }
+    fs.writeFile(name + "/index.html", createHtmlDoc(name), err=>{
+        if(err)return core.errorLog("index.html could not be created.");
     });
 
-    fs.writeFile(name + "/app/style.css", cssDoc, function (err) {
-        if (err) {
-            return core.errorLog("css file could not be created.");
-        }
+    fs.writeFile(name + "/app/style.css", cssDoc, err=>{
+        if(err)return core.errorLog("css file could not be created.");
     });
     
     var conf = fs.readFileSync(require.resolve("./defaults/config.json"));
-    fs.writeFile(name + "/a7.config.json", conf, function (err) {
-        if (err) {
-            return core.errorLog("config could not be created.");
-        }
+    fs.writeFile(name + "/a7.config.json", conf, err=>{
+        if(err)return core.errorLog("config could not be created.");
     });
 
     fs.writeFile(name + "/app/index.js", fs.readFileSync(require.resolve("./defaults/index.js")), function (err) {
-        if (err) {
-            return core.errorLog("app/index.js could not be created.");
-        }
+        if(err)return core.errorLog("app/index.js could not be created.");
     });
 
     core.successLog("the project was created successfully!");
 };
-
-const a7createComponent = function(name, rootPath) {
+programs.newcomponent = (name, rootPath) => {
     var path = "app/components/";
-    if(rootPath !== undefined){
-        path = rootPath + path;
-    } else {
-        path = "./"+path;
-    }
-    var _file = path + name + "/" + name;
-    var jsFileName = _file + ".js";
-    var cssFileName = _file + ".css";
-    var htmlFileName = _file + ".html";
+    if(rootPath !== undefined) path = rootPath + path;
+    else path = "./"+path;
+    path+= name + "/" + name;
+    var jsPath = `${path}.js`;
+    var cssPath = `${path}.css`;
+    var htmlPath = `${path}.html`;
     var _imports = core.getImports();
     //the last import
     var last = _imports.imports[_imports.imports.length - 1];
@@ -125,39 +106,29 @@ const a7createComponent = function(name, rootPath) {
         return core.errorLog(name+" is already defined as a component.");
     }
 
-    fs.writeFile(core.config.entry, source, function(err){
-        if (err) {
-            core.errorLog("An error happened while trying to add import to component" + name);
-        } else {
-            core.successLog("Component " + name + " was successfully added to imports");
-        }
+    fs.writeFile(core.config.entry, source, err=>{
+        if (err) core.errorLog("An error happened while trying to add import to component" + name);
+        else core.successLog("Component " + name + " was successfully added to imports");
     });
 
     fs.mkdirSync(path + name);
-    fs.writeFile(jsFileName, fs.readFileSync(require.resolve("./defaults/component.js"), "utf-8").replace(/name/g, name),function(err){
+    fs.writeFile(jsPath, fs.readFileSync(require.resolve("./defaults/component.js"), "utf-8").replace(/name/g, name),err=>{
         if(err){
             return core.errorLog("There was an error while generating the js file for " + name + ".");
-        } else {
-            core.successLog("Component " + name + " was successfully created.");
-        }
+        } else core.successLog("Component " + name + " was successfully created.");
     });
     var ermsg = ". This is not an big issue but this means that you would have to make the file yourself";
-    fs.writeFile(htmlFileName, "", function(err){
-        if(err){
-            core.errorLog("Couldn't create ./app/" + name + "/" + name + ".html"+ermsg);
-        }
+    fs.writeFile(htmlPath, "", err=>{
+        if(err) core.errorLog("Couldn't create ./app/" + name + "/" + name + ".html"+ermsg);
     });
-    fs.writeFile(cssFileName, "", function(err){
-        if(err){
-            core.errorLog("Couldn't create ./app/" + name + "/" + name + ".css"+ermsg);
-        }
-
+    fs.writeFile(cssPath, "", err=>{
+        if(err) core.errorLog("Couldn't create ./app/" + name + "/" + name + ".css"+ermsg);
     });
 };
 //TODO: Move it also to another dir
 const http = require("http");
 
-const a7test = function(){
+programs.test = ()=>{
     core.infoLog("starting an automatic a7 tester");
     core.infoLog("this is the tool to find to the most critical bugs in the code.");
     var a7testFolder =  module.filename.replace(/cli(\/|\\)cli\.js/, "tests/");
@@ -189,7 +160,7 @@ const a7test = function(){
     }
 
     //Results
-    fs.writeFile(a7testFolder + "errorlog.txt", errors, function(err){
+    fs.writeFile(a7testFolder + "errorlog.txt", errors, err=>{
         if(err){
             core.errorLog("could not store error log so here is the log");
             log(errors);
@@ -197,34 +168,12 @@ const a7test = function(){
     });
 };
 
-const a7devServer = require("./dev-server/dev-server.js"); 
+programs.devserver = require("./dev-server/dev-server.js"); 
 
-switch (args[0]) {
-    case undefined:
-        /* jshint -W086 */
-        a7greet();
-    case "help":
-        /* jshint +W086 */
-        a7helper();
-        break;
-    case "newproject":
-    case "np":
-        a7newproject(args[1]);
-        break;
-    case "build":
-        a7build();
-        break;
-    case "newcomponent":
-    case "nc":
-        a7createComponent(args[1]);
-        break;
-    case "devserver":
-        a7devServer(args[1]);
-        break;
-    case "test":
-        a7test();
-        break;
-    default:
-        core.errorLog(chalk.cyan(args.join(" ")) + " is not a valid argument.");
-        break;
+if (args[0]===undefined){
+    programs.default();
+} else if (programs[args[0]]!==undefined){
+    programs[args[0]]();
+} else {
+    core.errorLog(`${chalk.cyan(args.join(" "))} is not a valid sub program.`);
 }
