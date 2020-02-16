@@ -81,7 +81,7 @@ programs.np=programs.newproject=name=>{
         if(err)return core.errorLog("config could not be created.");
     });
 
-    fs.writeFile(name + "/app/index.js", fs.readFileSync(require.resolve("./defaults/index.js")), function (err) {
+    fs.writeFile(name + "/app/index.js", fs.readFileSync(require.resolve("./defaults/index.js")), err=>{
         if(err)return core.errorLog("app/index.js could not be created.");
     });
 

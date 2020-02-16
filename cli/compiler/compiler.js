@@ -42,7 +42,6 @@ const importHandler = imp => {
 };
 
 module.exports = sourceCode => {
-    sourceCode = "var a7_i={};\n" + sourceCode;
     if(config.entry === "noEntry"){
         core.errorLog("no entry to your application was defined in a7.config.json");
         process.exit();
@@ -135,7 +134,7 @@ module.exports = sourceCode => {
             expName = modExp[0].replace(/(module.exports\s*=\s*|;)/g, "");
         }
 
-        var mod = `;(function(){${modSrc} a7_i.${imp.name}=${expName};})();var ${imp.name}=a7_i.${imp.name};`;
+        var mod = `;var ${imp.name}=function(){${modSrc} return ${expName};}();`;
 
         if(config.mode === "production"){
             mod = minifier(mod);

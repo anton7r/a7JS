@@ -94,9 +94,29 @@ Including better frontend performance and some changes that we can't change anym
 
 Features that we plan to release with it
 
- - Static site generator
+- Improved performance
 
- - Improved syntax
+- Improved syntax
+
+- Smaller compiler output
+
+- Auto reload to development server
+
+## 5.0.0-alpha2
+
+- Reduced your apps bundle size
+
+- Optimized CLI
+
+- Bug Fixes
+
+## 5.0.0-alpha1
+
+- Improved syntax
+
+- Development server auto reload
+
+- Custom error messages
 
 ## Version 4 (December 2019)
 
@@ -112,7 +132,7 @@ Features that we plan to release with it
 
 Also CLI now works silently unless an error occurs
 
-## 4.0.0 Initial release (Very close)
+## 4.0.0 Initial release
 
 Project metadata is now saved to `./package.json`, this is neccessary for upgrading configuration files
 

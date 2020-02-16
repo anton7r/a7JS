@@ -1,12 +1,8 @@
-/* jshint -W104 */
-/* jshint -W119 */
 const fs = require("fs");
-const core = require("./core/core.js");
+const core = require("./core/core");
 const compile = require("./compiler/compiler");
-module.exports = function(settings) {
-    if(core.configLoaded === false){
-        return core.errorLog("can't run build command on this directory."); 
-    }
+module.exports = ()=>{
+    if(core.configLoaded === false) return core.errorLog("can't run build command on this directory."); 
 
     core.config.mode = "production";
     var config = core.config;
@@ -16,5 +12,4 @@ module.exports = function(settings) {
     var file = fs.readFileSync(config.entry, "utf-8");
     fs.writeFileSync(config.output, compile(file));
     core.successLog("app was built.");
-    
 };

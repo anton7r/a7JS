@@ -1,7 +1,4 @@
-/* jshint -W104 */
-/* jshint -W119 */
-
-//This file is used to compile html to our javascript equivelant code.
+//This file is used to compile html to javascript equivelant code.
 const HTMLParser = require("node-html-parser");
 const errorHandler = require("../core/errorhandler");
 
@@ -11,7 +8,7 @@ function buildEl(tag, src, content){
         var srcAttr = src.match(/(\@|)(\w|\d|\.)+?\=\'[^']+\'/g);
         if(srcAttr !== null){
             //loop trough attributes
-            srcAttr.forEach((val)=>{
+            srcAttr.forEach(val=>{
                 var name = val.match(/[^=]+/)[0];
                 var value = val.match(/[^=]+$/)[0].replace(/\'/g, "");
                 //is not a property
@@ -52,7 +49,7 @@ function __ChildNodes(nodes){
     var compiled = "";
     if(nodes.length === 0)return"";
 
-    nodes.forEach((node)=>{
+    nodes.forEach(node=>{
         if(node.tagName !== undefined) compiled += buildEl(node.tagName, node.rawAttrs,__ChildNodes(node.childNodes) + ",");
         else compiled += "\'" + node.rawText + "\',";
     });
