@@ -1,0 +1,1 @@
+module.exports=()=>process.kill(process.pid, 'SIGTERM');

@@ -7,6 +7,7 @@ const htmlCompiler = require("./html-compiler");
 const csso = require("csso");
 var config = core.config;
 const safeMatch = require("./safematch");
+const exit = require("../utils/exit");
 
 const minifier = src => {
     try {
@@ -32,7 +33,7 @@ const existsRead = path => {
     path = fsx.purePath(path);
     if(fs.existsSync(path)) return fs.readFileSync(path, "utf-8");
     core.errorLog("file could not be located. "+ path);
-    process.exit();
+    exit();
 };
 
 const importHandler = imp => {
@@ -44,7 +45,7 @@ const importHandler = imp => {
 module.exports = sourceCode => {
     if(config.entry === "noEntry"){
         core.errorLog("no entry to your application was defined in a7.config.json");
-        process.exit();
+        exit();
     }
     let entryFolder = config.entry.replace(/(\w|\d)+\.js/i, "");
     var CSSBundle = "";
@@ -162,7 +163,7 @@ module.exports = sourceCode => {
 
         if(min.error !== undefined){
             core.errorLog("UglifyJS found an error in your code\n\n" + min.error);
-            process.exit();
+            exit();
         }
         sourceCode = min.code;
     }
