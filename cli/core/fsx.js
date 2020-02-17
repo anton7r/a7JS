@@ -24,6 +24,10 @@ module.exports = {
         return this.formatSlashes(path).replace(/(\/\.\/|\/[^\/]*\/\.\.\/)/g, "/");
     },
 
+    folderFile(path){
+        return path.replace(/(\w|\d)+\.js/i, "");
+    },
+
     readJSONfile(path){
         var file = fs.readFileSync(path, "utf-8");
         if(file === "") return {};

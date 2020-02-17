@@ -5,7 +5,6 @@ module.exports = {
     isNewer(newV, oldV){
         var oldVersion = oldV.split(".");
         var newVersion = newV.split(".");
-        
         var i = 0;
         while(true){
             var newHasDash = false;
@@ -21,23 +20,14 @@ module.exports = {
                 oldHasDash = true;
             }
 
-            if(oldVersion[i] > newVersion[i]){
-                return false
-            } else if(newVersion[i] > oldVersion[i]){
-                return true;   
-            } else if (oldHasDash === true && newHasDash === false && newVersion[i] == oldVersion[i]){
-                return true;
-            } else if (oldHasDash === false && newHasDash === true && newVersion[i] == oldVersion[i]){
-                return false;
-            } else if (oldHasDash === true && newHasDash === true){
-                break;
-            } else if (newVersion.length - 1 === i && oldVersion.length - 1 === i){
-                return false;
-            } else if (newVersion.length - 1 === i && oldVersion.length - 1 !== i){
-                break;
-            } else if (newVersion.length - 1 !== i && oldVersion.length - 1 === i){
-                break;
-            }
+            if(oldVersion[i] > newVersion[i]) return false;
+            else if(newVersion[i] > oldVersion[i]) return true;   
+            else if (oldHasDash === true && newHasDash === false && newVersion[i] == oldVersion[i]) return true;
+            else if (oldHasDash === false && newHasDash === true && newVersion[i] == oldVersion[i]) return false;
+            else if (oldHasDash === true && newHasDash === true) break;
+            else if (newVersion.length - 1 === i && oldVersion.length - 1 === i) return false;
+            else if (newVersion.length - 1 === i && oldVersion.length - 1 !== i) break;
+            else if (newVersion.length - 1 !== i && oldVersion.length - 1 === i) break;
             i++;
         };
 
@@ -56,9 +46,7 @@ module.exports = {
         } else if(newVstage.indexOf("rc") === 0){
             newStage = 2;
             newVstage = newVstage.replace("rc", "")
-        } else {
-            return console.error("Unsupported stage");
-        }
+        } else return console.error("Unsupported stage");
 
         if(oldVstage.indexOf("alpha") === 0){
             oldVstage = oldVstage.replace("alpha", "");
@@ -68,35 +56,21 @@ module.exports = {
         } else if(oldVstage.indexOf("rc") === 0){
             oldStage = 2;
             oldVstage = oldVstage.replace("rc", "");
-        } else {
-            return console.error("Unssupported stage");
-        }
-    
-        if (newStage > oldStage){
-            return true;
-        } else if (oldStage > newStage){
-            return false;
-        }
+        } else return console.error("Unssupported stage");
+
+        if (newStage > oldStage) return true;
+        else if (oldStage > newStage) return false;
 
         var newerStages = newVstage.split(".");
         var olderStages = oldVstage.split(".");
-    
-        if(newerStages[0] === ""){
-            newerStages[0] = 1;
-        }
-        
-        if (olderStages[0] === ""){
-            olderStages[0] = 1;
-        }
+
+        if(newerStages[0] === "") newerStages[0] = 1;
+        if (olderStages[0] === "") olderStages[0] = 1;
 
         i = 0;
         while(true){
-            if(newerStages[i] > olderStages[i]){
-                return true;
-            } else if (newerStages.length - 1 === i){
-                return false;
-            }
-
+            if(newerStages[i] > olderStages[i]) return true;
+            else if(newerStages.length - 1 === i) return false;
             i++;
         }
     }

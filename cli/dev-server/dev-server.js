@@ -37,15 +37,10 @@ module.exports = function(port, dir){
         } else if(url === "/"){
             if (fsx.fileExists(dir + "index.html")) {
                 return getIndexHTML();
-            } else {
-                return "Could not find index.html file from directory";
-            }
-    
+            } else return "Could not find index.html file from directory";
         } else if (fsx.fileExists(dir+url) === true){
             return fs.readFileSync(dir+url);
-        } else {
-            return getIndexHTML();
-        }
+        } else return getIndexHTML();
     }
     
     if(dir === undefined) dir = "./";
