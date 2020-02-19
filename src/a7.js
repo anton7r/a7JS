@@ -175,6 +175,7 @@ a7.secureProps = function (mode) {
 
 //REVIEW:
 a7.createElement = function (element, attributes) {
+    console.log(element);
     //Replace this
     var props;
     var component = a7store[1][element];

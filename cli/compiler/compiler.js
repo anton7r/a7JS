@@ -103,6 +103,8 @@ module.exports = sourceCode => {
             [/((\'\')\s*\+\s*|(\s*\+\s*\'\'))/g, ""]
         ));
 
+        out = out.replace(/'  ',/g, "")
+
         var exec = `a7.registerComponent(\"${tag}\",${out});function ${imp.name}(a){return a7.createElement(\"${tag}\",a)}`;
         sourceCode = sourceCode.replace(Import, exec);
         imports += {from:imp.path,as:imp.name};
