@@ -95,7 +95,7 @@ module.exports = sourceCode => {
             html = html.replace(literal, `\'+this.data.${clean}+\'`);
         });
 
-        object = componentSrc.replace(/^{/, "").replace(/}$/, "");
+        object = componentSrc.replace(/^{/, "").replace(/}(|;)$/, "");
         objectWithRenderer = object + `,render(){return ${html}}`.replace(/,,/g, ",")        
 
         var out = minifier(multiReplace(componentSrc,

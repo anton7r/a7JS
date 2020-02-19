@@ -107,7 +107,7 @@ cmd.nc=cmd.newcomponent=(name, rootPath) => {
 
     fs.writeFile(core.config.entry, source, err=>{
         if (err) core.errorLog("An error happened while trying to add import to component" + name);
-        else core.successLog("Component " + name + " was successfully added to imports");
+        else core.successLog(`Component ${name} was successfully added to imports`);
     });
 
     fs.mkdirSync(path);
