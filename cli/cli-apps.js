@@ -88,12 +88,12 @@ cmd.np=cmd.newproject=name=>{
     core.successLog("the project was created successfully!");
 };
 cmd.nc=cmd.newcomponent=(name, rootPath) => {
-    var path = `app/components/${name}/${name}`;
+    var path = `app/components/${name}/`;
     if(rootPath !== undefined) path = rootPath + path;
     else path = "./"+path;
-    var jsPath = `${path}.js`;
-    var cssPath = `${path}.css`;
-    var htmlPath = `${path}.html`;
+    var jsPath = `${path}${name}.js`;
+    var cssPath = `${path}${name}.css`;
+    var htmlPath = `${path}${name}.html`;
     var _imports = core.getImports();
     //the last import
     var last = _imports.imports[_imports.imports.length - 1];
@@ -110,7 +110,7 @@ cmd.nc=cmd.newcomponent=(name, rootPath) => {
         else core.successLog("Component " + name + " was successfully added to imports");
     });
 
-    fs.mkdirSync(path + name);
+    fs.mkdirSync(path);
     fs.writeFile(jsPath, fs.readFileSync(require.resolve("./defaults/component.js"), "utf-8").replace(/name/g, name),err=>{
         if(err){
             return core.errorLog("There was an error while generating the js file for " + name + ".");
