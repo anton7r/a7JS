@@ -50,7 +50,7 @@ programs.np=programs.newproject=name=>{
     fs.writeFile(name + "/package.json", JSON.stringify({    
         name,
         version:"0.0.1",
-        description: name + " is a A7JS application.",
+        description: `${name} is a A7JS application.`,
         private: true,
         dependencies: {
             "a7js": "^"+core.getVersion()

@@ -1,5 +1,3 @@
-/* jshint -W104 */
-/* jshint -W119 */
 const http = require("http");
 const fs = require("fs");
 const core = require("../core/core");
@@ -10,7 +8,7 @@ const fsx = require("../core/fsx");
 const WebSocket = require("ws");
 const errorHandler = require("../core/errorhandler");
 
-module.exports = function(port, dir){
+module.exports = (port, dir)=>{
     if(core.configLoaded === false){
         core.errorLog("Couldn't find configuration file in the directory.")
         return;
@@ -35,17 +33,10 @@ module.exports = function(port, dir){
         if("." + url === conf.output){
             return packaged;
         } else if(url === "/"){
-            if (fsx.fileExists(dir + "index.html")) {
-                return getIndexHTML();
-            } else {
-                return "Could not find index.html file from directory";
-            }
-    
-        } else if (fsx.fileExists(dir+url) === true){
-            return fs.readFileSync(dir+url);
-        } else {
-            return getIndexHTML();
-        }
+            if (fsx.fileExists(dir + "index.html")) return getIndexHTML();
+            else return "Could not find index.html file from directory";
+        } else if (fsx.fileExists(dir+url) === true) return fs.readFileSync(dir+url);
+        else return getIndexHTML();
     }
     
     if(dir === undefined) dir = "./";
@@ -117,7 +108,7 @@ module.exports = function(port, dir){
     pack();
 
     //Lauri
-    fs.watch(dir, { encoding: "utf-8", recursive:true }, (event) => {
+    fs.watch(dir, { encoding: "utf-8", recursive:true }, event=>{
         if(event !== "change") return;
         pack();
     }); //© Lauri Särkioja 2020

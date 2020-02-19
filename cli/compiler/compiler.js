@@ -135,7 +135,7 @@ module.exports = sourceCode => {
             expName = modExp[0].replace(/(module.exports\s*=\s*|;)/g, "");
         }
 
-        var mod = `;var ${imp.name}=function(){${modSrc} return ${expName};}();`;
+        var mod = `;var ${imp.name}=function(){${modSrc} return ${expName}}();`;
 
         if(config.mode === "production"){
             mod = minifier(mod);

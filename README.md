@@ -83,8 +83,6 @@ MIT License [license](https://github.com/anton7r/a7JS/blob/master/LICENSE)
 
 Discord: [discord.gg/388FREA](https://discord.gg/388FREA)
 
-Slack: -
-
 # Changes
 
 ## Version 5 (March 2020)
