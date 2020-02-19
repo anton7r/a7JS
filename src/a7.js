@@ -16,11 +16,9 @@ function a7debug(message) {
 
 /* internal methods start */
 //Init will run once
-var init = function(){
+var init = ()=>{
     //a7store[8] is initDone
-    if (a7store[8] === true) {
-        return;
-    }
+    if (a7store[8] === true) return;
 
     var pageContainerEL = document.querySelector("[a7app]");
     if (pageContainerEL === null) {
@@ -358,8 +356,6 @@ a7.setTitle = function (title) {
     document.title = title;
 };
 
-//Menu stuff
-
 //REVIEW: combine toggleMenu and closeMenu
 //make a forceState parameter into toggle menu.
 //since toggleMenu and closeMenu is basicly the same.
@@ -372,9 +368,7 @@ a7.toggleMenu = function (menuName) {
     classList.toggle("a7-menu-" + menuName + "-closed");
 
     var menuToggleFunc = a7store[5][menuName];
-    if (menuToggleFunc === undefined) {
-        return;
-    }
+    if (menuToggleFunc === undefined) return;
 
     if (classList.contains(open) === true) {
         menuState = "open";

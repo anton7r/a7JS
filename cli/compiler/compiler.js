@@ -80,7 +80,7 @@ module.exports = sourceCode => {
         var folder = fsx.purePath(entryFolder +imp.path.replace(/(\w|\n)+\.js/g, ""));
         
         //Component sourcecode
-        var componentSrc = existsRead(entryFolder + imp.path).replace(/export default\s*/, "");
+        var componentSrc = existsRead(entryFolder + imp.path).replace(/export default\s*/, "").replace(/;$/, "");
 
         var htmlPath = folder + imp.name + ".html";
         var CSSPath = folder + imp.name + ".css";
@@ -95,7 +95,7 @@ module.exports = sourceCode => {
             html = html.replace(literal, `\'+this.data.${clean}+\'`);
         });
 
-        object = componentSrc.replace(/^{/, "").replace(/}(|;)$/, "");
+        object = componentSrc.replace(/^{/, "").replace(/}$/, "");
         objectWithRenderer = object + `,render(){return ${html}}`.replace(/,,/g, ",")        
 
         var out = minifier(multiReplace(componentSrc,
