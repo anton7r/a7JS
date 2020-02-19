@@ -6,7 +6,7 @@ const cssMinifier = require("./css-minifier");
 const htmlCompiler = require("./html-compiler");
 const csso = require("csso");
 var config = core.config;
-const safeMatch = require("./safematch");
+const safeMatch = require("../utils/safematch");
 const exit = require("../utils/exit");
 
 const minifier = src => {
@@ -47,7 +47,7 @@ module.exports = sourceCode => {
         core.errorLog("no entry to your application was defined in a7.config.json");
         exit();
     }
-    let entryFolder = config.entry.replace(/(\w|\d)+\.js/i, "");
+    let entryFolder = fsx.folderFile(config.entry);
     var CSSBundle = "";
     
     if(config.css.bundle && config.css.file !== null){
@@ -113,20 +113,15 @@ module.exports = sourceCode => {
         var imp = importHandler(Import);
         
         //if the package is a7js, it will go searching for it 
-        if(imp.path === "a7js"){
-            imp.path = require.resolve("../../src/a7.js");
-        } else if(imp.path.charAt(0) === "."){
-            imp.path = fsx.purePath("./app/" + imp.path);
-        } else {
-            imp.path = require.resolve(imp.path);
-        }
+        if(imp.path === "a7js") imp.path = require.resolve("../../src/a7.js");
+        else if(imp.path.charAt(0) === ".") imp.path = fsx.purePath("./app/" + imp.path);
+        else imp.path = require.resolve(imp.path);
+
         var modSrc = fs.readFileSync(imp.path, "utf-8");
         //modImp finds modules imports
         var modImp = modSrc.match(/(import\s+.+?\s+from\".*?\"|require\(.*?\))/g);
-        if(modImp !== null){
-            core.errorLog(`Module ${imp.name} has its own imports which we cannot right now import with our detections!`);
-            return;
-        } else if(config.mode === "production") modSrc = minifier(modSrc);
+        if(modImp !== null) return core.errorLog(`Module ${imp.name} has its own imports which we cannot right now import with our detections!`);
+        else if(config.mode === "production") modSrc = minifier(modSrc);
 
         var expName = "";
         var modExp = modSrc.match(/module.exports\s*=\s*(\w|\d)*;*/g);

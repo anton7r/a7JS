@@ -1,46 +1,36 @@
-//This file is used to compile html to javascript equivelant code.
 const HTMLParser = require("node-html-parser");
 const errorHandler = require("../core/errorhandler");
-
+const safeMatch = require("../utils/safematch")
 function buildEl(tag, src, content){
     var attributes = {};
     if(src !== undefined){
-        var srcAttr = src.match(/(\@|)(\w|\d|\.)+?\=\'[^']+\'/g);
-        if(srcAttr !== null){
-            //loop trough attributes
-            srcAttr.forEach(val=>{
-                var name = val.match(/[^=]+/)[0];
-                var value = val.match(/[^=]+$/)[0].replace(/\'/g, "");
-                //is not a property
-                if(name.indexOf("@") !== 0){
-                    if(name.indexOf("a7on") === 0){
-                        value = "this.functions." + value.replace("()", "");
-                    }
-                    attributes[name] = value;
-                } else {
-                    if(attributes.props===undefined)attributes.props={};
-                    attributes.props[name.replace("@","")]=value;
-                }
-            });
-        }
+        var srcAttr = safeMatch(src, /(\@|)(\w|\d|\.)+?\=\'[^']+\'/g);
+        //loop trough attributes
+        srcAttr.forEach(val=>{
+            var name = val.match(/[^=]+/)[0];
+            var value = val.match(/[^=]+$/)[0].replace(/\'/g, "");
+            //is not a property
+            if(name.indexOf("@") !== 0){
+                if(name.indexOf("a7on") === 0) value = `this.functions.${value.replace("()", "")}`;
+                attributes[name] = value;
+            } else {
+                if(attributes.props===undefined)attributes.props={};
+                attributes.props[name.replace("@","")]=value;
+            }
+        });
     }
 
     if (src.match("a7link") !== null) attributes.a7link = "";
     attributes = JSON.stringify(attributes);
     //replaces evlisteners with the real thing
-    var ev = attributes.match(/\"a7on\w*\":\"[\w|\d\_\.]*\"/gi);
-    if(ev !== null){
-        ev.forEach(function(val){
-            var event = val.match(/\".+?\"/);
-            var listener = val.match(/\:\".+?\"/)[0].replace(/\"/g, "");
-            attributes = attributes.replace(val, event + listener);
-        });
-    }
-    if(attributes === "{}"){
-        attributes = 0;
-    } else {
-        attributes = attributes.replace(/\"/g, "'");
-    }
+    var ev = safeMatch(attributes, /\"a7on\w*\":\"[\w|\d\_\.]*\"/gi);
+    ev.forEach(val=>{
+        var event = val.match(/\".+?\"/);
+        var listener = val.match(/\:\".+?\"/)[0].replace(/\"/g, "");
+        attributes = attributes.replace(val, event + listener);
+    });
+    if(attributes === "{}") attributes = 0;
+    else attributes = attributes.replace(/\"/g, "'");
 
     return "a7.createElement(\'"+tag+"\',"+attributes+","+content+"),";
 }
@@ -51,7 +41,7 @@ function __ChildNodes(nodes){
 
     nodes.forEach(node=>{
         if(node.tagName !== undefined) compiled += buildEl(node.tagName, node.rawAttrs,__ChildNodes(node.childNodes) + ",");
-        else compiled += "\'" + node.rawText + "\',";
+        else compiled += `\'${node.rawText}\',`;
     });
     return compiled.replace(/,\)/, ")").replace(/\',\)/, "')");
 }

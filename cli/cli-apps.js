@@ -2,7 +2,7 @@ const log = console.log;
 const fs = require("fs");
 const chalk = require("chalk");
 const core = require("./core/core.js");
-var programs = {
+var cmd = {
     build:require("./build.js"),
     devserver:require("./dev-server/dev-server.js")
 };
@@ -15,7 +15,7 @@ const createHtmlDoc = name => {
 
 const cssDoc = `* {\n    margin:0px;\n    padding:0px;\n}\n\nbody {\n    font-family:"FONT HERE";\n}`;
 
-programs.default=()=>{
+cmd.default=()=>{
     log(chalk.blue("A7JS")+chalk.gray("@"+core.getVersion())+"\n");
     core.helperLog("newproject", "create a new project with a7.");
     core.syntaxLog("a7 newproject [projectname]");
@@ -32,7 +32,7 @@ programs.default=()=>{
     core.syntaxLog("a7 devserver [port(optional)]");
 };
 
-programs.np=programs.newproject=name=>{
+cmd.np=cmd.newproject=name=>{
     if (name === undefined) {
         return core.errorLog("you have not defined a name for your project.");
     } else if (fs.existsSync(name) !== false) {
@@ -87,7 +87,7 @@ programs.np=programs.newproject=name=>{
 
     core.successLog("the project was created successfully!");
 };
-programs.nc=programs.newcomponent=(name, rootPath) => {
+cmd.nc=cmd.newcomponent=(name, rootPath) => {
     var path = `app/components/${name}/${name}`;
     if(rootPath !== undefined) path = rootPath + path;
     else path = "./"+path;
@@ -127,7 +127,7 @@ programs.nc=programs.newcomponent=(name, rootPath) => {
 //TODO: Move it also to another dir
 const http = require("http");
 
-programs.test = ()=>{
+cmd.test = ()=>{
     core.infoLog("starting an automatic a7 tester");
     core.infoLog("this is the tool to find to the most critical bugs in the code.");
     var a7testFolder =  module.filename.replace(/cli(\/|\\)cli\.js/, "tests/");
@@ -165,4 +165,4 @@ programs.test = ()=>{
         }
     });
 };
-module.exports = programs;
+module.exports = cmd;
