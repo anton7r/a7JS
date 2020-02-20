@@ -213,7 +213,8 @@ a7.createElement = function (element, attributes) {
             var childEl = arguments[i];
             //loops through the rest of the arguments
             if(typeof childEl === "string" && childEl !== ""){
-                rElement.innerText += childEl;
+                var text = document.createTextNode(childEl);
+                rElement.appendChild(text);
             } else if (typeof childEl === "number"){
                 // instance of number
                 var text = document.createTextNode(childEl);
