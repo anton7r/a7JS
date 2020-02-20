@@ -47,7 +47,11 @@ function __ChildNodes(nodes){
 }
 
 module.exports=(html, path)=>{
-    html=html.replace(/\r\n/g, "").replace(/\>\s/g, ">").replace(/\s\</g, "<").replace(/\"/g, "\'");
+    html=html
+    .replace(/\r\n/g, "")
+    .replace(/\>\s/g, ">")
+    .replace(/\s\</g, "<")
+    .replace(/\"/g, "\'");
     var compiled = "";
     var Nodes = HTMLParser.parse(html).childNodes;
     var count = Nodes.length;
@@ -64,5 +68,5 @@ module.exports=(html, path)=>{
         var attributes = Nodes[i].rawAttrs;
         compiled += buildEl(tag, attributes, inner);
     }
-    return compiled.replace(/\,\)/g, ")").replace(/\,\"\"/g, "").replace(/\)\,$/g, ")").replace(/\',\)/g, "')").replace(/\),\)/g, "))");
+    return compiled.replace(/\,\)/g, ")").replace(/\,\"\s*\"/g, "").replace(/\)\,$/g, ")").replace(/\',\)/g, "')").replace(/\),\)/g, "))");
 };

@@ -20,19 +20,18 @@ module.exports = (port, dir)=>{
 
     //returns the index file
     function getIndexHTML(){
+        var css = fs.readFileSync(require.resolve("./client.css"), "utf-8")
+        .replace(/[\r\n]/g, "").replace(/\s+/g, " ");
         var index = fs.readFileSync(dir + "index.html", "utf-8");
-        var script = fs.readFileSync(require.resolve("./client.js"), "utf-8");
-        script = script.replace("{{ port }}", port);
-        var css = fs.readFileSync(require.resolve("./client.css"), "utf-8");
-        css = css.replace(/[\r\n]/g, "").replace(/\s+/g, " ");
-        script = script.replace("{{ css }}", css);
+        var script = fs.readFileSync(require.resolve("./client.js"), "utf-8")
+        .replace("{{ port }}", port)
+        .replace("{{ css }}", css);
         return index.replace("</body>", `<!-- a7js dev script ---><script>${script}</script></body>`);
     }
 
     function resolveFile(url){
-        if("." + url === conf.output){
-            return packaged;
-        } else if(url === "/"){
+        if("." + url === conf.output) return packaged;
+        else if(url === "/"){
             if (fsx.fileExists(dir + "index.html")) return getIndexHTML();
             else return "Could not find index.html file from directory";
         } else if (fsx.fileExists(dir+url) === true) return fs.readFileSync(dir+url);
@@ -62,7 +61,7 @@ module.exports = (port, dir)=>{
         }
         var file = resolveFile(req.url);
         if(type !== "png/image" || type !== "") {
-            res.writeHead(200, {'Content-Type': type, 'Content-Encoding': "gzip"});
+            res.writeHead(200, {'Content-Type':type, 'Content-Encoding':"gzip"});
             zlib.gzip(new Buffer.from(file, "utf-8"), (_, result) => res.end(result));
         } else {
             res.writeHead(200, {'Content-Type':type});
@@ -70,6 +69,7 @@ module.exports = (port, dir)=>{
         }
 
     });
+    //Lauri
     var w = new WebSocket.Server({ server });
     w.on("connection", (c) => {
         if(errorHandler.errorCount !== 0) c.send(JSON.stringify(errorHandler.errors[0]));
@@ -79,7 +79,7 @@ module.exports = (port, dir)=>{
     var sendAll=(m)=>w.clients.forEach((c)=>c.send(m));
 
     //Builds the app
-    var pack = () => {
+    var pack=()=>{
         errorHandler.clear();
         console.clear();
         try {
@@ -106,8 +106,6 @@ module.exports = (port, dir)=>{
         }
     }
     pack();
-
-    //Lauri
     fs.watch(dir, { encoding: "utf-8", recursive:true }, event=>{
         if(event !== "change") return;
         pack();
