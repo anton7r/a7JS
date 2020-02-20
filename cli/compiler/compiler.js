@@ -80,7 +80,7 @@ module.exports = sourceCode => {
         var folder = fsx.purePath(entryFolder +imp.path.replace(/(\w|\n)+\.js/g, ""));
         
         //Component sourcecode
-        var componentSrc = existsRead(entryFolder + imp.path).replace(/export default\s*/, "");
+        var componentSrc = existsRead(entryFolder + imp.path).replace(/export default\s*/, "").replace(/;$/, "");
 
         var htmlPath = folder + imp.name + ".html";
         var CSSPath = folder + imp.name + ".css";
@@ -102,6 +102,8 @@ module.exports = sourceCode => {
             [object, objectWithRenderer],
             [/((\'\')\s*\+\s*|(\s*\+\s*\'\'))/g, ""]
         ));
+
+        out = out.replace(/'  ',/g, "")
 
         var exec = `a7.registerComponent(\"${tag}\",${out});function ${imp.name}(a){return a7.createElement(\"${tag}\",a)}`;
         sourceCode = sourceCode.replace(Import, exec);

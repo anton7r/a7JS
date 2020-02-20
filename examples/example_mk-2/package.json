@@ -1,0 +1,16 @@
+{
+    "name": "example_mk-2",
+    "version": "0.0.1",
+    "description": "example_mk-2 is a A7JS application.",
+    "private": true,
+    "dependencies": {
+        "a7js": "^5.0.0-alpha1.1"
+    },
+    "main": "app/index.js",
+    "a7js": {
+        "metadata": {
+            "lastUsedVersion": "5.0.0-alpha1.1",
+            "lastUsedTime": "2020-02-19T07:17:06.244Z"
+        }
+    }
+}
