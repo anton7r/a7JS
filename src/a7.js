@@ -216,7 +216,8 @@ a7.createElement = function (element, attributes) {
                 rElement.innerText += childEl;
             } else if (typeof childEl === "number"){
                 // instance of number
-                rElement.innerText += childEl;
+                var text = document.createTextNode(childEl);
+                rElement.appendChild(text);
             } else if (childEl instanceof Element){
                 //instance of element
                 rElement.appendChild(childEl);
@@ -323,14 +324,14 @@ a7.registerComponent = function (name, compObj) {
 };
 
 //html sanitizer
-a7.sanitizer = function (str) {
+a7.sanitizer = str=>{
     var result = str
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#x27;")
-        .replace(/\//g, "&#x2F;");
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;")
+    .replace(/\//g, "&#x2F;");
 
     //finds typical xss vectors
     var findScript = /<script>(.|\s)+<\/script>/g;
