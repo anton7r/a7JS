@@ -32,7 +32,7 @@ function buildEl(tag, src, content){
     if(attributes === "{}") attributes = 0;
     else attributes = attributes.replace(/\"/g, "'");
 
-    return "a7.createElement(\'"+tag+"\',"+attributes+","+content+"),";
+    return `a7.createElement(\'${tag}\',${attributes},${content}),`;
 }
 
 function __ChildNodes(nodes){
@@ -55,13 +55,7 @@ module.exports=(html, path)=>{
     var compiled = "";
     var Nodes = HTMLParser.parse(html).childNodes;
     var count = Nodes.length;
-
-    if (count > 1){
-        errorHandler.addError({
-            error:"more than one root element was found", file:path
-        })
-    }
-
+    if (count > 1) errorHandler.addError({error:"more than one root element was found", file:path});
     for(var i = 0; i < count; i++){
         var tag = Nodes[i].tagName;
         var inner = __ChildNodes(Nodes[i].childNodes);
