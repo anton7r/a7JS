@@ -5,9 +5,7 @@ const core = require("./core/core");
 const ver = require("./core/compare-versions");
 module.exports = ()=>{
     //needs to check wether directory has a7 config file
-    if (fsx.fileExists("./a7.config.json") === false) {
-        return;
-    }
+    if (fsx.fileExists("./a7.config.json") === false) return;
 
     var pk;
     if(fsx.fileExists("./package.json") === true){
@@ -42,9 +40,6 @@ module.exports = ()=>{
             if(err !== null) console.log("an error happened while trying to update package.json");
         })
 
-    } else if (init === true){
-        //TODO: make it async
-        fs.writeFileSync("./package.json", JSON.stringify(pk, null, 4));
-    };
+    } else if (init === true) fs.writeFileSync("./package.json", JSON.stringify(pk, null, 4));
     return init;
 }

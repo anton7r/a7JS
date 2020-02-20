@@ -36,14 +36,12 @@ cmd.np=cmd.newproject=name=>{
     if (name === undefined) {
         return core.errorLog("you have not defined a name for your project.");
     } else if (fs.existsSync(name) !== false) {
-        return core.errorLog(name + " folder already exists in this directory.");
+        return core.errorLog(`${name} folder already exists in this directory.`);
     }
 
     core.infoLog(`creating a new project in ${name}`);
 
-    fs.mkdir(name, {
-        recursive: true
-    }, err => {
+    fs.mkdir(name, { recursive: true }, err => {
         if (err) return core.errorLog("there was an error while creating project folder.");
     });
 
@@ -52,9 +50,7 @@ cmd.np=cmd.newproject=name=>{
         version:"0.0.1",
         description: `${name} is a A7JS application.`,
         private: true,
-        dependencies: {
-            "a7js": "^"+core.getVersion()
-        },
+        dependencies: { a7js: "^"+core.getVersion() },
         main: "app/index.js",
         a7js: {
             metadata: {
@@ -122,47 +118,6 @@ cmd.nc=cmd.newcomponent=(name, rootPath) => {
     });
     fs.writeFile(cssPath, "", err=>{
         if(err) core.errorLog("Couldn't create ./app/" + name + "/" + name + ".css"+ermsg);
-    });
-};
-//TODO: Move it also to another dir
-const http = require("http");
-
-cmd.test = ()=>{
-    core.infoLog("starting an automatic a7 tester");
-    core.infoLog("this is the tool to find to the most critical bugs in the code.");
-    var a7testFolder =  module.filename.replace(/cli(\/|\\)cli\.js/, "tests/");
-    var errors = "";
-    if(fs.existsSync(a7testFolder) === false){
-        fs.mkdirSync(a7testFolder);
-        log("folder " + a7testFolder + " was not found. So we added it");
-    }
-    core.infoLog("the whole log is available in the ./tests/ folder");
-    try{
-        a7newproject(a7testFolder + "x");
-    } catch(err){
-        core.errorLog("the project couldn't be created.");
-        errors += err+"\n";
-    }
-    try{
-        a7createComponent("test", a7testFolder+ "x/");
-    } catch(err){
-        core.errorLog("there was an error while trying to create new component.");
-        errors += err+"\n";
-    }
-    try{
-        a7devServer("8698", dir);
-        http.get("localhost:8698");
-    } catch(err){
-        core.errorLog("");
-        errors += err+"\n";
-    }
-
-    //Results
-    fs.writeFile(a7testFolder + "errorlog.txt", errors, err=>{
-        if(err){
-            core.errorLog("could not store error log so here is the log");
-            log(errors);
-        }
     });
 };
 module.exports = cmd;
