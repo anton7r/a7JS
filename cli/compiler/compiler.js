@@ -12,18 +12,18 @@ const exit = require("../utils/exit");
 const minifier = src => {
     try {
         var m = uglifyJS.minify(src);
-        if(m.code === undefined) return src;
+        if (m.code === undefined) return src;
         return m.code;
-    } catch(e){
+    } catch (e) {
         core.errorLog("an error happened while trying to minify a script");
         return src;
     }
 };
 
 //replace multiple things from a string;
-function multiReplace(s){
+function multiReplace(s) {
     const a = arguments;
-    for(var i = 1; i < a.length; i++){
+    for (var i = 1; i < a.length; i++) {
         s = s.replace(a[i][0], a[i][1]);
     }
     return s;
@@ -31,8 +31,8 @@ function multiReplace(s){
 
 const existsRead = path => {
     path = fsx.purePath(path);
-    if(fs.existsSync(path)) return fs.readFileSync(path, "utf-8");
-    core.errorLog("file could not be located. "+ path);
+    if (fs.existsSync(path)) return fs.readFileSync(path, "utf-8");
+    core.errorLog("file could not be located. " + path);
     exit();
 };
 
@@ -43,18 +43,18 @@ const importHandler = imp => {
 };
 
 module.exports = sourceCode => {
-    if(config.entry === "noEntry"){
+    if (config.entry === "noEntry") {
         core.errorLog("no entry to your application was defined in a7.config.json");
         exit();
     }
     let entryFolder = fsx.folderFile(config.entry);
     var CSSBundle = "";
-    
-    if(config.css.bundle && config.css.file !== null){
+
+    if (config.css.bundle && config.css.file !== null) {
         var cssFile = config.css.file;
-        if(fs.existsSync(cssFile)){
+        if (fs.existsSync(cssFile)) {
             CSSBundle += csso.minify(fs.readFileSync(cssFile, "utf-8"), {
-                filename:cssFile
+                filename: cssFile
             });
         }
     }
@@ -65,20 +65,20 @@ module.exports = sourceCode => {
 
     //Whole imports eliminate component imports
     wholeImports = wholeImports.filter(val => {
-        if(val.match(/"\.\/components\/.+?\"/) !== null) return false;
+        if (val.match(/"\.\/components\/.+?\"/) !== null) return false;
         else return true;
     });
 
     var partialImports = safeMatch(sourceCode, /import\s*{\s*.*?\s*}\s+from\s*\".+?\";*/gi);
 
     //Goes through component imports
-    for(let i = 0; i < componentImports.length; i++){
+    for (let i = 0; i < componentImports.length; i++) {
         var Import = componentImports[i];
         //imp means the imported object
         var imp = importHandler(Import);
         //path to component folder
-        var folder = fsx.purePath(entryFolder +imp.path.replace(/(\w|\n)+\.js/g, ""));
-        
+        var folder = fsx.purePath(entryFolder + imp.path.replace(/(\w|\n)+\.js/g, ""));
+
         //Component sourcecode
         var componentSrc = existsRead(entryFolder + imp.path).replace(/export default\s*/, "").replace(/;$/, "");
 
@@ -96,7 +96,7 @@ module.exports = sourceCode => {
         });
 
         object = componentSrc.replace(/^{/, "").replace(/}$/, "");
-        objectWithRenderer = object + `,render(){return ${html}}`.replace(/,,/g, ",")        
+        objectWithRenderer = object + `,render(){return ${html}}`.replace(/,,/g, ",")
 
         var out = minifier(multiReplace(componentSrc,
             [object, objectWithRenderer],
@@ -107,58 +107,66 @@ module.exports = sourceCode => {
 
         var exec = `a7.registerComponent(\"${tag}\",${out});function ${imp.name}(a){return a7.createElement(\"${tag}\",a)}`;
         sourceCode = sourceCode.replace(Import, exec);
-        imports += {from:imp.path,as:imp.name};
+        imports += {
+            from: imp.path,
+            as: imp.name
+        };
     }
 
-    for (let i = 0; i < wholeImports.length; i++){
+    for (let i = 0; i < wholeImports.length; i++) {
         var Import = wholeImports[i];
         var imp = importHandler(Import);
-        
+
         //if the package is a7js, it will go searching for it 
-        if(imp.path === "a7js") imp.path = require.resolve("../../src/a7.js");
-        else if(imp.path.charAt(0) === ".") imp.path = fsx.purePath("./app/" + imp.path);
+        if (imp.path === "a7js") imp.path = require.resolve("../../src/a7.js");
+        else if (imp.path.charAt(0) === ".") imp.path = fsx.purePath("./app/" + imp.path);
         else imp.path = require.resolve(imp.path);
 
         var modSrc = fs.readFileSync(imp.path, "utf-8");
         //modImp finds modules imports
         var modImp = modSrc.match(/(import\s+.+?\s+from\".*?\"|require\(.*?\))/g);
-        if(modImp !== null) return core.errorLog(`Module ${imp.name} has its own imports which we cannot right now import with our detections!`);
-        else if(config.mode === "production") modSrc = minifier(modSrc);
+        if (modImp !== null) return core.errorLog(`Module ${imp.name} has its own imports which we cannot right now import with our detections!`);
+        else if (config.mode === "production") modSrc = minifier(modSrc);
 
         var expName = "";
         var modExp = modSrc.match(/module.exports\s*=\s*(\w|\d)*;*/g);
-        if(modExp !== null){
-            modSrc = modSrc.replace(modExp[0],"");
+        if (modExp !== null) {
+            modSrc = modSrc.replace(modExp[0], "");
             expName = modExp[0].replace(/(module.exports\s*=\s*|;)/g, "");
         }
 
         var mod = `;var ${imp.name}=function(){${modSrc} return ${expName}}();`;
 
-        if(config.mode === "production"){
+        if (config.mode === "production") {
             mod = minifier(mod);
         }
         //replacing the import on the sourcecode with the modules contens
         sourceCode = sourceCode.replace(Import, `/* ${imp.name} */ ${mod}`);
         imports += {
-            from:imp.path,
-            as:imp.name
+            from: imp.path,
+            as: imp.name
         };
     }
 
     var len = partialImports.length;
     if (len > 0) return core.errorLog("Importing only a part of a framework or a library is not yet supported!");
-    for(let i = 0; i < len; i++){
+    for (let i = 0; i < len; i++) {
         var Import = partialImports[i];
         var imp = importHandler(Import);
     }
 
-    if (CSSBundle != "") sourceCode += "a7.loadCSS(\""+cssMinifier(CSSBundle)+"\")";
-    if (config.mode === "production"){
+    if (CSSBundle != "") sourceCode += "a7.loadCSS(\"" + cssMinifier(CSSBundle) + "\")";
+    if (config.mode === "production") {
         var min = uglifyJS.minify(`(function(){${sourceCode}})()`, {
-            compress:{passes:1}, mangle:{toplevel:true}
+            compress: {
+                passes: 1
+            },
+            mangle: {
+                toplevel: true
+            }
         });
 
-        if(min.error !== undefined){
+        if (min.error !== undefined) {
             core.errorLog("UglifyJS found an error in your code\n\n" + min.error);
             exit();
         }
