@@ -6,9 +6,8 @@ module.exports = ()=>{
 
     core.config.mode = "production";
     var config = core.config;
-    if (config.entry === undefined){
-        return core.errorLog("You have not defined the entrypoint of your app.");
-    }
+    if (config.entry === undefined) return core.errorLog("You have not defined the entrypoint of your app.");
+    
     var file = fs.readFileSync(config.entry, "utf-8");
     fs.writeFileSync(config.output, compile(file));
     core.successLog("app was built.");
