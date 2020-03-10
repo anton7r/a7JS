@@ -1,6 +1,6 @@
 const fs = require("fs");
 const fsx = require("../core/fsx");
-const uglifyJS = require("uglify-js");
+const terser = require("terser");
 const core = require("../core/core");
 const cssMinifier = require("./css-minifier");
 const htmlCompiler = require("./html-compiler");
@@ -11,7 +11,7 @@ const exit = require("../utils/exit");
 
 const minifier = src => {
     try {
-        var m = uglifyJS.minify(src);
+        var m = terser.minify(src);
         if (m.code === undefined) return src;
         return m.code;
     } catch (e) {
@@ -19,6 +19,10 @@ const minifier = src => {
         return src;
     }
 };
+
+function minifyCreateElement(src) {
+  return src.replace(/a7.createElement/g, "a7.e")
+}
 
 //replace multiple things from a string;
 function multiReplace(s) {
@@ -95,17 +99,19 @@ module.exports = sourceCode => {
             html = html.replace(literal, `\'+this.data.${clean}+\'`);
         });
 
+        html = minifyCreateElement(html);
+
         object = componentSrc.replace(/^{/, "").replace(/}$/, "");
         objectWithRenderer = object + `,render(){return ${html}}`.replace(/,,/g, ",")
 
-        var out = minifier(multiReplace(componentSrc,
+        var out = multiReplace(componentSrc,
             [object, objectWithRenderer],
             [/((\'\')\s*\+\s*|(\s*\+\s*\'\'))/g, ""]
-        ));
+        );
 
-        out = out.replace(/'  ',/g, "")
+        out = out.replace(/'  ',/g, "").replace(/\n(\r|)\s+/g, "").replace(/\n/g, "")
 
-        var exec = `a7.registerComponent(\"${tag}\",${out});function ${imp.name}(a){return a7.createElement(\"${tag}\",a)}`;
+        var exec = `a7.registerComponent(\"${tag}\",${out});function ${imp.name}(a){return a7.e(\"${tag}\",a)}`;
         sourceCode = sourceCode.replace(Import, exec);
         imports += {
             from: imp.path,
@@ -114,19 +120,21 @@ module.exports = sourceCode => {
     }
 
     for (let i = 0; i < wholeImports.length; i++) {
+        var isSelf = false;
         var Import = wholeImports[i];
         var imp = importHandler(Import);
 
         //if the package is a7js, it will go searching for it 
-        if (imp.path === "a7js") imp.path = require.resolve("../../src/a7.js");
-        else if (imp.path.charAt(0) === ".") imp.path = fsx.purePath("./app/" + imp.path);
+        if (imp.path === "a7js"){
+            imp.path = require.resolve("../../src/a7.js");
+            isSelf = true;
+        } else if (imp.path.charAt(0) === ".") imp.path = fsx.purePath("./app/" + imp.path);
         else imp.path = require.resolve(imp.path);
 
         var modSrc = fs.readFileSync(imp.path, "utf-8");
         //modImp finds modules imports
         var modImp = modSrc.match(/(import\s+.+?\s+from\".*?\"|require\(.*?\))/g);
         if (modImp !== null) return core.errorLog(`Module ${imp.name} has its own imports which we cannot right now import with our detections!`);
-        else if (config.mode === "production") modSrc = minifier(modSrc);
 
         var expName = "";
         var modExp = modSrc.match(/module.exports\s*=\s*(\w|\d)*;*/g);
@@ -135,11 +143,12 @@ module.exports = sourceCode => {
             expName = modExp[0].replace(/(module.exports\s*=\s*|;)/g, "");
         }
 
+        if(isSelf) modSrc = minifyCreateElement(modSrc)
+
         var mod = `;var ${imp.name}=function(){${modSrc} return ${expName}}();`;
 
-        if (config.mode === "production") {
-            mod = minifier(mod);
-        }
+        if (config.mode === "production") mod = minifier(mod);
+
         //replacing the import on the sourcecode with the modules contens
         sourceCode = sourceCode.replace(Import, `/* ${imp.name} */ ${mod}`);
         imports += {
@@ -157,20 +166,23 @@ module.exports = sourceCode => {
 
     if (CSSBundle != "") sourceCode += "a7.loadCSS(\"" + cssMinifier(CSSBundle) + "\")";
     if (config.mode === "production") {
-        var min = uglifyJS.minify(`(function(){${sourceCode}})()`, {
+        var min = terser.minify(`(function(){${sourceCode}})()`, {
+            parse:{
+                ecma: 2017
+            },
             compress: {
-                passes: 1
+                passes: 1,
+                ecma: 5
             },
             mangle: {
-                toplevel: true
+                toplevel: true,
+                properties: true
             }
         });
 
         if (min.error !== undefined) {
-            core.errorLog("UglifyJS found an error in your code\n\n" + min.error);
-            exit();
-        }
-        sourceCode = min.code;
+            core.errorLog("Terser found an error in your code: " + min.error.message);
+        } else sourceCode = min.code;
     }
     return sourceCode;
 };
