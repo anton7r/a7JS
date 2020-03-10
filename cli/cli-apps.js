@@ -50,20 +50,23 @@ cmd.np = cmd.newproject = name => {
 
   core.infoLog(`creating a new project in ${name}`);
 
-  fs.mkdir(name, { recursive: true }, err => {
+  fs.mkdir(name, {
+    recursive: true
+  }, err => {
     if (err)
       return core.errorLog("there was an error while creating project folder.");
   });
 
   fs.writeFile(
     name + "/package.json",
-    JSON.stringify(
-      {
+    JSON.stringify({
         name,
         version: "0.0.1",
         description: `${name} is a A7JS application.`,
         private: true,
-        dependencies: { a7js: "^" + core.getVersion() },
+        dependencies: {
+          a7js: "^" + core.getVersion()
+        },
         main: "app/index.js",
         a7js: {
           metadata: {
@@ -109,64 +112,49 @@ cmd.nc = cmd.newcomponent = (name, rootPath) => {
   var path = `app/components/${name}/`;
   if (rootPath !== undefined) path = rootPath + path;
   else path = "./" + path;
-  var jsPath = `${path}${name}.js`;
   var cssPath = `${path}${name}.css`;
   var htmlPath = `${path}${name}.html`;
-  var _imports = core.getImports();
+  var imp = core.getImports();
   //the last import
-  var last = _imports.imports[_imports.imports.length - 1];
-  var source = _imports.source
-    .replace(
-      last,
-      `${last};\nimport ${name} from "./components/${name}/${name}.js;`
-    )
+  var last = imp.imports[imp.imports.length - 1];
+  var source = imp.source
+    .replace(last, `${last};\nimport ${name} from "./components/${name}/${name}.js;`)
     .replace(";;", ";");
 
   if (core.htmlTags.indexOf(name) !== -1) {
-    return core.errorLog(
-      name +
-        " is a tag in the html5 specification, please choose a different tag name"
-    );
+    return core.errorLog(name +" is a tag in the html5 specification, please choose a different tag name");
   } else if (fs.existsSync(path + name) === true) {
     return core.errorLog(name + " is already defined as a component.");
   }
 
   fs.writeFile(core.config.entry, source, err => {
-    if (err)
-      core.errorLog(
-        "An error happened while trying to add import to component" + name
-      );
+    if (err) core.errorLog("An error happened while trying to add import to component" + name);
     else core.successLog(`Component ${name} was successfully added to imports`);
   });
 
   fs.mkdirSync(path);
+
+  //write js file
   fs.writeFile(
-    jsPath,
+    `${path}${name}.js`,
     fs
-      .readFileSync(require.resolve("./defaults/component.js"), "utf-8")
-      .replace(/name/g, name),
+    .readFileSync(require.resolve("./defaults/component.js"), "utf-8")
+    .replace(/name/g, name),
     err => {
       if (err) {
-        return core.errorLog(
-          "There was an error while generating the js file for " + name + "."
-        );
-      } else
-        core.successLog("Component " + name + " was successfully created.");
+        return core.errorLog(`There was an error while generating the js file for ${name}.`);
+      } else core.successLog("Component " + name + " was successfully created.");
     }
   );
-  var ermsg =
-    ". This is not an big issue but this means that you would have to make the file yourself";
+
+  var ermsg = ". This is not an big issue but this means that you would have to make the file yourself";
+
   fs.writeFile(htmlPath, "", err => {
-    if (err)
-      core.errorLog(
-        "Couldn't create ./app/" + name + "/" + name + ".html" + ermsg
-      );
+    if (err) core.errorLog(`Couldn't create ./app/${name}/${name}.html ${ermsg}`);
   });
+
   fs.writeFile(cssPath, "", err => {
-    if (err)
-      core.errorLog(
-        "Couldn't create ./app/" + name + "/" + name + ".css" + ermsg
-      );
+    if (err) core.errorLog(`Couldn't create ./app/${name}/${name}.css ${ermsg}`);
   });
 };
 module.exports = cmd;
