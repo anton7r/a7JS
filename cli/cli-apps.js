@@ -122,7 +122,7 @@ cmd.nc = cmd.newcomponent = (name, rootPath) => {
     .replace(";;", ";");
 
   if (core.htmlTags.indexOf(name) !== -1) {
-    return core.errorLog(name +" is a tag in the html5 specification, please choose a different tag name");
+    return core.errorLog(name + " is a tag in the html5 specification, please choose a different tag name");
   } else if (fs.existsSync(path + name) === true) {
     return core.errorLog(name + " is already defined as a component.");
   }

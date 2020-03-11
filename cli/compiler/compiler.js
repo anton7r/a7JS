@@ -91,7 +91,8 @@ module.exports = sourceCode => {
         var tag = imp.name;
 
         CSSBundle += existsRead(CSSPath).replace(/\s+/g, " ");
-        var html = `a7.documentFragment(${htmlCompiler(existsRead(htmlPath), htmlPath)})`;
+        var html = htmlCompiler(existsRead(htmlPath), htmlPath);
+        console.log(html)
         //replace literals
         templateLiterals = safeMatch(html, /{{\s*.+?\s*}}/g);
         templateLiterals.forEach(literal => {

@@ -21,7 +21,7 @@ module.exports = (port, dir)=>{
     //returns the index file
     function getIndexHTML(){
         var css = fs.readFileSync(require.resolve("./client.css"), "utf-8")
-        .replace(/[\r\n]/g, "").replace(/\s+/g, " ");
+        .replace(/([\r\n]|)\s+/g, " ");
         var index = fs.readFileSync(dir + "index.html", "utf-8");
         var script = fs.readFileSync(require.resolve("./client.js"), "utf-8")
         .replace("{{ port }}", port)

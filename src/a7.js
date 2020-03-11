@@ -129,7 +129,6 @@ var a7 = {};
 a7.routes = routes => {
     a7store[0] = routes;
     init();
-    return a7store[0];
 };
 
 a7.secureProps = mode => {
@@ -144,7 +143,7 @@ a7.secureProps = mode => {
 };
 
 //REVIEW:
-a7.createElement = function (element, attributes) {
+a7.createElement = (element, attributes) => {
     //Replace this
     var props;
     var component = a7store[1][element];
@@ -166,18 +165,16 @@ a7.createElement = function (element, attributes) {
     //if the element is a component
     if (component !== undefined) {
         //It's a component
-        var cElement = document.createElement("div");
-        cElement.className = "a7-component " + element;
-        cElement.appendChild(component.render(props));
+        var cElement = component.render(props);
         cElement = eventListeners(cElement, attributes);
         return cElement;
     } else {
         //It's a regular element
-        var rElement = eventListeners(document.createElement(element), attributes);
-
+        var rElement = eventListeners(document.createElement(element), attributes),
         //child elements and text nodes
-        var i;
-        var argLen = arguments.length;
+        i,
+        argLen = arguments.length;
+        console.log(rElement);
 
         for (i = 2; i < argLen; i++) {
             var childEl = arguments[i];
@@ -188,6 +185,8 @@ a7.createElement = function (element, attributes) {
             } else if (childEl instanceof Element) rElement.appendChild(childEl);
             else a7debug("cant recognize type of " + childEl);
         }
+        console.log(rElement);
+
         return rElement;
     }
 };
@@ -196,12 +195,12 @@ a7.app = () => {
     return a7store[7];
 };
 
-a7.onMobile = function (func) {
-    if (isMobile === true) func();
+a7.onMobile = f => {
+    if (isMobile === true) f();
 };
 
-a7.onDesktop = function (func) {
-    if (isMobile === false) func();
+a7.onDesktop = f => {
+    if (isMobile === false) f();
 };
 
 a7.observable = () => {
@@ -254,6 +253,7 @@ a7.globalObservable = function (ObservalbeName) {
     return __;
 };
 
+/*
 a7.documentFragment = function () {
     var len = arguments.length,
         i,
@@ -262,24 +262,20 @@ a7.documentFragment = function () {
     for (i = 0; i < len; i++) {
         if (typeof arguments[i] === "string") {
             res.appendChild(document.createTextNode(arguments[i]));
-        } else {
-            res.appendChild(arguments[i]);
-        }
+        } else res.appendChild(arguments[i]);
     }
     return res;
 };
+*/
 
 //inserts css into the document head
 a7.loadCSS = css => {
     document.head.insertAdjacentHTML("beforeend", "<style>" + css + "</style>");
 };
 
-a7.registerComponent = (name, compObj) => {
-    if (a7store[1][name] === undefined) {
-        a7store[1][name] = compObj;
-    } else {
-        a7debug("That component is already registered!");
-    }
+a7.registerComponent = (name, obj) => {
+    if (a7store[1][name] === undefined) a7store[1][name] = obj;
+    else a7debug("That component is already registered!");
 };
 
 //html sanitizer
