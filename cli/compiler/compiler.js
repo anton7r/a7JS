@@ -21,15 +21,13 @@ const minifier = src => {
 };
 
 function minifyCreateElement(src) {
-  return src.replace(/a7.createElement/g, "a7.e")
+    return src.replace(/a7.createElement/g, "a7.e").replace(/document./g, "d.");
 }
 
 //replace multiple things from a string;
-function multiReplace(s) {
-    const a = arguments;
-    for (var i = 1; i < a.length; i++) {
-        s = s.replace(a[i][0], a[i][1]);
-    }
+function multiReplace(s){
+    const a=arguments;
+    for(var i=1;i<a.length;i++)s=s.replace(a[i][0],a[i][1]);
     return s;
 };
 
@@ -46,7 +44,9 @@ const importHandler = imp => {
     return this;
 };
 
-module.exports = sourceCode => {
+module.exports = src => {
+    src = "var d=document;"+src;
+
     if (config.entry === "noEntry") {
         core.errorLog("no entry to your application was defined in a7.config.json");
         exit();
@@ -64,8 +64,8 @@ module.exports = sourceCode => {
     }
 
     var imports = [];
-    var componentImports = safeMatch(sourceCode, /import\s+(\d|\w|\_)+\s+from\s*\"\.\/components\/.+?\";*/gi);
-    var wholeImports = safeMatch(sourceCode, /import\s+(\d|\w|\_)+\s+from\s*\".+\";*/gi);
+    var componentImports = safeMatch(src, /import\s+(\d|\w|\_)+\s+from\s*\"\.\/components\/.+?\";*/gi);
+    var wholeImports = safeMatch(src, /import\s+(\d|\w|\_)+\s+from\s*\".+\";*/gi);
 
     //Whole imports eliminate component imports
     wholeImports = wholeImports.filter(val => {
@@ -73,7 +73,7 @@ module.exports = sourceCode => {
         else return true;
     });
 
-    var partialImports = safeMatch(sourceCode, /import\s*{\s*.*?\s*}\s+from\s*\".+?\";*/gi);
+    var partialImports = safeMatch(src, /import\s*{\s*.*?\s*}\s+from\s*\".+?\";*/gi);
 
     //Goes through component imports
     for (let i = 0; i < componentImports.length; i++) {
@@ -83,7 +83,7 @@ module.exports = sourceCode => {
         //path to component folder
         var folder = fsx.purePath(entryFolder + imp.path.replace(/(\w|\n)+\.js/g, ""));
 
-        //Component sourcecode
+        //Component src
         var componentSrc = existsRead(entryFolder + imp.path).replace(/export default\s*/, "").replace(/;$/, "");
 
         var htmlPath = folder + imp.name + ".html";
@@ -92,7 +92,6 @@ module.exports = sourceCode => {
 
         CSSBundle += existsRead(CSSPath).replace(/\s+/g, " ");
         var html = htmlCompiler(existsRead(htmlPath), htmlPath);
-        console.log(html)
         //replace literals
         templateLiterals = safeMatch(html, /{{\s*.+?\s*}}/g);
         templateLiterals.forEach(literal => {
@@ -112,8 +111,8 @@ module.exports = sourceCode => {
 
         out = out.replace(/(\r|)\n(\s+|)/g, "")
 
-        var exec = `a7.registerComponent(\"${tag}\",${out});function ${imp.name}(a){return a7.e(\"${tag}\",a)}`;
-        sourceCode = sourceCode.replace(Import, exec);
+        out = `a7.registerComponent(\"${tag}\",${out});function ${imp.name}(a){return a7.e(\"${tag}\",a)}`;
+        src = src.replace(Import, out);
         imports += {
             from: imp.path,
             as: imp.name
@@ -150,8 +149,8 @@ module.exports = sourceCode => {
 
         if (config.mode === "production") mod = minifier(mod);
 
-        //replacing the import on the sourcecode with the modules contens
-        sourceCode = sourceCode.replace(Import, `/* ${imp.name} */ ${mod}`);
+        //replacing the import on the src with the modules contens
+        src = src.replace(Import, mod);
         imports += {
             from: imp.path,
             as: imp.name
@@ -165,25 +164,30 @@ module.exports = sourceCode => {
         var imp = importHandler(Import);
     }
 
-    if (CSSBundle != "") sourceCode += "a7.loadCSS(\"" + cssMinifier(CSSBundle) + "\")";
+    if (CSSBundle != "") src += "a7.loadCSS(\"" + cssMinifier(CSSBundle) + "\")";
     if (config.mode === "production") {
-        var min = terser.minify(`(function(){${sourceCode}})()`, {
+        var min = terser.minify(`(function(){${src}})()`, {
             parse:{
-                ecma: 2018
+                ecma: 5
             },
             compress: {
-                passes: 1,
-                ecma: 5
+                ecma: 5,
+                hoist_funs:true,
+                hoist_vars:true,
+                hoist_props:true
             },
             mangle: {
                 toplevel: true,
-                properties: true
-            }
+                properties: true,
+            },
+            output: {
+                ecma: 5
+            },
         });
 
         if (min.error !== undefined) {
             core.errorLog("Terser found an error in your code: " + min.error.message);
-        } else sourceCode = min.code;
+        } else src = min.code;
     }
-    return sourceCode;
+    return src;
 };

@@ -82,10 +82,7 @@ var linkHandler = link => link.addEventListener("click", ev => {
 });
 
 var eventListeners = (elm, attributes) => {
-    if (typeof attributes === "number") {
-        //no attributes
-        return elm;
-    }
+    if (typeof attributes === "number") {return elm}
 
     if (attributes.a7onInit) attributes.a7onInit(elm);
     if (attributes.a7onClick) elm.addEventListener("click", attributes.a7onClick);
@@ -141,10 +138,10 @@ a7.secureProps = mode => {
 };
 
 //REVIEW:
-a7.createElement = function(element, attributes) {
+a7.createElement = function(name, attributes) {
     //Replace this
     var props;
-    var component = a7store[1][element];
+    var component = a7store[1][name];
 
     if (attributes === undefined | null | "null" | 0) {
         attributes = {};
@@ -162,13 +159,19 @@ a7.createElement = function(element, attributes) {
 
     //if the element is a component
     if (component !== undefined) {
-        //It's a component
-        var cElement = component.render(props);
-        cElement = eventListeners(cElement, attributes);
-        return cElement;
+        var element = component.render(props);
+        element = eventListeners(element, attributes);
+        element.setAttribute("a7Id", name);
+        var nodes = element.childNodes;
+
+        for(var i = 0; i < nodes.length; i++){
+            nodes[i].setAttribute("a7Id", name);
+        }
+
+        return element;
     } else {
         //It's a regular element
-        var rElement = eventListeners(document.createElement(element), attributes),
+        var element = eventListeners(document.createElement(name), attributes),
         //child elements and text nodes
         i,
         argLen = arguments.length;
@@ -178,13 +181,13 @@ a7.createElement = function(element, attributes) {
             //loops through the rest of the arguments
             if (typeof childEl === "number" || typeof childEl === "string" && childEl !== "") {
                 var text = document.createTextNode(childEl);
-                rElement.appendChild(text);
+                element.appendChild(text);
             } else if (childEl instanceof Element){
-                rElement.appendChild(childEl);
+                element.appendChild(childEl);
             } else a7debug("cant recognize type of " + childEl);
         }
 
-        return rElement;
+        return element;
     }
 };
 
@@ -201,20 +204,16 @@ a7.onDesktop = f => {
 };
 
 a7.observable = () => {
-    var listeners = [];
-    var set = newValue => {
+    this.listeners = [];
+    this.set = newValue => {
         this.value = newValue;
-        if (listeners !== undefined) {
-            for (var i = 0; i < listeners.length; i++) {
-                listeners[i]();
+        if (this.listeners !== undefined) {
+            for (var i = 0; i < this.listeners.length; i++) {
+                this.listeners[i]();
             }
         }
-        return newValue;
-    };
-    var addListener = l => listeners.push(l);
-    this.set = set;
-    this.addListener = addListener;
-    this.listeners = listeners;
+    }
+    this.addListener = l => this.listeners.push(l);;
     return this;
 };
 
@@ -251,9 +250,7 @@ a7.globalObservable = function (ObservalbeName) {
 };
 
 //inserts css into the document head
-a7.loadCSS = css => {
-    document.head.insertAdjacentHTML("beforeend", "<style>" + css + "</style>");
-};
+a7.loadCSS = css => document.head.insertAdjacentHTML("beforeend", "<style>" + css + "</style>");
 
 a7.registerComponent = (name, obj) => {
     if (a7store[1][name] === undefined) a7store[1][name] = obj;
@@ -262,22 +259,22 @@ a7.registerComponent = (name, obj) => {
 
 //html sanitizer
 a7.sanitizer = str => {
-    var result = str
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#x27;")
-        .replace(/\//g, "&#x2F;");
+    str = str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;")
+    .replace(/\//g, "&#x2F;");
 
     //finds typical xss vectors
     var findScript = /<script>(.|\s)+<\/script>/g;
-    if (result.match(findScript) !== null) {
+    if (str.match(findScript) !== null) {
         a7debug("a script tag were fed into the sanitizer and it was blocked due to it potentially being malicious.");
-        result.replace(findScript, "");
+        str.replace(findScript, "");
     }
 
-    return result;
+    return str;
 };
 
 a7.getDesc = () => {
