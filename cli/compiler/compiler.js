@@ -173,7 +173,7 @@ module.exports = sourceCode => {
             },
             compress: {
                 passes: 1,
-                ecma: 2009
+                ecma: 5
             },
             mangle: {
                 toplevel: true,
