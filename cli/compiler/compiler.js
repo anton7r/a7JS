@@ -110,7 +110,7 @@ module.exports = sourceCode => {
             [/((\'\')\s*\+\s*|(\s*\+\s*\'\'))/g, ""]
         );
 
-        out = out.replace(/'  ',/g, "").replace(/\n(\r|)\s+/g, "").replace(/\n/g, "")
+        out = out.replace(/(\r|)\n(\s+|)/g, "")
 
         var exec = `a7.registerComponent(\"${tag}\",${out});function ${imp.name}(a){return a7.e(\"${tag}\",a)}`;
         sourceCode = sourceCode.replace(Import, exec);
@@ -169,11 +169,11 @@ module.exports = sourceCode => {
     if (config.mode === "production") {
         var min = terser.minify(`(function(){${sourceCode}})()`, {
             parse:{
-                ecma: 2017
+                ecma: 2018
             },
             compress: {
                 passes: 1,
-                ecma: 5
+                ecma: 2009
             },
             mangle: {
                 toplevel: true,

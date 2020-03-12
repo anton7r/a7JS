@@ -50,10 +50,10 @@ var init = () => {
         }
     }
     //links init
-    var linkcollection = document.getElementsByTagName("a");
-    for (var y = 0; y < linkcollection.length; y++) {
-        if (linkcollection[y].dataset.a7link !== undefined | linkcollection[y].getAttribute("a7link") !== null) {
-            linkHandler(linkcollection[y]);
+    var links = document.getElementsByTagName("a");
+    for (var y = 0; y < links.length; y++) {
+        if (links[y].dataset.a7link !== undefined | links[y].getAttribute("a7link") !== null) {
+            linkHandler(links[y]);
         }
     }
     //descriptions
@@ -77,17 +77,15 @@ var init = () => {
 };
 
 var linkHandler = link => link.addEventListener("click", ev => {
-    //console.log(link);
     ev.preventDefault();
     a7.router(link.getAttribute("href"));
 });
 
 var eventListeners = (elm, attributes) => {
     if (typeof attributes === "number") {
-        //returns if there is no attributes
+        //no attributes
         return elm;
     }
-    //basic event listeners
 
     if (attributes.a7onInit) attributes.a7onInit(elm);
     if (attributes.a7onClick) elm.addEventListener("click", attributes.a7onClick);
@@ -143,7 +141,7 @@ a7.secureProps = mode => {
 };
 
 //REVIEW:
-a7.createElement = (element, attributes) => {
+a7.createElement = function(element, attributes) {
     //Replace this
     var props;
     var component = a7store[1][element];
@@ -174,7 +172,6 @@ a7.createElement = (element, attributes) => {
         //child elements and text nodes
         i,
         argLen = arguments.length;
-        console.log(rElement);
 
         for (i = 2; i < argLen; i++) {
             var childEl = arguments[i];
@@ -182,10 +179,10 @@ a7.createElement = (element, attributes) => {
             if (typeof childEl === "number" || typeof childEl === "string" && childEl !== "") {
                 var text = document.createTextNode(childEl);
                 rElement.appendChild(text);
-            } else if (childEl instanceof Element) rElement.appendChild(childEl);
-            else a7debug("cant recognize type of " + childEl);
+            } else if (childEl instanceof Element){
+                rElement.appendChild(childEl);
+            } else a7debug("cant recognize type of " + childEl);
         }
-        console.log(rElement);
 
         return rElement;
     }
@@ -252,21 +249,6 @@ a7.globalObservable = function (ObservalbeName) {
     __.value = observable;
     return __;
 };
-
-/*
-a7.documentFragment = function () {
-    var len = arguments.length,
-        i,
-        res = document.createDocumentFragment();
-
-    for (i = 0; i < len; i++) {
-        if (typeof arguments[i] === "string") {
-            res.appendChild(document.createTextNode(arguments[i]));
-        } else res.appendChild(arguments[i]);
-    }
-    return res;
-};
-*/
 
 //inserts css into the document head
 a7.loadCSS = css => {
@@ -348,11 +330,11 @@ a7.onMenuToggle = (name, f) => a7store[5][name] = f;
 //if newPath is not defined then it will return the current path
 a7.path = path => {
     if (path === undefined) {
-        return window.location.pathname.replace("/", "");
+        return location.pathname.replace("/", "");
     } else {
         if (path.indexOf("/") !== 0) path = "/" + path;
 
-        if (!history.pushState) window.location = path;
+        if (!history.pushState) location = path;
         else history.pushState({}, undefined, path);
     }
 };
