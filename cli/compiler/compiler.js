@@ -38,7 +38,7 @@ const existsRead = path => {
     exit();
 };
 
-const importHandler = imp => {
+const importParser = imp => {
     this.path = imp.match(/(\"|\').+(\"|\')/i)[0].replace(/\"/g, "");
     this.name = imp.replace(/import\s*/, "").replace(/\s*from\s*\".+?\";*/, "");
     return this;
@@ -79,7 +79,7 @@ module.exports = src => {
     for (let i = 0; i < componentImports.length; i++) {
         var Import = componentImports[i];
         //imp means the imported object
-        var imp = importHandler(Import);
+        var imp = importParser(Import);
         //path to component folder
         var folder = fsx.purePath(entryFolder + imp.path.replace(/(\w|\n)+\.js/g, ""));
 
@@ -122,7 +122,7 @@ module.exports = src => {
     for (let i = 0; i < wholeImports.length; i++) {
         var isSelf = false;
         var Import = wholeImports[i];
-        var imp = importHandler(Import);
+        var imp = importParser(Import);
 
         //if the package is a7js, it will go searching for it 
         if (imp.path === "a7js"){
@@ -137,7 +137,7 @@ module.exports = src => {
         if (modImp !== null) return core.errorLog(`Module ${imp.name} has its own imports which we cannot right now import with our detections!`);
 
         var expName = "";
-        var modExp = modSrc.match(/module.exports\s*=\s*(\w|\d)*;*/g);
+        var modExp = modSrc.match(/module.exports\s*=\s*[\w\d]*;*/g);
         if (modExp !== null) {
             modSrc = modSrc.replace(modExp[0], "");
             expName = modExp[0].replace(/(module.exports\s*=\s*|;)/g, "");
@@ -161,14 +161,14 @@ module.exports = src => {
     if (len > 0) return core.errorLog("Importing only a part of a framework or a library is not yet supported!");
     for (let i = 0; i < len; i++) {
         var Import = partialImports[i];
-        var imp = importHandler(Import);
+        var imp = importParser(Import);
     }
 
     if (CSSBundle != "") src += "a7.loadCSS(\"" + cssMinifier(CSSBundle) + "\")";
     if (config.mode === "production") {
         var min = terser.minify(`(function(){${src}})()`, {
             parse:{
-                ecma: 5
+                ecma: 2018
             },
             compress: {
                 ecma: 5,
