@@ -137,6 +137,24 @@ a7.secureProps = mode => {
     }
 };
 
+function setComponentAttributes(nodes, name) {
+    for(var i = 0; i < nodes.length; i++){
+
+        if(nodes[i].nodeName !== "#text"){
+            
+            if(!nodes[i].attributes.a7id){
+
+                nodes[i].setAttribute("a7Id", name);
+
+                if(nodes[i].childElementCount > 0) {
+                    setComponentAttributes(nodes[i].childNodes, name);
+                }
+            }
+
+        }
+    }
+}
+
 //REVIEW:
 a7.createElement = function(name, attributes) {
     //Replace this
@@ -162,11 +180,7 @@ a7.createElement = function(name, attributes) {
         var element = component.render(props);
         element = eventListeners(element, attributes);
         element.setAttribute("a7Id", name);
-        var nodes = element.childNodes;
-
-        for(var i = 0; i < nodes.length; i++){
-            nodes[i].setAttribute("a7Id", name);
-        }
+        setComponentAttributes(element.childNodes, name);
 
         return element;
     } else {
@@ -351,9 +365,11 @@ a7.router = newPath => {
     else if (routes["/*"]) route = "/*";
     else return console.error("A7JS: no specified route matched " + newPath);
 
-    var renderable = routes[route](),
+    console.time("Render");
+    
+    var view = routes[route](),
         i,
-        links = renderable.getElementsByTagName("a");
+        links = view.getElementsByTagName("a");
 
     if (links !== null) {
         for (i = 0; i < links.length; i++) {
@@ -361,7 +377,10 @@ a7.router = newPath => {
         }
     }
 
-    render(renderable);
+    render(view);
+
+    console.timeEnd("Render");
+
     a7.path(newPath);
     scrollTo(0, pageXOffset);
 };

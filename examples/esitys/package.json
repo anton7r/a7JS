@@ -1,0 +1,16 @@
+{
+    "name": "esitys",
+    "version": "0.0.1",
+    "description": "esitys is a A7JS application.",
+    "private": true,
+    "dependencies": {
+        "a7js": "^5.0.0-alpha3"
+    },
+    "main": "app/index.js",
+    "a7js": {
+        "metadata": {
+            "lastUsedVersion": "5.0.0-alpha3",
+            "lastUsedTime": "2020-03-18T22:44:21.161Z"
+        }
+    }
+}

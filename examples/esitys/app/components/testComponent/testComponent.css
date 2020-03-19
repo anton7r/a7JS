@@ -1,0 +1,13 @@
+div {
+    background: black;
+    color: white;
+}
+
+@keyframes xd {
+    from {
+        background-color: aqua;
+    }
+    to {
+        background-color: black;
+    }
+}

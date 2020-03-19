@@ -51,8 +51,31 @@ module.exports = src => {
         core.errorLog("no entry to your application was defined in a7.config.json");
         exit();
     }
+
     let entryFolder = fsx.folderFile(config.entry);
     var CSSBundle = "";
+
+
+    //TODO: make it testable
+    function handleComponentCss(path, name){
+
+        var css = existsRead(path);
+        
+        //TODO: match all rules and then match all @supports and @keyframes and then remove the incorrect selectors;
+        var rules = safeMatch(css, /(@|)[\#\.\w\-\,\s\n\r\t:]+(?=\s*\{)/gi);
+
+        for(var i = 0; i < rules.length; i++) {
+            if(rules[i].indexOf("@") !== 0){
+                
+            }
+        }
+
+        setTimeout(function(){
+            console.log(rules);
+        }, 500);
+
+        CSSBundle += css;
+    }
 
     if (config.css.bundle && config.css.file !== null) {
         var cssFile = config.css.file;
@@ -75,12 +98,13 @@ module.exports = src => {
 
     var partialImports = safeMatch(src, /import\s*{\s*.*?\s*}\s+from\s*\".+?\";*/gi);
 
-    //Goes through component imports
+
+    //Component
+
+
     for (let i = 0; i < componentImports.length; i++) {
         var Import = componentImports[i];
-        //imp means the imported object
         var imp = importParser(Import);
-        //path to component folder
         var folder = fsx.purePath(entryFolder + imp.path.replace(/(\w|\n)+\.js/g, ""));
 
         //Component src
@@ -90,7 +114,8 @@ module.exports = src => {
         var CSSPath = folder + imp.name + ".css";
         var tag = imp.name;
 
-        CSSBundle += existsRead(CSSPath).replace(/\s+/g, " ");
+        handleComponentCss(CSSPath);
+
         var html = htmlCompiler(existsRead(htmlPath), htmlPath);
         //replace literals
         templateLiterals = safeMatch(html, /{{\s*.+?\s*}}/g);
@@ -164,7 +189,7 @@ module.exports = src => {
         var imp = importParser(Import);
     }
 
-    if (CSSBundle != "") src += "a7.loadCSS(\"" + cssMinifier(CSSBundle) + "\")";
+    if (CSSBundle != "") src += `a7.loadCSS(\"${cssMinifier(CSSBundle)}\")`;
     if (config.mode === "production") {
         var min = terser.minify(`(function(){${src}})()`, {
             parse:{
