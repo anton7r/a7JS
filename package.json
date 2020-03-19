@@ -34,6 +34,7 @@
   "homepage": "https://github.com/anton7r/a7JS#readme",
   "dependencies": {
     "chalk": "^2.4.2",
+    "css-what": "^3.2.1",
     "csso": "^4.0.2",
     "node-html-parser": "^1.2.4",
     "terser": "^4.6.6",

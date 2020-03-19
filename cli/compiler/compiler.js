@@ -8,6 +8,7 @@ const csso = require("csso");
 var config = core.config;
 const safeMatch = require("../utils/safematch");
 const exit = require("../utils/exit");
+const cssWhat = require("css-what");
 
 const minifier = src => {
     try {
@@ -57,24 +58,70 @@ module.exports = src => {
 
 
     //TODO: make it testable
-    function handleComponentCss(path, name){
+    function handleComponentCss(path, compname){
 
-        var css = existsRead(path);
-        
-        //TODO: match all rules and then match all @supports and @keyframes and then remove the incorrect selectors;
-        var rules = safeMatch(css, /(@|)[\#\.\w\-\,\s\n\r\t:]+(?=\s*\{)/gi);
+        var css = existsRead(path)
+            .replace(/\s+{/g, "{")
+            .replace(/\r\n\s*/g, "");
 
-        for(var i = 0; i < rules.length; i++) {
-            if(rules[i].indexOf("@") !== 0){
+        if(css !== ""){
+
+            console.time("CSS Parse");
+            var cssSelectors = safeMatch(css, /([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/gi); 
+
+            //Remove unneccessary charracters
+            for(var i = 0; i < cssSelectors.length; i++) {
+                cssSelectors[i] = cssSelectors[i].replace("{", "");
+            }
+            
+            //Filter non selectors away
+            cssSelectors = cssSelectors.filter(value => {
+                if(value.indexOf("@") !== -1){
+                    return false;
+                } else if (value.replace(/(from|to|[0-9]+%)/, "") === ""){
+                    return false;
+                } else {
+                    return true;
+                }
+            });
+
+            var changed = true;
+            while(changed === true) {
+                for(var i = 0; i < cssSelectors.length; i++){
+                    if(cssSelectors[i].lastIndexOf(",") === cssSelectors[i].length - 1){
+                        cssSelectors[i] += cssSelectors[i + 1];
+                        cssSelectors.splice(i + 1, 1);
+                        break;
+    
+                    } else if (i === (cssSelectors.length - 1)){
+                        changed = false;
+                        break;
+                    }
+                }
                 
             }
+
+            var corrected = [];
+
+            for(var i = 0; i < cssSelectors.length; i++) {
+
+                var parsed = cssWhat.parse(cssSelectors[i]);
+
+                for(var x= 0; x < parsed.length; x++){
+                    parsed[x].push({type:"attribute", action: 'equals', name: "a7id", value: compname, ignoreCase: false})
+                }
+
+                corrected[i] = cssWhat.stringify(parsed);
+            }
+
+            console.timeEnd("CSS Parse");
+    
+            for(var i = 0; i < cssSelectors.length; i++) {
+                css = css.replace(cssSelectors[i] + "{", corrected[i] + "{")
+            }
+
+            CSSBundle += css;
         }
-
-        setTimeout(function(){
-            console.log(rules);
-        }, 500);
-
-        CSSBundle += css;
     }
 
     if (config.css.bundle && config.css.file !== null) {
@@ -114,7 +161,7 @@ module.exports = src => {
         var CSSPath = folder + imp.name + ".css";
         var tag = imp.name;
 
-        handleComponentCss(CSSPath);
+        handleComponentCss(CSSPath, imp.name);
 
         var html = htmlCompiler(existsRead(htmlPath), htmlPath);
         //replace literals

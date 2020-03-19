@@ -1,6 +1,14 @@
-div {
+ul,
+div,
+li,
+body {
     background: black;
     color: white;
+}
+
+div {
+    background-color: blue;
+    background-color: violet;
 }
 
 @keyframes xd {
@@ -9,5 +17,17 @@ div {
     }
     to {
         background-color: black;
+    }
+}
+
+@keyframes nc {
+    0% {
+
+    }
+    50% {
+
+    }
+    100% {
+
     }
 }

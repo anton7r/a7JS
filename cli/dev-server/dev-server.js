@@ -1,7 +1,6 @@
 const http = require("http");
 const fs = require("fs");
 const core = require("../core/core");
-const zlib = require("zlib");
 const build = require("../compiler/compiler");
 const chalk = require("chalk");
 const fsx = require("../core/fsx");
@@ -9,6 +8,10 @@ const WebSocket = require("ws");
 const errorHandler = require("../core/errorhandler");
 
 module.exports = (port, dir)=>{
+
+    if(dir === undefined) dir = "./";
+    if(port === undefined) port = 2550;
+
     if(core.configLoaded === false){
         core.errorLog("Couldn't find configuration file in the directory.")
         return;
@@ -37,9 +40,6 @@ module.exports = (port, dir)=>{
         } else if (fsx.fileExists(dir+url) === true) return fs.readFileSync(dir+url);
         else return getIndexHTML();
     }
-    
-    if(dir === undefined) dir = "./";
-    if(port === undefined) port = 2550;
 
     var server = http.createServer((req, res) => {
         var types = req.headers.accept;//.split(",")
@@ -60,14 +60,8 @@ module.exports = (port, dir)=>{
             }
         }
         var file = resolveFile(req.url);
-        if(type !== "png/image" || type !== "") {
-            res.writeHead(200, {'Content-Type':type, 'Content-Encoding':"gzip"});
-            zlib.gzip(new Buffer.from(file, "utf-8"), (_, result) => res.end(result));
-        } else {
-            res.writeHead(200, {'Content-Type':type});
-            res.end(file);
-        }
-
+        res.writeHead(200, {'Content-Type':type});
+        res.end(file);
     });
     //Lauri
     var w = new WebSocket.Server({ server });
@@ -107,8 +101,7 @@ module.exports = (port, dir)=>{
     }
     pack();
     fs.watch(dir, { encoding: "utf-8", recursive:true }, event=>{
-        if(event !== "change") return;
-        pack();
+        if(event === "change") pack();
     }); //© Lauri Särkioja 2020
 
     server.listen(port);
