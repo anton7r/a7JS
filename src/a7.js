@@ -178,6 +178,7 @@ a7.createElement = function(name, attributes) {
     //if the element is a component
     if (component !== undefined) {
         var element = component.render(props);
+
         element = eventListeners(element, attributes);
         element.setAttribute("a7Id", name);
         setComponentAttributes(element.childNodes, name);
