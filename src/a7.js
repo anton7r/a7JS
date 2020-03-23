@@ -84,11 +84,22 @@ var linkHandler = link => link.addEventListener("click", ev => {
 var eventListeners = (elm, attributes) => {
     if (typeof attributes === "number") {return elm}
 
-    if (attributes.a7onInit) attributes.a7onInit(elm);
-    if (attributes.a7onClick) elm.addEventListener("click", attributes.a7onClick);
-    if (attributes.a7onHover) elm.addEventListener("hover", attributes.a7onHover);
-    if (attributes.a7onChange) elm.addEventListener("change", attributes.a7onChange);
-    if (attributes.a7onInput) elm.addEventListener("input", attributes.a7onInput);
+    if (attributes.a7onInit)
+        attributes.a7onInit(elm);
+
+    if (attributes.a7onClick)
+        elm.addEventListener("click", attributes.a7onClick);
+
+    if (attributes.a7onHover)
+        elm.addEventListener("hover", attributes.a7onHover);
+
+    if (attributes.a7onChange)
+        elm.addEventListener("change", attributes.a7onChange);
+
+    if (attributes.a7onInput)
+        elm.addEventListener("input", attributes.a7onInput);
+
+    
 
     for (var attr in attributes) {
         if (attr.indexOf("a7on") !== 0) elm.setAttribute(attr, attributes[attr]);
@@ -177,7 +188,19 @@ a7.createElement = function(name, attributes) {
 
     //if the element is a component
     if (component !== undefined) {
-        var element = component.render(props);
+        
+        var element;
+        
+        if(!props){
+            element = component.render();
+        } else {
+            var obj = {
+                ...component,
+                data: props
+            };
+            console.log(obj);
+            element = obj.render();
+        }
 
         element = eventListeners(element, attributes);
         element.setAttribute("a7Id", name);

@@ -239,9 +239,7 @@ module.exports = src => {
     if (CSSBundle != "") src += `a7.loadCSS(\"${cssMinifier(CSSBundle)}\")`;
     if (config.mode === "production") {
         var min = terser.minify(`(function(){${src}})()`, {
-            parse:{
-                ecma: 2018
-            },
+            parse: { ecma: 2018 },
             compress: {
                 ecma: 5,
                 hoist_funs:true,
@@ -252,9 +250,7 @@ module.exports = src => {
                 toplevel: true,
                 properties: true,
             },
-            output: {
-                ecma: 5
-            },
+            output: { ecma: 5 },
         });
 
         if (min.error !== undefined) {

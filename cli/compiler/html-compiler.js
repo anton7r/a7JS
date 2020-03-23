@@ -5,9 +5,11 @@ const safeMatch = require("../utils/safematch")
 function buildEl(tag, src, content) {
     var attributes = {};
     if (src !== undefined) {
-        var srcAttr = safeMatch(src, /(\@|)(\w|\d|\.)+?\=\'[^']+\'/g);
+        var srcAttr = safeMatch(src, /(\@|)[\w\d\.\:]+?\=(\'[^']+\'|\{\{\s*[\w\d]+\s*\}\}|[^\s]+)/g);
+
         //loop trough attributes
         srcAttr.forEach(val => {
+            console.log(val);
             var name = val.match(/[^=]+/)[0];
             var value = val.match(/[^=]+$/)[0].replace(/\'/g, "");
             //is not a property
@@ -24,7 +26,7 @@ function buildEl(tag, src, content) {
     if (src.match("a7link") !== null) attributes.a7link = "";
     attributes = JSON.stringify(attributes);
     //replaces evlisteners with the real thing
-    var ev = safeMatch(attributes, /\"a7on\w*\":\"[\w|\d\_\.]*\"/gi);
+    var ev = safeMatch(attributes, /\"a7on\w*\":\"[\w\d\_\.]*\"/gi);
     ev.forEach(val => {
         var event = val.match(/\".+?\"/);
         var listener = val.match(/\:\".+?\"/)[0].replace(/\"/g, "");
@@ -49,10 +51,11 @@ function __ChildNodes(nodes) {
 
 module.exports = (html, path) => {
     html = html
-    .replace(/\r\n\s+/g, "")
-    .replace(/\>\s/g, ">")
-    .replace(/\s\</g, "<")
-    .replace(/\"/g, "\'");
+        .replace(/\r\n\s+/g, "")
+        .replace(/\>\s/g, ">")
+        .replace(/\s\</g, "<")
+        .replace(/\"/g, "\'");
+
     var compiled = "";
     var Nodes = HTMLParser.parse(html).childNodes;
     var count = Nodes.length;
