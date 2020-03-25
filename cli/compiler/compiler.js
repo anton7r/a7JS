@@ -40,12 +40,13 @@ const existsRead = path => {
 };
 
 const importParser = imp => {
-    this.path = imp.match(/(\"|\').+(\"|\')/i)[0].replace(/\"/g, "");
+    this.path = imp.match(/[\"\'].+[\"\']/i)[0].replace(/\"/g, "");
     this.name = imp.replace(/import\s*/, "").replace(/\s*from\s*\".+?\";*/, "");
     return this;
 };
 
 module.exports = src => {
+
     src = "var d=document;"+src;
 
     if (config.entry === "noEntry") {
@@ -62,20 +63,21 @@ module.exports = src => {
 
         var css = existsRead(path)
             .replace(/\s+{/g, "{")
-            .replace(/\r\n\s*/g, "");
+            .replace(/\r\n\s*/g, "")
+            .replace(/;}/g, "}")
+            .replace(/:\s/g, ":");
 
         if(css !== ""){
 
-            console.time("CSS Parse");
-            var cssSelectors = safeMatch(css, /([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/gi); 
+            var selectors = safeMatch(css, /([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/gi); 
 
             //Remove unneccessary charracters
-            for(var i = 0; i < cssSelectors.length; i++) {
-                cssSelectors[i] = cssSelectors[i].replace("{", "");
+            for(var i = 0; i < selectors.length; i++) {
+                selectors[i] = selectors[i].replace("{", "");
             }
             
             //Filter non selectors away
-            cssSelectors = cssSelectors.filter(value => {
+            selectors = selectors.filter(value => {
                 if(value.indexOf("@") !== -1){
                     return false;
                 } else if (value.replace(/(from|to|[0-9]+%)/, "") === ""){
@@ -85,27 +87,22 @@ module.exports = src => {
                 }
             });
 
-            var changed = true;
-            while(changed === true) {
-                for(var i = 0; i < cssSelectors.length; i++){
-                    if(cssSelectors[i].lastIndexOf(",") === cssSelectors[i].length - 1){
-                        cssSelectors[i] += cssSelectors[i + 1];
-                        cssSelectors.splice(i + 1, 1);
-                        break;
+            for(var i = 0, len = selectors.length; i < len;){
+                if(selectors[i].lastIndexOf(",") === selectors[i].length - 1){
+                    selectors[i] += selectors[i + 1];
+                    selectors.splice(i + 1, 1);
+                    len--;
     
-                    } else if (i === (cssSelectors.length - 1)){
-                        changed = false;
-                        break;
-                    }
+                } else {
+                    i++
                 }
-                
             }
 
             var corrected = [];
 
-            for(var i = 0; i < cssSelectors.length; i++) {
+            for(var i = 0; i < selectors.length; i++) {
 
-                var parsed = cssWhat.parse(cssSelectors[i]);
+                var parsed = cssWhat.parse(selectors[i]);
 
                 for(var x= 0; x < parsed.length; x++){
                     parsed[x].push({type:"attribute", action: 'equals', name: "a7id", value: compname, ignoreCase: false})
@@ -113,11 +110,9 @@ module.exports = src => {
 
                 corrected[i] = cssWhat.stringify(parsed);
             }
-
-            console.timeEnd("CSS Parse");
     
-            for(var i = 0; i < cssSelectors.length; i++) {
-                css = css.replace(cssSelectors[i] + "{", corrected[i] + "{")
+            for(var i = 0; i < selectors.length; i++) {
+                css = css.replace(selectors[i] + "{", corrected[i] + "{")
             }
 
             CSSBundle += css;
@@ -134,8 +129,8 @@ module.exports = src => {
     }
 
     var imports = [];
-    var componentImports = safeMatch(src, /import\s+(\d|\w|\_)+\s+from\s*\"\.\/components\/.+?\";*/gi);
-    var wholeImports = safeMatch(src, /import\s+(\d|\w|\_)+\s+from\s*\".+\";*/gi);
+    var componentImports = safeMatch(src, /import\s+[\d\w\_]+\s+from\s*\"\.\/components\/.+?\";*/gi);
+    var wholeImports = safeMatch(src, /import\s+[\d\w\_]+\s+from\s*\".+\";*/gi);
 
     //Whole imports eliminate component imports
     wholeImports = wholeImports.filter(val => {
@@ -150,18 +145,25 @@ module.exports = src => {
 
 
     for (let i = 0; i < componentImports.length; i++) {
+
+
         var Import = componentImports[i];
+        console.time("Component")
         var imp = importParser(Import);
-        var folder = fsx.purePath(entryFolder + imp.path.replace(/(\w|\n)+\.js/g, ""));
+
+        console.timeEnd("Component")
+        var folder = fsx.purePath(entryFolder + imp.path.replace(/[\w\n]+\.js/g, ""));
+
 
         //Component src
         var componentSrc = existsRead(entryFolder + imp.path).replace(/export default\s*/, "").replace(/;$/, "");
 
-        var htmlPath = folder + imp.name + ".html";
-        var CSSPath = folder + imp.name + ".css";
-        var tag = imp.name;
 
-        handleComponentCss(CSSPath, imp.name);
+        var tag = imp.name;
+        var htmlPath = folder + tag + ".html";
+        var CSSPath = folder + tag + ".css";
+
+        handleComponentCss(CSSPath, tag);
 
         var html = htmlCompiler(existsRead(htmlPath), htmlPath);
         //replace literals
@@ -179,9 +181,7 @@ module.exports = src => {
         var out = multiReplace(componentSrc,
             [object, objectWithRenderer],
             [/((\'\')\s*\+\s*|(\s*\+\s*\'\'))/g, ""]
-        );
-
-        out = out.replace(/(\r|)\n(\s+|)/g, "")
+        ).replace(/\r\n\s*/g, "");
 
         out = `a7.registerComponent(\"${tag}\",${out});function ${imp.name}(a){return a7.e(\"${tag}\",a)}`;
         src = src.replace(Import, out);

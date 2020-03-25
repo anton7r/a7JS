@@ -9,7 +9,6 @@ function buildEl(tag, src, content) {
 
         //loop trough attributes
         srcAttr.forEach(val => {
-            console.log(val);
             var name = val.match(/[^=]+/)[0];
             var value = val.match(/[^=]+$/)[0].replace(/\'/g, "");
             //is not a property
@@ -24,14 +23,18 @@ function buildEl(tag, src, content) {
     }
 
     if (src.match("a7link") !== null) attributes.a7link = "";
+    
     attributes = JSON.stringify(attributes);
+
     //replaces evlisteners with the real thing
     var ev = safeMatch(attributes, /\"a7on\w*\":\"[\w\d\_\.]*\"/gi);
+    
     ev.forEach(val => {
         var event = val.match(/\".+?\"/);
         var listener = val.match(/\:\".+?\"/)[0].replace(/\"/g, "");
         attributes = attributes.replace(val, event + listener);
     });
+
     if (attributes === "{}") attributes = 0;
     else attributes = attributes.replace(/\"/g, "'");
 
@@ -56,18 +59,17 @@ module.exports = (html, path) => {
         .replace(/\s\</g, "<")
         .replace(/\"/g, "\'");
 
-    var compiled = "";
     var Nodes = HTMLParser.parse(html).childNodes;
     var count = Nodes.length;
     if (count > 1) errorHandler.addError({
         error: "more than one root element was found",
         file: path
     });
-    for (var i = 0; i < count; i++) {
-        var tag = Nodes[i].tagName;
-        var inner = __ChildNodes(Nodes[i].childNodes);
-        var attributes = Nodes[i].rawAttrs;
-        compiled += buildEl(tag, attributes, inner);
-    }
+
+    var tag = Nodes[0].tagName;
+    var inner = __ChildNodes(Nodes[0].childNodes);
+    var attributes = Nodes[0].rawAttrs;
+    var compiled = buildEl(tag, attributes, inner);
+
     return compiled.replace(/\,\)/g, ")").replace(/\,\"\s*\"/g, "").replace(/\)\,$/g, ")").replace(/\',\)/g, "')").replace(/\),\)/g, "))");
 };

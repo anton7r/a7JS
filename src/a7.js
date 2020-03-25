@@ -196,7 +196,7 @@ a7.createElement = function(name, attributes) {
         } else {
             var obj = {
                 ...component,
-                data: props
+                data: { ...props, ...component.data }
             };
             console.log(obj);
             element = obj.render();
