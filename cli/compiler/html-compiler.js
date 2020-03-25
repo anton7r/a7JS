@@ -21,8 +21,6 @@ function buildEl(tag, src, content) {
             }
         });
     }
-
-    if (src.match("a7link") !== null) attributes.a7link = "";
     
     attributes = JSON.stringify(attributes);
 
