@@ -148,10 +148,7 @@ module.exports = src => {
 
 
         var Import = componentImports[i];
-        console.time("Component")
         var imp = importParser(Import);
-
-        console.timeEnd("Component")
         var folder = fsx.purePath(entryFolder + imp.path.replace(/[\w\n]+\.js/g, ""));
 
 
@@ -165,14 +162,16 @@ module.exports = src => {
 
         handleComponentCss(CSSPath, tag);
 
+        console.time("createElement")
+
         var html = htmlCompiler(existsRead(htmlPath), htmlPath);
+        console.timeEnd("createElement")
         //replace literals
         templateLiterals = safeMatch(html, /{{\s*.+?\s*}}/g);
         templateLiterals.forEach(literal => {
             var clean = literal.replace(/({{|}})/g, "").replace(/\s/g, "");
             html = html.replace(literal, `\'+this.data.${clean}+\'`);
         });
-
         html = minifyCreateElement(html);
 
         object = componentSrc.replace(/^{/, "").replace(/}$/, "");
@@ -217,7 +216,7 @@ module.exports = src => {
 
         if(isSelf) modSrc = minifyCreateElement(modSrc)
 
-        var mod = `;var ${imp.name}=function(){${modSrc} return ${expName}}();`;
+        var mod = `var ${imp.name}=function(){${modSrc} return ${expName}}();`;
 
         if (config.mode === "production") mod = minifier(mod);
 

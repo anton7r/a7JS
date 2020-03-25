@@ -49,7 +49,7 @@ function __ChildNodes(nodes) {
         if (node.tagName !== undefined) compiled += buildEl(node.tagName, node.rawAttrs, __ChildNodes(node.childNodes) + ",");
         else compiled += `\'${node.rawText}\',`;
     });
-    return compiled.replace(/,\)/, ")").replace(/\',\)/, "')");
+    return compiled
 }
 
 module.exports = (html, path) => {
@@ -60,16 +60,13 @@ module.exports = (html, path) => {
         .replace(/\"/g, "\'");
 
     var Nodes = HTMLParser.parse(html).childNodes;
-    var count = Nodes.length;
-    if (count > 1) errorHandler.addError({
-        error: "more than one root element was found",
+    if (Nodes.length > 1) errorHandler.addError({
+        error: "A7JS-HTML Linter: More than one root element was found",
         file: path
     });
 
     var tag = Nodes[0].tagName;
     var inner = __ChildNodes(Nodes[0].childNodes);
     var attributes = Nodes[0].rawAttrs;
-    var compiled = buildEl(tag, attributes, inner);
-
-    return compiled.replace(/\,\)/g, ")").replace(/\,\"\s*\"/g, "").replace(/\)\,$/g, ")").replace(/\',\)/g, "')").replace(/\),\)/g, "))");
+    return buildEl(tag, attributes, inner).replace(/\,\)/g, ")").replace(/\)\,$/g, ")");
 };
