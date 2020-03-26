@@ -46,7 +46,6 @@ const importParser = imp => {
 };
 
 module.exports = src => {
-
     src = "var d=document;"+src;
 
     if (config.entry === "noEntry") {
@@ -69,8 +68,7 @@ module.exports = src => {
 
         if(css !== ""){
 
-            var selectors = safeMatch(css, /([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/gi); 
-
+            var selectors = safeMatch(css, /([^{}]+)(,(?=[^}]*{)|\s*{)/gi);
             //Remove unneccessary charracters
             for(var i = 0; i < selectors.length; i++) {
                 selectors[i] = selectors[i].replace("{", "");
@@ -86,17 +84,6 @@ module.exports = src => {
                     return true;
                 }
             });
-
-            for(var i = 0, len = selectors.length; i < len;){
-                if(selectors[i].lastIndexOf(",") === selectors[i].length - 1){
-                    selectors[i] += selectors[i + 1];
-                    selectors.splice(i + 1, 1);
-                    len--;
-    
-                } else {
-                    i++
-                }
-            }
 
             var corrected = [];
 
@@ -162,10 +149,8 @@ module.exports = src => {
 
         handleComponentCss(CSSPath, tag);
 
-        console.time("createElement")
-
         var html = htmlCompiler(existsRead(htmlPath), htmlPath);
-        console.timeEnd("createElement")
+
         //replace literals
         templateLiterals = safeMatch(html, /{{\s*.+?\s*}}/g);
         templateLiterals.forEach(literal => {

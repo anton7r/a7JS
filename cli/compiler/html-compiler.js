@@ -5,12 +5,12 @@ const safeMatch = require("../utils/safematch")
 function buildEl(tag, src, content) {
     var attributes = {};
     if (src !== undefined) {
-        var srcAttr = safeMatch(src, /(\@|)[\w\d\.\:]+?\=(\'[^']+\'|\{\{\s*[\w\d]+\s*\}\}|[^\s]+)/g);
+        var srcAttr = safeMatch(src, /(\@|)[\w\d\.\:]+?\=(\'[^']+\'|[^\s]+)/g);
 
         //loop trough attributes
-        srcAttr.forEach(val => {
-            var name = val.match(/[^=]+/)[0];
-            var value = val.match(/[^=]+$/)[0].replace(/\'/g, "");
+        for(var i = 0; i < srcAttr.length; i++) {
+            var name = srcAttr[i].match(/[^=]+/)[0];
+            var value = srcAttr[i].match(/[^=]+$/)[0].replace(/\'/g, "");
             //is not a property
             if (name.indexOf("@") !== 0) {
                 if (name.indexOf("a7on") === 0) value = `this.functions.${value.replace("()", "")}`;
@@ -19,7 +19,7 @@ function buildEl(tag, src, content) {
                 if (attributes.props === undefined) attributes.props = {};
                 attributes.props[name.replace("@", "")] = value;
             }
-        });
+        };
     }
     
     attributes = JSON.stringify(attributes);
@@ -41,7 +41,7 @@ function buildEl(tag, src, content) {
 
 function __ChildNodes(nodes) {
     var compiled = "";
-    if (nodes.length === 0) return "";
+    if (nodes.length === 0) return"";
 
     nodes.forEach(node => {
         if (node.tagName !== undefined) compiled += buildEl(node.tagName, node.rawAttrs, __ChildNodes(node.childNodes) + ",");
@@ -55,7 +55,10 @@ module.exports = (html, path) => {
         .replace(/\r\n\s+/g, "")
         .replace(/\>\s/g, ">")
         .replace(/\s\</g, "<")
-        .replace(/\"/g, "\'");
+        .replace(/\"/g, "\'")
+        .replace(/{{\s+/g, "{{")
+        .replace(/\s+}}/g, "}}");
+
 
     var Nodes = HTMLParser.parse(html).childNodes;
     if (Nodes.length > 1) errorHandler.addError({
@@ -66,5 +69,5 @@ module.exports = (html, path) => {
     var tag = Nodes[0].tagName;
     var inner = __ChildNodes(Nodes[0].childNodes);
     var attributes = Nodes[0].rawAttrs;
-    return buildEl(tag, attributes, inner).replace(/\,\)/g, ")").replace(/\)\,$/g, ")");
+    return buildEl(tag, attributes, inner).replace(/,\)/g, ")").replace(/\)\,$/g, ")");
 };
