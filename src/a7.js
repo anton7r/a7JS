@@ -255,20 +255,20 @@ a7.observable = () => {
     return this;
 };
 
-a7.globalObservable = function (ObservalbeName) {
-    var observable = a7store[3][ObservalbeName];
-    var listeners = a7store[4][ObservalbeName];
+a7.globalObservable = function (ObservableName) {
+    var observable = a7store[3][ObservableName];
+    var listeners = a7store[4][ObservableName];
 
     if (observable === undefined) {
         observable = "";
-        a7store[4][ObservalbeName] = [];
+        a7store[4][ObservableName] = [];
     }
 
     //methods of observable
     var __ = {};
 
     __.set = function (NewValue) {
-        a7store[3][ObservalbeName] = NewValue;
+        a7store[3][ObservableName] = NewValue;
         if (listeners !== undefined) {
             for (var i = 0; i < listeners.length; i++) {
                 listeners[i]();
@@ -279,7 +279,7 @@ a7.globalObservable = function (ObservalbeName) {
     };
 
     __.addListener = function (Listener) {
-        a7store[4][ObservalbeName].push(Listener);
+        a7store[4][ObservableName].push(Listener);
     };
 
     __.listeners = listeners;
